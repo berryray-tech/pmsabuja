@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Projects | Pontifical Mission Society</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(145deg, #0b1a22 0%, #132b34 50%, #1e3e4a 100%);
+      color: #f0f3f8;
+      overflow-x: hidden;
+      position: relative;
+      min-height: 100vh;
+    }
+
+    /* ============================================
+       ✨ PROFESSIONAL LOGO BACKGROUND LAYERS
+       ============================================ */
+    .logo-bg-layer {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      opacity: 0.04;
+      background-image: url('Images/main logo.jpeg');
+      background-repeat: repeat;
+      background-size: 320px 320px;
+      background-position: center center;
+      filter: brightness(1.4) contrast(0.9);
+      mix-blend-mode: lighten;
+    }
+    .logo-bg-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(circle at 20% 20%, rgba(255,217,102,0.06), transparent 45%),
+        radial-gradient(circle at 80% 80%, rgba(95,176,212,0.06), transparent 45%),
+        linear-gradient(180deg, rgba(11,26,34,0.55) 0%, rgba(11,26,34,0.15) 50%, rgba(11,26,34,0.55) 100%);
+    }
+
+    .hero-logo-watermark {
+      position: absolute;
+      top: 55%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 520px;
+      height: 520px;
+      max-width: 80vw;
+      max-height: 80vw;
+      background-image: url('Images/main logo.jpeg');
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+      opacity: 0.06;
+      pointer-events: none;
+      z-index: 0;
+      filter: blur(0.5px) brightness(1.5);
+      animation: watermarkFloat 14s ease-in-out infinite;
+    }
+    @keyframes watermarkFloat {
+      0%, 100% { transform: translate(-50%, -50%) scale(1) rotate(0deg); }
+      50% { transform: translate(-50%, -50%) scale(1.05) rotate(3deg); }
+    }
+
+    .navbar, .page-header, .container, .projects-section, footer { position: relative; z-index: 1; }
+
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); }
+    ::-webkit-scrollbar-thumb { background: rgba(255,215,150,0.5); border-radius: 10px; }
+
+    .navbar {
+      background: rgba(10, 25, 30, 0.65);
+      backdrop-filter: blur(14px);
+      padding: 12px 0;
+      z-index: 1050;
+    }
+    .navbar-brand {
+      font-weight: 700; font-size: 1.7rem;
+      background: linear-gradient(135deg, #FFE6B0, #FFC97E);
+      -webkit-background-clip: text; background-clip: text; color: transparent !important;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .logo-icon { font-size: 1.8rem; color: #FFD966; margin-right: 8px; }
+
+    .navbar-logo-img {
+      height: 45px;
+      width: 45px;
+      object-fit: contain;
+      border-radius: 50%;
+      border: 2px solid rgba(255,217,102,0.5);
+      background: rgba(255,255,255,0.05);
+      padding: 3px;
+      transition: 0.3s;
+    }
+    .navbar-logo-img:hover {
+      transform: scale(1.08);
+      border-color: #FFD966;
+      box-shadow: 0 0 15px rgba(255,217,102,0.5);
+    }
+
+    /* ✅ FIXED MOBILE TOGGLER */
+    .navbar-toggler {
+      border-color: rgba(255,215,150,0.6);
+      background: rgba(255,217,102,0.08);
+      padding: 6px 10px;
+    }
+    .navbar-toggler:focus {
+      box-shadow: 0 0 0 3px rgba(255,217,102,0.25);
+      outline: none;
+    }
+    .navbar-toggler-icon {
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(255,217,102,1)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important;
+    }
+
+    .nav-link { color: rgba(255,248,225,0.9) !important; font-weight: 500; margin: 0 6px; transition: 0.3s; }
+    .nav-link:hover, .nav-link.active { color: #FFD966 !important; transform: translateY(-2px); }
+
+    @media (max-width: 991px) {
+      .navbar-logo-img { height: 38px; width: 38px; }
+      .navbar-brand { font-size: 1.3rem; }
+      .navbar-collapse {
+        background: rgba(10, 25, 30, 0.98);
+        backdrop-filter: blur(20px);
+        border-radius: 1rem;
+        padding: 1rem;
+        margin-top: 1rem;
+        border: 1px solid rgba(255,217,102,0.3);
+        box-shadow: 0 15px 40px rgba(0,0,0,0.5);
+      }
+      .nav-link {
+        padding: 0.8rem 1rem;
+        text-align: center;
+        border-radius: 0.5rem;
+        margin: 3px 0;
+      }
+      .nav-link:hover, .nav-link.active {
+        background: rgba(255,217,102,0.12);
+        transform: none;
+      }
+    }
+
+    .page-header { padding: 140px 20px 60px; text-align: center; overflow: hidden; }
+    .glass-header {
+      background: rgba(20, 40, 48, 0.55); backdrop-filter: blur(16px);
+      border-radius: 3rem; padding: 2rem;
+      border: 1px solid rgba(255,230,170,0.35);
+      display: inline-block; box-shadow: 0 20px 35px -12px rgba(0,0,0,0.3);
+      position: relative;
+      z-index: 2;
+    }
+    .glass-header h1 {
+      font-size: 3.2rem; font-weight: 800;
+      background: linear-gradient(135deg, #FFF6E0, #FFDA88);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+
+    .glass-tabs {
+      background: rgba(25, 45, 55, 0.4); backdrop-filter: blur(12px);
+      border-radius: 60px; padding: 8px; display: inline-flex; gap: 0.5rem;
+      border: 1px solid rgba(255,230,170,0.25);
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .glass-tab-btn {
+      background: transparent; border: none; padding: 0.8rem 2rem;
+      border-radius: 50px; color: #f0f3f8; font-weight: 600;
+      transition: all 0.3s; cursor: pointer;
+    }
+    .glass-tab-btn i { margin-right: 8px; }
+    .glass-tab-btn.active {
+      background: linear-gradient(135deg, #FFD966, #FFB347);
+      color: #1e2f38; box-shadow: 0 4px 15px rgba(255,217,102,0.3);
+    }
+
+    .project-card {
+      background: rgba(25, 45, 55, 0.5); backdrop-filter: blur(14px);
+      border-radius: 1.5rem; border: 1px solid rgba(255,230,170,0.25);
+      overflow: hidden; transition: all 0.4s; height: 100%; cursor: pointer;
+    }
+    .project-card:hover {
+      transform: translateY(-10px) scale(1.02);
+      background: rgba(35, 65, 78, 0.75); border-color: #FFD966;
+      box-shadow: 0 25px 40px rgba(0,0,0,0.4);
+    }
+    .project-img-wrapper { position: relative; overflow: hidden; height: 220px; }
+    .project-img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s ease; }
+    .project-card:hover .project-img { transform: scale(1.08); }
+    .project-overlay {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      background: linear-gradient(0deg, rgba(0,0,0,0.8), transparent); padding: 1.2rem;
+    }
+    .project-badge {
+      background: rgba(255,217,102,0.25); backdrop-filter: blur(8px);
+      padding: 0.3rem 1rem; border-radius: 30px; font-size: 0.7rem;
+      font-weight: 600; color: #FFD966; margin-bottom: 0.5rem; display: inline-block;
+    }
+    .project-card h3 { font-size: 1.3rem; font-weight: 700; margin-bottom: 0.3rem; }
+    .project-card p { font-size: 0.8rem; opacity: 0.85; }
+    .project-info { padding: 1rem; }
+    .project-stats {
+      display: flex; gap: 1rem; margin-top: 0.5rem;
+      padding-top: 0.5rem; border-top: 1px solid rgba(255,230,170,0.2); flex-wrap: wrap;
+    }
+    .stat { display: flex; align-items: center; gap: 0.3rem; font-size: 0.7rem; }
+    .stat i { color: #FFD966; }
+
+    .projects-tab { display: none; }
+    .projects-tab.active-tab { display: block; }
+
+    .admin-btn {
+      position: fixed; bottom: 30px; right: 30px; width: 55px; height: 55px;
+      background: linear-gradient(135deg, #FFD966, #FFB347); border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; z-index: 100; box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+    }
+    .admin-btn:hover { transform: scale(1.1); }
+    .admin-btn i { font-size: 1.5rem; color: #1e2f38; }
+
+    .modal-content {
+      background: rgba(20, 40, 48, 0.98); backdrop-filter: blur(20px);
+      border: 1px solid #FFD966; border-radius: 1.5rem; color: white;
+    }
+    .modal-img { width: 100%; max-height: 300px; object-fit: cover; border-radius: 1rem; }
+    .glass-card {
+      background: rgba(255,255,255,0.1); backdrop-filter: blur(8px);
+      border: 1px solid rgba(255,230,170,0.2); border-radius: 1rem; padding: 1rem;
+    }
+    .counter-value { font-size: 1.5rem; font-weight: 800; color: #FFD966; }
+
+    footer {
+      background: rgba(5, 20, 25, 0.8);
+      backdrop-filter: blur(12px);
+      padding: 2rem; text-align: center;
+      border-top: 1px solid rgba(255,210,130,0.2);
+      margin-top: 2rem;
+    }
+
+    /* ============================================
+       ✅ SUPPORT BUTTON + TICKET MODAL
+       ============================================ */
+    .support-btn {
+      position: fixed;
+      bottom: 30px;
+      left: 30px;
+      height: 55px;
+      background: linear-gradient(135deg, #FFD966, #FFB347);
+      border-radius: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 999;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.35),
+                  0 0 25px rgba(255,217,102,0.3),
+                  inset 0 1px 0 rgba(255,255,255,0.4);
+      padding: 0 22px;
+      transition: all 0.3s;
+      animation: supportPulse 2.5s ease-in-out infinite;
+      gap: 8px;
+      border: none;
+    }
+    @keyframes supportPulse {
+      0%, 100% { box-shadow: 0 8px 25px rgba(0,0,0,0.35), 0 0 25px rgba(255,217,102,0.3), inset 0 1px 0 rgba(255,255,255,0.4); }
+      50% { box-shadow: 0 8px 25px rgba(0,0,0,0.35), 0 0 40px rgba(255,217,102,0.55), inset 0 1px 0 rgba(255,255,255,0.4); }
+    }
+    .support-btn:hover { transform: scale(1.08) translateY(-3px); }
+    .support-btn i { font-size: 1.3rem; color: #1e2f38; }
+    .support-btn span { font-size: 0.85rem; font-weight: 700; color: #1e2f38; letter-spacing: 0.3px; }
+
+    .ticket-modal-content {
+      background: rgba(20, 40, 48, 0.98);
+      backdrop-filter: blur(28px);
+      border: 1px solid #FFD966;
+      border-radius: 1.5rem;
+      color: white;
+    }
+    .ticket-modal-content .modal-header { border-bottom: 1px solid rgba(255,217,102,0.3); }
+    .ticket-modal-content .form-label {
+      color: #FFD966;
+      font-weight: 500;
+      font-size: 0.85rem;
+      margin-bottom: 4px;
+    }
+    .ticket-modal-content .form-control,
+    .ticket-modal-content .form-select {
+      background: rgba(255,255,255,0.08);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255,230,170,0.3);
+      color: white;
+      padding: 0.7rem 1rem;
+      border-radius: 0.8rem;
+      transition: 0.3s;
+    }
+    .ticket-modal-content .form-control:focus,
+    .ticket-modal-content .form-select:focus {
+      background: rgba(255,255,255,0.15);
+      border-color: #FFD966;
+      box-shadow: 0 0 0 3px rgba(255,217,102,0.2);
+      color: white;
+    }
+    .ticket-modal-content .form-control::placeholder { color: rgba(255,255,255,0.5); }
+    .ticket-modal-content .form-select option { background: #1e2f38; color: white; }
+    .btn-submit-ticket {
+      background: linear-gradient(135deg, #FFD966, #FFB347);
+      border: none;
+      padding: 0.85rem 2rem;
+      border-radius: 2rem;
+      color: #1e2f38;
+      font-weight: 700;
+      width: 100%;
+      transition: 0.3s;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.4);
+    }
+    .btn-submit-ticket:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(255,217,102,0.45),
+                  inset 0 1px 0 rgba(255,255,255,0.4);
+    }
+
+    @media (max-width: 768px) {
+      .glass-header h1 { font-size: 2rem; }
+      .glass-tab-btn { padding: 0.5rem 1.2rem; font-size: 0.8rem; }
+      .project-img-wrapper { height: 180px; }
+      .logo-bg-layer { background-size: 200px 200px; }
+      .hero-logo-watermark { width: 380px; height: 380px; }
+      .support-btn {
+        bottom: 20px;
+        left: 20px;
+        height: 48px;
+        padding: 0 16px;
+      }
+      .support-btn span { font-size: 0.75rem; }
+      .support-btn i { font-size: 1.1rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ============================================ -->
+<!-- ✨ PROFESSIONAL LOGO BACKGROUND (FIXED LAYERS) -->
+<!-- ============================================ -->
+<div class="logo-bg-layer"></div>
+<div class="logo-bg-overlay"></div>
+
+<nav class="navbar navbar-expand-lg fixed-top">
+  <div class="container">
+    <a class="navbar-brand d-flex align-items-center" href="index.html">
+      <img src="Images/main logo.jpeg"
+           alt="Pontifical Mission Society Logo"
+           class="navbar-logo-img"
+           onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
+      <i class="fas fa-church logo-icon" style="display: none;"></i>
+      <span>Pontifical Mission Society</span>
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="mainNav">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item"><a class="nav-link" href="index.html"><i class="fas fa-home me-1"></i>Home</a></li>
+        <li class="nav-item"><a class="nav-link" href="about.html"><i class="fas fa-heart me-1"></i>About</a></li>
+        <li class="nav-item"><a class="nav-link" href="animators.html"><i class="fas fa-users me-1"></i>Animators</a></li>
+        <li class="nav-item"><a class="nav-link active" href="projects.html"><i class="fas fa-hands-helping me-1"></i>Projects</a></li>
+        <li class="nav-item"><a class="nav-link" href="news.html"><i class="fas fa-newspaper me-1"></i>News</a></li>
+        <li class="nav-item"><a class="nav-link" href="contact.html"><i class="fas fa-envelope me-1"></i>Contact</a></li>
+        <li class="nav-item"><a class="nav-link" href="gallery.html"><i class="fas fa-images me-1"></i>Gallery</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="page-header">
+  <div class="hero-logo-watermark"></div>
+  <div class="container">
+    <div class="glass-header" data-aos="fade-up">
+      <h1><i class="fas fa-project-diagram me-2"></i>Our Kingdom Projects</h1>
+      <p>Transforming lives, building communities, expanding God's kingdom</p>
+    </div>
+  </div>
+</div>
+
+<div class="container text-center" data-aos="fade-up" data-aos-delay="200">
+  <div class="glass-tabs">
+    <button class="glass-tab-btn active" data-tab="ongoing"><i class="fas fa-spinner"></i> Ongoing</button>
+    <button class="glass-tab-btn" data-tab="completed"><i class="fas fa-check-circle"></i> Completed</button>
+    <button class="glass-tab-btn" data-tab="upcoming"><i class="fas fa-calendar-alt"></i> Upcoming</button>
+  </div>
+</div>
+
+<section class="projects-section" style="padding: 40px 20px 80px;">
+  <div class="container">
+    <div id="ongoing-projects" class="projects-tab active-tab"><div class="row g-4" id="ongoingGrid"></div></div>
+    <div id="completed-projects" class="projects-tab"><div class="row g-4" id="completedGrid"></div></div>
+    <div id="upcoming-projects" class="projects-tab"><div class="row g-4" id="upcomingGrid"></div></div>
+  </div>
+</section>
+
+<div class="modal fade" id="projectModal" tabindex="-1">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalTitle" style="color:#FFD966;"></h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <img id="modalImage" class="modal-img mb-3" alt="">
+        <p id="modalDescription"></p>
+        <div class="row mt-3" id="modalDetails"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline-warning" data-bs-dismiss="modal">Close</button>
+        <button class="btn btn-warning" id="modalSupportBtn">Support</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="admin-btn" id="adminBtn"><i class="fas fa-lock"></i></div>
+
+<!-- ============================================ -->
+<!-- 🎫 FLOATING SUPPORT BUTTON -->
+<!-- ============================================ -->
+<button class="support-btn" id="supportBtn" title="Raise a Support Ticket">
+  <i class="fas fa-headset"></i>
+  <span>Support</span>
+</button>
+
+<!-- ============================================ -->
+<!-- 🎫 SUPPORT TICKET MODAL -->
+<!-- ============================================ -->
+<div class="modal fade" id="supportModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content ticket-modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" style="color:#FFD966;">
+          <i class="fas fa-ticket-alt me-2"></i>Raise a Support Ticket
+        </h4>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <p style="opacity:0.85; font-size:0.9rem; margin-bottom:1.2rem;">
+          <i class="fas fa-info-circle text-warning me-1"></i>
+          Fill in the form below and our team will get back to you shortly. All tickets are logged and tracked.
+        </p>
+
+        <form id="ticketForm">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label"><i class="fas fa-user me-1"></i>Full Name *</label>
+              <input type="text" class="form-control" id="ticketName" required placeholder="Enter your full name">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label"><i class="fas fa-envelope me-1"></i>Email *</label>
+              <input type="email" class="form-control" id="ticketEmail" required placeholder="your@email.com">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label"><i class="fas fa-phone me-1"></i>Phone / WhatsApp</label>
+              <input type="tel" class="form-control" id="ticketPhone" placeholder="+234 XXX XXX XXXX">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label"><i class="fas fa-tag me-1"></i>Category *</label>
+              <select class="form-select" id="ticketCategory" required>
+                <option value="" disabled selected>Select category</option>
+                <option value="General Inquiry">General Inquiry</option>
+                <option value="Technical Issue">Technical Issue</option>
+                <option value="Prayer Request">Prayer Request</option>
+                <option value="Donation / Support">Donation / Support</option>
+                <option value="Project Inquiry">Project Inquiry</option>
+                <option value="Event Information">Event Information</option>
+                <option value="Complaint">Complaint</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            <div class="col-12">
+              <label class="form-label"><i class="fas fa-heading me-1"></i>Subject *</label>
+              <input type="text" class="form-control" id="ticketSubject" required placeholder="Brief summary of your issue">
+            </div>
+            <div class="col-12">
+              <label class="form-label"><i class="fas fa-comment-dots me-1"></i>Description *</label>
+              <textarea class="form-control" id="ticketMessage" rows="5" required placeholder="Describe your issue or request in detail..."></textarea>
+            </div>
+            <div class="col-12">
+              <button type="submit" class="btn-submit-ticket" id="submitTicketBtn">
+                <i class="fas fa-paper-plane me-2"></i>Submit Ticket
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <p><i class="fas fa-cross me-1"></i> © 2026 Pontifical Mission Society · Spreading the Gospel Worldwide</p>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+
+<script>
+  (function() {
+    AOS.init({ once: true, offset: 60, duration: 700 });
+
+    // ==========================================
+    // 🔧 SUPPORT / TICKET CONFIGURATION
+    // ==========================================
+    const WHATSAPP_NUMBER = '2348091234567';  // ← CHANGE to your WhatsApp number
+    const SUPABASE_URL = 'https://ekhzbclqpelsrfefufpv.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVraHpiY2xxcGVsc3JmZWZ1ZnB2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY4NjQ2MjUsImV4cCI6MjA5MjQ0MDYyNX0.7dJiDcV4q8Ss_4Ua19-L-VFSxThJKNLyBv__bfdx02M';
+
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    let allProjects = [];
+
+    function escapeHtml(str) {
+      if (str === null || str === undefined) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function truncate(text, length = 100) {
+      const str = String(text || 'No description available');
+      return str.length > length ? str.substring(0, length) + '...' : str;
+    }
+
+    async function loadProjects() {
+      const loadingHtml = '<div class="col-12 text-center py-5"><div class="spinner-border text-warning"></div><p class="mt-2">Loading projects...</p></div>';
+      document.getElementById('ongoingGrid').innerHTML = loadingHtml;
+      document.getElementById('completedGrid').innerHTML = loadingHtml;
+      document.getElementById('upcomingGrid').innerHTML = loadingHtml;
+
+      try {
+        const { data, error } = await supabaseClient.from('projects').select('*');
+
+        console.log('📦 Supabase response:', { data, error });
+
+        if (error) {
+          console.error('❌ Supabase Error:', error);
+          showError('Error: ' + error.message);
+          return;
+        }
+
+        if (data && data.length > 0) {
+          allProjects = data;
+          console.log('✅ Projects loaded:', data.length);
+          displayProjects(data);
+        } else {
+          console.warn('⚠️ Query returned empty array. Possible causes: RLS policy blocks anonymous SELECT, or table is empty.');
+          showNoProjects();
+        }
+      } catch (err) {
+        console.error('❌ Connection Error:', err);
+        showError('Connection error: ' + err.message);
+      }
+    }
+
+    function displayProjects(projects) {
+      const ongoing = projects.filter(p => (p.category || '').toLowerCase() === 'ongoing');
+      const completed = projects.filter(p => (p.category || '').toLowerCase() === 'completed');
+      const upcoming = projects.filter(p => (p.category || '').toLowerCase() === 'upcoming');
+
+      document.getElementById('ongoingGrid').innerHTML = ongoing.length
+        ? ongoing.map(p => createCard(p, 'ongoing')).join('')
+        : '<div class="col-12 text-center"><div class="glass-header">No ongoing projects</div></div>';
+
+      document.getElementById('completedGrid').innerHTML = completed.length
+        ? completed.map(p => createCard(p, 'completed')).join('')
+        : '<div class="col-12 text-center"><div class="glass-header">No completed projects</div></div>';
+
+      document.getElementById('upcomingGrid').innerHTML = upcoming.length
+        ? upcoming.map(p => createCard(p, 'upcoming')).join('')
+        : '<div class="col-12 text-center"><div class="glass-header">No upcoming projects</div></div>';
+
+      attachCardEvents();
+    }
+
+    function createCard(p, type) {
+      let badge = '';
+      let stats = '';
+
+      const title = p.title || 'Untitled Project';
+      const description = truncate(p.description, 100);
+
+      if (type === 'ongoing') {
+        badge = `<span class="project-badge"><i class="fas fa-sync-alt"></i> ${escapeHtml(p.progress || 'In Progress')}</span>`;
+        stats = `<div class="project-stats">
+          <div class="stat"><i class="fas fa-chart-line"></i> Raised: ${escapeHtml(p.raised || 'N/A')}</div>
+          <div class="stat"><i class="fas fa-bullseye"></i> Goal: ${escapeHtml(p.goal || 'N/A')}</div>
+          <div class="stat"><i class="fas fa-map-marker-alt"></i> ${escapeHtml(p.location || 'N/A')}</div>
+        </div>`;
+      } else if (type === 'completed') {
+        badge = `<span class="project-badge"><i class="fas fa-check-circle"></i> Completed ${escapeHtml(p.completion_date || '')}</span>`;
+        stats = `<div class="project-stats">
+          <div class="stat"><i class="fas fa-users"></i> ${escapeHtml(p.impact || 'N/A')}</div>
+          <div class="stat"><i class="fas fa-money-bill-wave"></i> ${escapeHtml(p.cost || 'N/A')}</div>
+          <div class="stat"><i class="fas fa-map-marker-alt"></i> ${escapeHtml(p.location || 'N/A')}</div>
+        </div>`;
+      } else {
+        badge = `<span class="project-badge"><i class="fas fa-calendar-alt"></i> Starts ${escapeHtml(p.planned_start || 'TBA')}</span>`;
+        stats = `<div class="project-stats">
+          <div class="stat"><i class="fas fa-calendar"></i> ${escapeHtml(p.planned_start || 'TBA')}</div>
+          <div class="stat"><i class="fas fa-chart-line"></i> Est. ${escapeHtml(p.estimated_cost || 'N/A')}</div>
+          <div class="stat"><i class="fas fa-map-marker-alt"></i> ${escapeHtml(p.location || 'N/A')}</div>
+        </div>`;
+      }
+
+      return `
+        <div class="col-md-6 col-lg-4">
+          <div class="project-card" data-id="${escapeHtml(String(p.id))}" data-type="${type}">
+            <div class="project-img-wrapper">
+              <img src="${escapeHtml(p.image_url || 'https://images.unsplash.com/photo-1438032005730-c779502df39b?w=800&h=500&fit=crop')}" class="project-img" loading="lazy" alt="${escapeHtml(title)}">
+              <div class="project-overlay">
+                ${badge}
+                <h3>${escapeHtml(title)}</h3>
+                <p>${escapeHtml(description)}</p>
+              </div>
+            </div>
+            <div class="project-info">${stats}</div>
+          </div>
+        </div>
+      `;
+    }
+
+    function attachCardEvents() {
+      document.querySelectorAll('.project-card').forEach(card => {
+        card.addEventListener('click', () => {
+          const id = card.dataset.id;
+          const project = allProjects.find(p => String(p.id) === String(id));
+          if (project) openModal(project, card.dataset.type);
+          else console.warn('Project not found for id:', id);
+        });
+      });
+    }
+
+    function openModal(project, type) {
+      document.getElementById('modalTitle').innerHTML = `<i class="fas fa-project-diagram me-2"></i>${escapeHtml(project.title || 'Untitled Project')}`;
+      document.getElementById('modalImage').src = project.image_url || 'https://images.unsplash.com/photo-1438032005730-c779502df39b?w=800&h=500&fit=crop';
+      document.getElementById('modalDescription').innerHTML = escapeHtml(project.description || 'No description available');
+
+      let details = '';
+      if (type === 'ongoing') {
+        details = `
+          <div class="col-md-6"><div class="glass-card"><small class="text-warning">PROGRESS</small><div class="counter-value">${escapeHtml(project.progress || '0%')}</div></div></div>
+          <div class="col-md-6"><div class="glass-card"><small class="text-warning">RAISED / GOAL</small><div class="counter-value">${escapeHtml(project.raised || 'N/A')}</div><small>of ${escapeHtml(project.goal || 'N/A')}</small></div></div>
+          <div class="col-12 mt-2"><i class="fas fa-calendar-alt text-warning me-2"></i> Started: ${escapeHtml(project.start_date || 'N/A')}</div>
+          <div class="col-12"><i class="fas fa-flag-checkered text-warning me-2"></i> Expected: ${escapeHtml(project.completion_date || 'N/A')}</div>`;
+      } else if (type === 'completed') {
+        details = `
+          <div class="col-md-6"><div class="glass-card"><small class="text-warning">IMPACT</small><div class="counter-value">${escapeHtml(project.impact || 'N/A')}</div></div></div>
+          <div class="col-md-6"><div class="glass-card"><small class="text-warning">COST</small><div class="counter-value">${escapeHtml(project.cost || 'N/A')}</div></div></div>
+          <div class="col-12 mt-2"><i class="fas fa-check-circle text-warning me-2"></i> Completed: ${escapeHtml(project.completion_date || 'N/A')}</div>
+          ${project.testimonial ? `<div class="col-12 mt-2 p-2 bg-warning bg-opacity-10 rounded"><i class="fas fa-quote-left text-warning me-2"></i> ${escapeHtml(project.testimonial)}</div>` : ''}`;
+      } else {
+        details = `
+          <div class="col-md-6"><div class="glass-card"><small class="text-warning">PLANNED START</small><div class="counter-value">${escapeHtml(project.planned_start || 'TBA')}</div></div></div>
+          <div class="col-md-6"><div class="glass-card"><small class="text-warning">ESTIMATED COST</small><div class="counter-value">${escapeHtml(project.estimated_cost || 'N/A')}</div></div></div>
+          <div class="col-12 mt-2"><i class="fas fa-eye text-warning me-2"></i> Vision: ${escapeHtml(project.vision || 'N/A')}</div>`;
+      }
+      document.getElementById('modalDetails').innerHTML = details;
+      new bootstrap.Modal(document.getElementById('projectModal')).show();
+    }
+
+    function showNoProjects() {
+      const msg = '<div class="col-12 text-center"><div class="glass-header">⚠️ No projects found. Please add projects to your Supabase "projects" table and check RLS policies.</div></div>';
+      document.getElementById('ongoingGrid').innerHTML = msg;
+      document.getElementById('completedGrid').innerHTML = msg;
+      document.getElementById('upcomingGrid').innerHTML = msg;
+    }
+
+    function showError(msg) {
+      const errorHtml = `<div class="col-12 text-center"><div class="glass-header" style="border-color:#dc3545;"><i class="fas fa-exclamation-triangle me-2"></i>${escapeHtml(msg)}</div></div>`;
+      document.getElementById('ongoingGrid').innerHTML = errorHtml;
+      document.getElementById('completedGrid').innerHTML = errorHtml;
+      document.getElementById('upcomingGrid').innerHTML = errorHtml;
+    }
+
+    document.querySelectorAll('.glass-tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.glass-tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const tab = btn.dataset.tab;
+        document.querySelectorAll('.projects-tab').forEach(t => t.classList.remove('active-tab'));
+        document.getElementById(`${tab}-projects`).classList.add('active-tab');
+      });
+    });
+
+    document.getElementById('modalSupportBtn')?.addEventListener('click', () =>
+      alert('Thank you for your support! Our team will contact you shortly. 🙏')
+    );
+
+    let isAdmin = false;
+    document.getElementById('adminBtn')?.addEventListener('click', () => {
+      if (isAdmin) {
+        Swal.fire('Admin Mode', 'You can add projects by inserting directly into Supabase table.', 'info');
+      } else {
+        Swal.fire({
+          title: 'Admin Login',
+          html: '<input id="adminUser" class="swal2-input" placeholder="Username"><input id="adminPass" class="swal2-input" type="password" placeholder="Password">',
+          preConfirm: () => {
+            const user = document.getElementById('adminUser')?.value;
+            const pass = document.getElementById('adminPass')?.value;
+            if (user === 'admin' && pass === 'admin123') {
+              isAdmin = true;
+              Swal.fire('Success!', 'You are now in admin mode.', 'success');
+              document.getElementById('adminBtn').innerHTML = '<i class="fas fa-cog"></i>';
+            } else {
+              Swal.fire('Error!', 'Invalid credentials', 'error');
+            }
+          }
+        });
+      }
+    });
+
+    // ============================================
+    // 🎫 SUPPORT TICKET SYSTEM
+    // ============================================
+    document.getElementById('supportBtn').addEventListener('click', () => {
+      const modal = new bootstrap.Modal(document.getElementById('supportModal'));
+      modal.show();
+    });
+
+    document.getElementById('ticketForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+
+      const name = document.getElementById('ticketName').value.trim();
+      const email = document.getElementById('ticketEmail').value.trim();
+      const phone = document.getElementById('ticketPhone').value.trim() || 'Not provided';
+      const category = document.getElementById('ticketCategory').value;
+      const subject = document.getElementById('ticketSubject').value.trim();
+      const message = document.getElementById('ticketMessage').value.trim();
+
+      if (!name || !email || !category || !subject || !message) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Missing Fields',
+          text: 'Please fill in all required fields (*)',
+          background: 'rgba(20,40,48,0.98)',
+          color: '#f0f3f8',
+          confirmButtonColor: '#FFD966'
+        });
+        return;
+      }
+
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Invalid Email',
+          text: 'Please enter a valid email address',
+          background: 'rgba(20,40,48,0.98)',
+          color: '#f0f3f8',
+          confirmButtonColor: '#FFD966'
+        });
+        return;
+      }
+
+      const submitBtn = document.getElementById('submitTicketBtn');
+      const originalBtn = submitBtn.innerHTML;
+      submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Submitting...';
+      submitBtn.disabled = true;
+
+      try {
+        const ticketData = {
+          name: name,
+          email: email,
+          phone: phone,
+          category: category,
+          subject: subject,
+          message: message,
+          status: 'open'
+        };
+
+        const { data, error } = await supabaseClient
+          .from('support_tickets')
+          .insert([ticketData])
+          .select();
+
+        if (error) {
+          console.error('Supabase ticket insert error:', error);
+          throw new Error('Failed to save ticket: ' + error.message);
+        }
+
+        console.log('✅ Ticket saved to Supabase:', data);
+
+        const waMessage = 
+          `🎫 *NEW SUPPORT TICKET*\n\n` +
+          `👤 *Name:* ${name}\n` +
+          `📧 *Email:* ${email}\n` +
+          `📱 *Phone:* ${phone}\n` +
+          `📂 *Category:* ${category}\n` +
+          `📌 *Subject:* ${subject}\n\n` +
+          `💬 *Message:*\n${message}\n\n` +
+          `🆔 Ticket ID: #${data && data[0] ? data[0].id : 'N/A'}\n` +
+          `⏰ Submitted: ${new Date().toLocaleString()}`;
+
+        const waUrl = `https://wa.me/${2349058515139}?text=${encodeURIComponent(waMessage)}`;
+
+        const result = await Swal.fire({
+          icon: 'success',
+          title: 'Ticket Submitted! 🎉',
+          html: `
+            <p>Thank you, <strong>${escapeHtml(name)}</strong>!</p>
+            <p style="font-size:0.9rem; opacity:0.85; margin-top:0.5rem;">
+              Your ticket has been logged and our team will get back to you shortly.
+            </p>
+            <p style="font-size:0.8rem; opacity:0.7; margin-top:0.8rem;">
+              <i class="fas fa-ticket-alt" style="color:#FFD966;"></i>
+              Ticket ID: <strong>#${data && data[0] ? data[0].id : 'N/A'}</strong>
+            </p>
+          `,
+          background: 'rgba(20,40,48,0.98)',
+          color: '#f0f3f8',
+          confirmButtonColor: '#FFD966',
+          confirmButtonText: '<i class="fab fa-whatsapp"></i> Notify on WhatsApp',
+          showCancelButton: true,
+          cancelButtonText: 'Close',
+          cancelButtonColor: '#6c757d'
+        });
+
+        if (result.isConfirmed) {
+          window.open(waUrl, '_blank');
+        }
+
+        this.reset();
+        bootstrap.Modal.getInstance(document.getElementById('supportModal')).hide();
+
+      } catch (err) {
+        console.error('❌ Ticket submission error:', err);
+        Swal.fire({
+          icon: 'error',
+          title: 'Submission Failed',
+          text: 'Something went wrong. Please try again or contact us via WhatsApp.',
+          background: 'rgba(20,40,48,0.98)',
+          color: '#f0f3f8',
+          confirmButtonColor: '#FFD966'
+        });
+      } finally {
+        submitBtn.innerHTML = originalBtn;
+        submitBtn.disabled = false;
+      }
+    });
+
+    loadProjects();
+    console.log('%c✨ Projects Page Loaded | Support Tickets enabled ✨', 'color: #FFD966; font-size: 16px');
+    console.log('%c🎫 WhatsApp notifications → ' + WHATSAPP_NUMBER, 'color: #25D366; font-size: 12px');
+  })();
+</script>
+</body>
+</html>

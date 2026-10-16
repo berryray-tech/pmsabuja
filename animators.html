@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Animators | Pontifical Mission Society - Leadership Gallery</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(145deg, #0b1a22 0%, #132b34 50%, #1e3e4a 100%);
+      color: #f0f3f8;
+      overflow-x: hidden;
+      min-height: 100vh;
+      position: relative;
+    }
+
+    /* Logo background layers */
+    .logo-bg-layer {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      opacity: 0.04;
+      background-image: url('Images/main logo.jpeg');
+      background-repeat: repeat; background-size: 320px 320px;
+      background-position: center center;
+      filter: brightness(1.4) contrast(0.9);
+      mix-blend-mode: lighten;
+    }
+    .logo-bg-overlay {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background:
+        radial-gradient(circle at 20% 20%, rgba(255,217,102,0.06), transparent 45%),
+        radial-gradient(circle at 80% 80%, rgba(95,176,212,0.06), transparent 45%),
+        linear-gradient(180deg, rgba(11,26,34,0.55) 0%, rgba(11,26,34,0.15) 50%, rgba(11,26,34,0.55) 100%);
+    }
+
+    .hero-logo-watermark {
+      position: absolute; top: 55%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 520px; height: 520px; max-width: 80vw; max-height: 80vw;
+      background-image: url('Images/main logo.jpeg');
+      background-size: contain; background-repeat: no-repeat; background-position: center;
+      opacity: 0.06; pointer-events: none; z-index: 0;
+      filter: blur(0.5px) brightness(1.5);
+      animation: watermarkFloat 14s ease-in-out infinite;
+    }
+    @keyframes watermarkFloat {
+      0%, 100% { transform: translate(-50%, -50%) scale(1) rotate(0deg); }
+      50% { transform: translate(-50%, -50%) scale(1.05) rotate(3deg); }
+    }
+
+    .page-header, .category-section, footer, .navbar { position: relative; z-index: 1; }
+
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); }
+    ::-webkit-scrollbar-thumb { background: rgba(255,215,150,0.5); border-radius: 10px; }
+
+    /* NAVBAR */
+    .navbar {
+      background: rgba(10, 25, 30, 0.65);
+      backdrop-filter: blur(14px);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+      padding: 12px 0;
+      z-index: 1050;
+    }
+    .navbar-brand {
+      font-weight: 700;
+      font-size: 1.7rem;
+      background: linear-gradient(135deg, #FFE6B0, #FFC97E);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent !important;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .logo-icon { font-size: 1.8rem; color: #FFD966; margin-right: 8px; }
+
+    .navbar-logo-img {
+      height: 45px;
+      width: 45px;
+      object-fit: contain;
+      border-radius: 50%;
+      border: 2px solid rgba(255,217,102,0.5);
+      background: rgba(255,255,255,0.05);
+      padding: 3px;
+      transition: 0.3s;
+    }
+    .navbar-logo-img:hover {
+      transform: scale(1.08);
+      border-color: #FFD966;
+      box-shadow: 0 0 15px rgba(255,217,102,0.5);
+    }
+
+    /* ✅ FIXED MOBILE TOGGLER */
+    .navbar-toggler {
+      border-color: rgba(255,215,150,0.6);
+      background: rgba(255,217,102,0.08);
+      padding: 6px 10px;
+    }
+    .navbar-toggler:focus {
+      box-shadow: 0 0 0 3px rgba(255,217,102,0.25);
+      outline: none;
+    }
+    .navbar-toggler-icon {
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(255,217,102,1)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important;
+    }
+
+    .nav-link {
+      color: rgba(255,248,225,0.9) !important;
+      font-weight: 500;
+      margin: 0 6px;
+      transition: 0.3s;
+    }
+    .nav-link:hover, .nav-link.active { color: #FFD966 !important; transform: translateY(-2px); }
+
+    @media (max-width: 991px) {
+      .navbar-logo-img { height: 38px; width: 38px; }
+      .navbar-brand { font-size: 1.3rem; }
+      .navbar-collapse {
+        background: rgba(10, 25, 30, 0.98);
+        backdrop-filter: blur(20px);
+        border-radius: 1rem;
+        padding: 1rem;
+        margin-top: 1rem;
+        border: 1px solid rgba(255,217,102,0.3);
+        box-shadow: 0 15px 40px rgba(0,0,0,0.5);
+      }
+      .nav-link {
+        padding: 0.8rem 1rem;
+        text-align: center;
+        border-radius: 0.5rem;
+        margin: 3px 0;
+      }
+      .nav-link:hover, .nav-link.active {
+        background: rgba(255,217,102,0.12);
+        transform: none;
+      }
+    }
+
+    .page-header {
+      position: relative;
+      padding: 140px 20px 60px;
+      text-align: center;
+      overflow: hidden;
+    }
+    .glass-header {
+      background: rgba(20, 40, 48, 0.55);
+      backdrop-filter: blur(16px);
+      border-radius: 3rem;
+      padding: 2rem;
+      border: 1px solid rgba(255,230,170,0.35);
+      display: inline-block;
+      box-shadow: 0 20px 35px -12px rgba(0,0,0,0.3);
+      position: relative;
+      z-index: 2;
+    }
+    .glass-header h1 {
+      font-size: 3.2rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #FFF6E0, #FFDA88);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    .glass-header p { font-size: 1.2rem; opacity: 0.9; }
+
+    .category-title {
+      text-align: center;
+      margin-bottom: 40px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .section-logo-badge {
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      background: rgba(25, 45, 55, 0.6);
+      backdrop-filter: blur(12px);
+      border: 2px solid rgba(255,217,102,0.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.35),
+                  inset 0 0 20px rgba(255,217,102,0.15);
+      transition: all 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+      animation: sectionLogoPulse 3s ease-in-out infinite;
+    }
+
+    .section-logo-badge::before {
+      content: '';
+      position: absolute;
+      inset: -6px;
+      border-radius: 50%;
+      border: 2px dashed rgba(255,217,102,0.35);
+      animation: rotateRing 20s linear infinite;
+    }
+
+    @keyframes rotateRing { to { transform: rotate(360deg); } }
+
+    @keyframes sectionLogoPulse {
+      0%, 100% {
+        box-shadow: 0 10px 30px rgba(0,0,0,0.35),
+                    inset 0 0 20px rgba(255,217,102,0.15),
+                    0 0 0 0 rgba(255,217,102,0.3);
+      }
+      50% {
+        box-shadow: 0 10px 30px rgba(0,0,0,0.35),
+                    inset 0 0 30px rgba(255,217,102,0.25),
+                    0 0 0 12px rgba(255,217,102,0.05);
+      }
+    }
+
+    .section-logo-badge:hover {
+      transform: scale(1.08) rotate(-5deg);
+      border-color: #FFD966;
+    }
+
+    .section-logo-badge img {
+      width: 55%;
+      height: 55%;
+      object-fit: contain;
+      filter: drop-shadow(0 0 8px rgba(255,217,102,0.4));
+    }
+
+    .section-logo-badge i {
+      font-size: 2.4rem;
+      color: #FFD966;
+      filter: drop-shadow(0 0 8px rgba(255,217,102,0.4));
+    }
+
+    .category-title h2 {
+      font-size: 2rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #FFE6B0, #FFD966);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      display: inline-block;
+      padding: 0 20px;
+      position: relative;
+      margin: 0;
+    }
+    .category-title h2:before,
+    .category-title h2:after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      width: 50px;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, #FFD966, transparent);
+    }
+    .category-title h2:before { left: -60px; }
+    .category-title h2:after { right: -60px; }
+
+    @media (max-width: 768px) {
+      .category-title h2:before,
+      .category-title h2:after { width: 30px; }
+      .category-title h2:before { left: -40px; }
+      .category-title h2:after { right: -40px; }
+      .section-logo-badge { width: 75px; height: 75px; }
+      .section-logo-badge i { font-size: 1.9rem; }
+      .category-title h2 { font-size: 1.4rem; }
+    }
+
+    .category-section { margin-bottom: 80px; }
+
+    .glass-carousel {
+      background: rgba(25, 45, 55, 0.3);
+      backdrop-filter: blur(10px);
+      border-radius: 2rem;
+      padding: 30px 20px;
+      border: 1px solid rgba(255,230,170,0.2);
+    }
+
+    .animator-slide {
+      background: rgba(20, 40, 48, 0.7);
+      backdrop-filter: blur(12px);
+      border-radius: 1.5rem;
+      border: 1px solid rgba(255,230,170,0.25);
+      transition: all 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+      overflow: hidden;
+      height: 100%;
+      position: relative;
+      cursor: default;
+    }
+    .animator-slide:hover {
+      transform: translateY(-10px);
+      border-color: #FFD966;
+      background: rgba(35, 65, 78, 0.8);
+      box-shadow: 0 25px 40px rgba(0,0,0,0.4);
+    }
+    .animator-slide::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      border-radius: 1.5rem;
+      padding: 2px;
+      background: linear-gradient(135deg, rgba(255,217,102,0), rgba(255,217,102,0));
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      transition: 0.4s;
+      pointer-events: none;
+    }
+    .animator-slide:hover::before {
+      background: linear-gradient(135deg, #FFD966, #FFB347, #FFD966);
+      background-size: 200% 200%;
+      animation: borderGlow 1.5s ease infinite;
+    }
+    @keyframes borderGlow {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .animator-slide-inner {
+      padding: 1.5rem;
+      text-align: center;
+    }
+
+    .animator-image-wrapper {
+      width: 100%;
+      aspect-ratio: 3/4;
+      border-radius: 1rem;
+      overflow: hidden;
+      margin-bottom: 1rem;
+    }
+    .animator-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.5s ease;
+      pointer-events: none;
+      user-select: none;
+    }
+    .animator-slide:hover .animator-img { transform: scale(1.05); }
+
+    .animator-name {
+      font-size: 1.1rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #FFF, #FFE2A4);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      margin-bottom: 0.3rem;
+    }
+    .animator-role {
+      display: inline-block;
+      background: rgba(255,217,102,0.2);
+      backdrop-filter: blur(4px);
+      padding: 0.3rem 0.8rem;
+      border-radius: 40px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: #FFD966;
+      margin: 0.3rem 0;
+    }
+
+    .swiper-button-next, .swiper-button-prev {
+      color: #FFD966;
+      background: rgba(0,0,0,0.5);
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+    }
+    .swiper-button-next:after, .swiper-button-prev:after { font-size: 1.2rem; }
+    .swiper-pagination-bullet { background: rgba(255,255,255,0.5); }
+    .swiper-pagination-bullet-active { background: #FFD966; }
+
+    footer {
+      background: rgba(5, 20, 25, 0.8);
+      backdrop-filter: blur(12px);
+      padding: 2rem;
+      text-align: center;
+      border-top: 1px solid rgba(255,210,130,0.2);
+      margin-top: 3rem;
+    }
+
+    /* ============================================
+       ✅ SUPPORT BUTTON + TICKET MODAL
+       ============================================ */
+    .support-btn {
+      position: fixed;
+      bottom: 30px;
+      left: 30px;
+      height: 55px;
+      background: linear-gradient(135deg, #FFD966, #FFB347);
+      border-radius: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 999;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.35),
+                  0 0 25px rgba(255,217,102,0.3),
+                  inset 0 1px 0 rgba(255,255,255,0.4);
+      padding: 0 22px;
+      transition: all 0.3s;
+      animation: supportPulse 2.5s ease-in-out infinite;
+      gap: 8px;
+      border: none;
+    }
+    @keyframes supportPulse {
+      0%, 100% { box-shadow: 0 8px 25px rgba(0,0,0,0.35), 0 0 25px rgba(255,217,102,0.3), inset 0 1px 0 rgba(255,255,255,0.4); }
+      50% { box-shadow: 0 8px 25px rgba(0,0,0,0.35), 0 0 40px rgba(255,217,102,0.55), inset 0 1px 0 rgba(255,255,255,0.4); }
+    }
+    .support-btn:hover { transform: scale(1.08) translateY(-3px); }
+    .support-btn i { font-size: 1.3rem; color: #1e2f38; }
+    .support-btn span { font-size: 0.85rem; font-weight: 700; color: #1e2f38; letter-spacing: 0.3px; }
+
+    @media (max-width: 768px) {
+      .glass-header h1 { font-size: 2rem; }
+      .animator-name { font-size: 0.9rem; }
+      .animator-role { font-size: 0.6rem; }
+      .swiper-button-next, .swiper-button-prev { width: 35px; height: 35px; }
+      .logo-bg-layer { background-size: 200px 200px; }
+      .hero-logo-watermark { width: 380px; height: 380px; }
+      .support-btn {
+        bottom: 20px;
+        left: 20px;
+        height: 48px;
+        padding: 0 16px;
+      }
+      .support-btn span { font-size: 0.75rem; }
+      .support-btn i { font-size: 1.1rem; }
+    }
+
+    /* Ticket form modal */
+    .ticket-modal-content {
+      background: rgba(20, 40, 48, 0.98);
+      backdrop-filter: blur(28px);
+      border: 1px solid #FFD966;
+      border-radius: 1.5rem;
+      color: white;
+    }
+    .ticket-modal-content .modal-header { border-bottom: 1px solid rgba(255,217,102,0.3); }
+    .ticket-modal-content .form-label {
+      color: #FFD966;
+      font-weight: 500;
+      font-size: 0.85rem;
+      margin-bottom: 4px;
+    }
+    .ticket-modal-content .form-control,
+    .ticket-modal-content .form-select {
+      background: rgba(255,255,255,0.08);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255,230,170,0.3);
+      color: white;
+      padding: 0.7rem 1rem;
+      border-radius: 0.8rem;
+      transition: 0.3s;
+    }
+    .ticket-modal-content .form-control:focus,
+    .ticket-modal-content .form-select:focus {
+      background: rgba(255,255,255,0.15);
+      border-color: #FFD966;
+      box-shadow: 0 0 0 3px rgba(255,217,102,0.2);
+      color: white;
+    }
+    .ticket-modal-content .form-control::placeholder { color: rgba(255,255,255,0.5); }
+    .ticket-modal-content .form-select option { background: #1e2f38; color: white; }
+    .btn-submit-ticket {
+      background: linear-gradient(135deg, #FFD966, #FFB347);
+      border: none;
+      padding: 0.85rem 2rem;
+      border-radius: 2rem;
+      color: #1e2f38;
+      font-weight: 700;
+      width: 100%;
+      transition: 0.3s;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.4);
+    }
+    .btn-submit-ticket:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(255,217,102,0.45),
+                  inset 0 1px 0 rgba(255,255,255,0.4);
+    }
+  </style>
+</head>
+<body>
+
+<!-- Logo background -->
+<div class="logo-bg-layer"></div>
+<div class="logo-bg-overlay"></div>
+
+<!-- NAVBAR -->
+<nav class="navbar navbar-expand-lg fixed-top">
+  <div class="container">
+    <a class="navbar-brand d-flex align-items-center" href="index.html">
+      <img src="Images/main logo.jpeg"
+           alt="Pontifical Mission Society Logo"
+           class="navbar-logo-img"
+           onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
+      <i class="fas fa-church logo-icon" style="display: none;"></i>
+      <span>Pontifical Mission Society</span>
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="mainNav">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item"><a class="nav-link" href="index.html"><i class="fas fa-home me-1"></i>Home</a></li>
+        <li class="nav-item"><a class="nav-link" href="about.html"><i class="fas fa-heart me-1"></i>About</a></li>
+        <li class="nav-item"><a class="nav-link active" href="animators.html"><i class="fas fa-users me-1"></i>Animators</a></li>
+        <li class="nav-item"><a class="nav-link" href="projects.html"><i class="fas fa-hands-helping me-1"></i>Projects</a></li>
+        <li class="nav-item"><a class="nav-link" href="news.html"><i class="fas fa-newspaper me-1"></i>News</a></li>
+        <li class="nav-item"><a class="nav-link" href="contact.html"><i class="fas fa-envelope me-1"></i>Contact</a></li>
+        <li class="nav-item"><a class="nav-link" href="gallery.html"><i class="fas fa-images me-1"></i>Gallery</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- PAGE HEADER -->
+<div class="page-header">
+  <div class="hero-logo-watermark"></div>
+  <div class="container">
+    <div class="glass-header" data-aos="fade-up">
+      <h1><i class="fas fa-crown me-2"></i>Our Animators & Leaders</h1>
+      <p>Dedicated servants guiding our missionary work with wisdom and passion</p>
+      <div class="mt-3"><i class="fas fa-star-of-life" style="color:#FFD966;"></i></div>
+    </div>
+  </div>
+</div>
+
+<!-- COORDINATORS SECTION -->
+<section class="container category-section" data-aos="fade-up">
+  <div class="category-title">
+    <div class="section-logo-badge">
+      <img src="Images/main logo.jpeg"
+           alt="Coordinators Logo"
+           onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
+      <i class="fas fa-users" style="display: none;"></i>
+    </div>
+    <h2>COORDINATORS</h2>
+  </div>
+  <div class="glass-carousel">
+    <div class="swiper coordinators-swiper">
+      <div class="swiper-wrapper" id="coordinatorsSwiperWrapper"></div>
+      <div class="swiper-button-next"></div>
+      <div class="swiper-button-prev"></div>
+      <div class="swiper-pagination"></div>
+    </div>
+  </div>
+</section>
+
+<!-- HCA SECTION -->
+<section class="container category-section" data-aos="fade-up" data-aos-delay="100">
+  <div class="category-title">
+    <div class="section-logo-badge">
+      <img src="Images/logo-hca.png"
+           alt="HCA Logo"
+           onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
+      <i class="fas fa-hands-helping" style="display: none;"></i>
+    </div>
+    <h2>HCA ARCHDIOCESAN ANIMATORS AND EXECUTIVES</h2>
+  </div>
+  <div class="glass-carousel">
+    <div class="swiper hca-swiper">
+      <div class="swiper-wrapper" id="hcaSwiperWrapper"></div>
+      <div class="swiper-button-next"></div>
+      <div class="swiper-button-prev"></div>
+      <div class="swiper-pagination"></div>
+    </div>
+  </div>
+</section>
+
+<!-- YOMM SECTION -->
+<section class="container category-section" data-aos="fade-up" data-aos-delay="200">
+  <div class="category-title">
+    <div class="section-logo-badge">
+      <img src="Images/YOMM logo.jpeg"
+           alt="YOMM Logo"
+           onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
+      <i class="fas fa-church" style="display: none;"></i>
+    </div>
+    <h2>YOMM ANIMATORS</h2>
+  </div>
+  <div class="glass-carousel">
+    <div class="swiper yomm-swiper">
+      <div class="swiper-wrapper" id="yommSwiperWrapper"></div>
+      <div class="swiper-button-next"></div>
+      <div class="swiper-button-prev"></div>
+      <div class="swiper-pagination"></div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p><i class="fas fa-cross me-1"></i> © 2026 Pontifical Mission Society · Spreading the Gospel Worldwide</p>
+  <p style="opacity:0.7;">Designed with <i class="fas fa-heart" style="color:#FFD966;"></i> by BerryRay Technologies</p>
+</footer>
+
+<!-- ============================================ -->
+<!-- 🎫 FLOATING SUPPORT BUTTON -->
+<!-- ============================================ -->
+<button class="support-btn" id="supportBtn" title="Raise a Support Ticket">
+  <i class="fas fa-headset"></i>
+  <span>Support</span>
+</button>
+
+<!-- ============================================ -->
+<!-- 🎫 SUPPORT TICKET MODAL -->
+<!-- ============================================ -->
+<div class="modal fade" id="supportModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content ticket-modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" style="color:#FFD966;">
+          <i class="fas fa-ticket-alt me-2"></i>Raise a Support Ticket
+        </h4>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <p style="opacity:0.85; font-size:0.9rem; margin-bottom:1.2rem;">
+          <i class="fas fa-info-circle text-warning me-1"></i>
+          Fill in the form below and our team will get back to you shortly. All tickets are logged and tracked.
+        </p>
+
+        <form id="ticketForm">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label"><i class="fas fa-user me-1"></i>Full Name *</label>
+              <input type="text" class="form-control" id="ticketName" required placeholder="Enter your full name">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label"><i class="fas fa-envelope me-1"></i>Email *</label>
+              <input type="email" class="form-control" id="ticketEmail" required placeholder="your@email.com">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label"><i class="fas fa-phone me-1"></i>Phone / WhatsApp</label>
+              <input type="tel" class="form-control" id="ticketPhone" placeholder="+234 XXX XXX XXXX">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label"><i class="fas fa-tag me-1"></i>Category *</label>
+              <select class="form-select" id="ticketCategory" required>
+                <option value="" disabled selected>Select category</option>
+                <option value="General Inquiry">General Inquiry</option>
+                <option value="Technical Issue">Technical Issue</option>
+                <option value="Prayer Request">Prayer Request</option>
+                <option value="Donation / Support">Donation / Support</option>
+                <option value="Event Information">Event Information</option>
+                <option value="Complaint">Complaint</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            <div class="col-12">
+              <label class="form-label"><i class="fas fa-heading me-1"></i>Subject *</label>
+              <input type="text" class="form-control" id="ticketSubject" required placeholder="Brief summary of your issue">
+            </div>
+            <div class="col-12">
+              <label class="form-label"><i class="fas fa-comment-dots me-1"></i>Description *</label>
+              <textarea class="form-control" id="ticketMessage" rows="5" required placeholder="Describe your issue or request in detail..."></textarea>
+            </div>
+            <div class="col-12">
+              <button type="submit" class="btn-submit-ticket" id="submitTicketBtn">
+                <i class="fas fa-paper-plane me-2"></i>Submit Ticket
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.js"></script>
+<script>
+  // ==========================================
+  // 🔧 SUPPORT / TICKET CONFIGURATION
+  // ==========================================
+  const WHATSAPP_NUMBER = '2348091234567';  // ← CHANGE to your WhatsApp number
+  const SUPABASE_URL = 'https://ekhzbclqpelsrfefufpv.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVraHpiY2xxcGVsc3JmZWZ1ZnB2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY4NjQ2MjUsImV4cCI6MjA5MjQ0MDYyNX0.7dJiDcV4q8Ss_4Ua19-L-VFSxThJKNLyBv__bfdx02M';
+
+  const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  AOS.init({ once: true, offset: 60, duration: 700 });
+
+  // ============================================
+  // ANIMATORS DATA
+  // ============================================
+  const coordinators = [
+    { id: 1, name: "Rev. Fr. Hillary Ugwuanyi", role: "YOMM CHAPLAIN AND POF COORDINATOR", img: "Images/16.jpeg" },
+    { id: 2, name: "Sr Mary Lawrentine Amaefule, IHM", role: "HOLY CHILDHOOD ASSOCIATION COORDINATOR", img: "Images/sis.jpeg" },
+    { id: 3, name: "Sr. Ahaiwe Angelina, CCSSP", role: "HOLY CHILDHOOD ASSOCIATION COORDINATOR", img: "Images/sis1.jpg" },
+    { id: 4, name: "Bro. Charles Moses Amaghionyeodiwe", role: "YOMM ARCHDIOCESIAN COORDINATOR", img: "Images/4.jpeg" }
+  ];
+
+  const hcaAnimators = [
+    { id: 6, name: "Mrs Maria Itodo", role: "HCA Archdiocesan Finance Secretary", img: "Images/madam.jpg" },
+    { id: 7, name: "Bro. Matthew Igoche Otebe", role: "HCA Archdiocesan P.R.O", img: "Images/bro may.jpg" },
+    { id: 8, name: "Sr. Mary Lawrentine Amaefule, IHM", role: "HCA Archdiocesan Coordinator", img: "Images/sis.jpeg" },
+    { id: 9, name: "Mrs. Nneka-Mary Akwunwa", role: "Archdiocesan Ambassador/Scribe", img: "Images/11.jpeg" },
+    { id: 9, name: "Sr. Ahaiwe Angelina, CCSSP", role: "HOLY CHILDHOOD ASSOCIATION COORDINATOR", img: "Images/sis1.jpg" },
+    { id: 10, name: "Mrs. Atigwe Priscilla Ujunwa", role: "HCA DEANARY COORDINATOR", img: "Images/old1 (2).jpg" },
+    { id: 10, name: "Mrs. Atigwe Priscilla Ujunwa", role: "HCA DEANARY COORDINATOR", img: "Images/2.jpeg" },
+    { id: 10, name: "Mrs. Atigwe Priscilla Ujunwa", role: "HCA DEANARY COORDINATOR", img: "Images/15.jpeg" }
+  ];
+
+  const yommAnimators = [
+    { id: 12, name: "Mrs. Margaret Williams", role: "YOMM Coordinator, Bwari Deanary", img: "Images/8.jpeg" },
+    { id: 13, name: "Mrs. Atigwe Priscilla Ujunwa", role: "Karimo DEANARY YOMM Coordinator", img: "Images/15.jpeg" },
+    { id: 16, name: "Sis. Blessing James", role: "Master YOMM Abuja Province", img: "https://randomuser.me/api/portraits/men/55.jpg" },
+    { id: 17, name: "Mrs. Nneka-Mary Akwunwa", role: "Yomm Archdiocesan Ambassador/Scribe", img: "Images/11.jpeg" }
+  ];
+
+  function createAnimatorSlide(animator) {
+    return `
+      <div class="swiper-slide">
+        <div class="animator-slide">
+          <div class="animator-slide-inner">
+            <div class="animator-image-wrapper">
+              <img src="${animator.img}" alt="${animator.name}" class="animator-img" loading="lazy">
+            </div>
+            <div class="animator-name">${escapeHtml(animator.name)}</div>
+            <div class="animator-role">${escapeHtml(animator.role)}</div>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  function escapeHtml(str) {
+    if (!str) return '';
+    return String(str).replace(/[&<>]/g, m => m === '&' ? '&amp;' : m === '<' ? '&lt;' : '&gt;');
+  }
+
+  function renderCarousels() {
+    const coordWrapper = document.getElementById('coordinatorsSwiperWrapper');
+    if (coordWrapper) coordWrapper.innerHTML = coordinators.map(c => createAnimatorSlide(c)).join('');
+
+    const hcaWrapper = document.getElementById('hcaSwiperWrapper');
+    if (hcaWrapper) hcaWrapper.innerHTML = hcaAnimators.map(c => createAnimatorSlide(c)).join('');
+
+    const yommWrapper = document.getElementById('yommSwiperWrapper');
+    if (yommWrapper) yommWrapper.innerHTML = yommAnimators.map(c => createAnimatorSlide(c)).join('');
+  }
+
+  function initSwipers() {
+    if (document.querySelector('.coordinators-swiper')) {
+      new Swiper('.coordinators-swiper', {
+        slidesPerView: 1, spaceBetween: 20, loop: true,
+        autoplay: { delay: 4000, disableOnInteraction: false, pauseOnMouseEnter: true },
+        navigation: { nextEl: '.coordinators-swiper .swiper-button-next', prevEl: '.coordinators-swiper .swiper-button-prev' },
+        pagination: { el: '.coordinators-swiper .swiper-pagination', clickable: true },
+        breakpoints: { 480: { slidesPerView: 1 }, 640: { slidesPerView: 2 }, 768: { slidesPerView: 3 }, 1024: { slidesPerView: 4 } }
+      });
+    }
+
+    if (document.querySelector('.hca-swiper')) {
+      new Swiper('.hca-swiper', {
+        slidesPerView: 1, spaceBetween: 20, loop: true,
+        autoplay: { delay: 4000, disableOnInteraction: false, pauseOnMouseEnter: true },
+        navigation: { nextEl: '.hca-swiper .swiper-button-next', prevEl: '.hca-swiper .swiper-button-prev' },
+        pagination: { el: '.hca-swiper .swiper-pagination', clickable: true },
+        breakpoints: { 480: { slidesPerView: 1 }, 640: { slidesPerView: 2 }, 768: { slidesPerView: 3 }, 1024: { slidesPerView: 4 } }
+      });
+    }
+
+    if (document.querySelector('.yomm-swiper')) {
+      new Swiper('.yomm-swiper', {
+        slidesPerView: 1, spaceBetween: 20, loop: true,
+        autoplay: { delay: 4000, disableOnInteraction: false, pauseOnMouseEnter: true },
+        navigation: { nextEl: '.yomm-swiper .swiper-button-next', prevEl: '.yomm-swiper .swiper-button-prev' },
+        pagination: { el: '.yomm-swiper .swiper-pagination', clickable: true },
+        breakpoints: { 480: { slidesPerView: 1 }, 640: { slidesPerView: 2 }, 768: { slidesPerView: 3 }, 1024: { slidesPerView: 4 } }
+      });
+    }
+  }
+
+  renderCarousels();
+  initSwipers();
+
+  // ============================================
+  // 🎫 SUPPORT TICKET SYSTEM
+  // ============================================
+  document.getElementById('supportBtn').addEventListener('click', () => {
+    const modal = new bootstrap.Modal(document.getElementById('supportModal'));
+    modal.show();
+  });
+
+  document.getElementById('ticketForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+
+    const name = document.getElementById('ticketName').value.trim();
+    const email = document.getElementById('ticketEmail').value.trim();
+    const phone = document.getElementById('ticketPhone').value.trim() || 'Not provided';
+    const category = document.getElementById('ticketCategory').value;
+    const subject = document.getElementById('ticketSubject').value.trim();
+    const message = document.getElementById('ticketMessage').value.trim();
+
+    if (!name || !email || !category || !subject || !message) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Missing Fields',
+        text: 'Please fill in all required fields (*)',
+        background: 'rgba(20,40,48,0.98)',
+        color: '#f0f3f8',
+        confirmButtonColor: '#FFD966'
+      });
+      return;
+    }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Invalid Email',
+        text: 'Please enter a valid email address',
+        background: 'rgba(20,40,48,0.98)',
+        color: '#f0f3f8',
+        confirmButtonColor: '#FFD966'
+      });
+      return;
+    }
+
+    const submitBtn = document.getElementById('submitTicketBtn');
+    const originalBtn = submitBtn.innerHTML;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Submitting...';
+    submitBtn.disabled = true;
+
+    try {
+      const ticketData = {
+        name: name,
+        email: email,
+        phone: phone,
+        category: category,
+        subject: subject,
+        message: message,
+        status: 'open'
+      };
+
+      const { data, error } = await supabaseClient
+        .from('support_tickets')
+        .insert([ticketData])
+        .select();
+
+      if (error) {
+        console.error('Supabase ticket insert error:', error);
+        throw new Error('Failed to save ticket: ' + error.message);
+      }
+
+      console.log('✅ Ticket saved to Supabase:', data);
+
+      const waMessage = 
+        `🎫 *NEW SUPPORT TICKET*\n\n` +
+        `👤 *Name:* ${name}\n` +
+        `📧 *Email:* ${email}\n` +
+        `📱 *Phone:* ${phone}\n` +
+        `📂 *Category:* ${category}\n` +
+        `📌 *Subject:* ${subject}\n\n` +
+        `💬 *Message:*\n${message}\n\n` +
+        `🆔 Ticket ID: #${data && data[0] ? data[0].id : 'N/A'}\n` +
+        `⏰ Submitted: ${new Date().toLocaleString()}`;
+
+      const waUrl = `https://wa.me/${2349058515139}?text=${encodeURIComponent(waMessage)}`;
+
+      const result = await Swal.fire({
+        icon: 'success',
+        title: 'Ticket Submitted! 🎉',
+        html: `
+          <p>Thank you, <strong>${escapeHtml(name)}</strong>!</p>
+          <p style="font-size:0.9rem; opacity:0.85; margin-top:0.5rem;">
+            Your ticket has been logged and our team will get back to you shortly.
+          </p>
+          <p style="font-size:0.8rem; opacity:0.7; margin-top:0.8rem;">
+            <i class="fas fa-ticket-alt" style="color:#FFD966;"></i>
+            Ticket ID: <strong>#${data && data[0] ? data[0].id : 'N/A'}</strong>
+          </p>
+        `,
+        background: 'rgba(20,40,48,0.98)',
+        color: '#f0f3f8',
+        confirmButtonColor: '#FFD966',
+        confirmButtonText: '<i class="fab fa-whatsapp"></i> Notify on WhatsApp',
+        showCancelButton: true,
+        cancelButtonText: 'Close',
+        cancelButtonColor: '#6c757d'
+      });
+
+      if (result.isConfirmed) {
+        window.open(waUrl, '_blank');
+      }
+
+      this.reset();
+      bootstrap.Modal.getInstance(document.getElementById('supportModal')).hide();
+
+    } catch (err) {
+      console.error('❌ Ticket submission error:', err);
+      Swal.fire({
+        icon: 'error',
+        title: 'Submission Failed',
+        text: 'Something went wrong. Please try again or contact us via WhatsApp.',
+        background: 'rgba(20,40,48,0.98)',
+        color: '#f0f3f8',
+        confirmButtonColor: '#FFD966'
+      });
+    } finally {
+      submitBtn.innerHTML = originalBtn;
+      submitBtn.disabled = false;
+    }
+  });
+
+  console.log('%c✨ Animators Page Loaded | Support Tickets enabled ✨', 'color: #FFD966; font-size: 16px');
+  console.log('%c🎫 WhatsApp notifications → ' + WHATSAPP_NUMBER, 'color: #25D366; font-size: 12px');
+</script>
+
+</body>
+</html>

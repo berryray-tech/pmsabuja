@@ -1,0 +1,1689 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Pontifical Mission Society | Sacred Doors</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(145deg, #0b1a22 0%, #132b34 50%, #1e3e4a 100%);
+      color: #f0f3f8;
+      overflow-x: hidden;
+      min-height: 100vh;
+      position: relative;
+    }
+
+    .logo-bg-layer {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      opacity: 0.04;
+      background-image: url('Images/main logo.jpeg');
+      background-repeat: repeat; background-size: 320px 320px;
+      background-position: center center;
+      filter: brightness(1.4) contrast(0.9);
+      mix-blend-mode: lighten;
+    }
+    .logo-bg-overlay {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background:
+        radial-gradient(circle at 20% 20%, rgba(255,217,102,0.06), transparent 45%),
+        radial-gradient(circle at 80% 80%, rgba(95,176,212,0.06), transparent 45%),
+        linear-gradient(180deg, rgba(11,26,34,0.55) 0%, rgba(11,26,34,0.15) 50%, rgba(11,26,34,0.55) 100%);
+    }
+    .hero-logo-watermark {
+      position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 620px; height: 620px;
+      max-width: 85vw; max-height: 85vw;
+      background-image: url('Images/main logo.jpeg');
+      background-size: contain; background-repeat: no-repeat; background-position: center;
+      opacity: 0.06; pointer-events: none; z-index: 2;
+      filter: blur(0.5px) brightness(1.5);
+      animation: watermarkFloat 14s ease-in-out infinite;
+    }
+    @keyframes watermarkFloat {
+      0%, 100% { transform: translate(-50%, -50%) scale(1) rotate(0deg); }
+      50% { transform: translate(-50%, -50%) scale(1.05) rotate(3deg); }
+    }
+
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); }
+    ::-webkit-scrollbar-thumb { background: rgba(255,215,150,0.5); border-radius: 10px; }
+
+    /* GLASS DOOR OVERLAY */
+    .glass-door-overlay {
+      position: fixed; top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: 2000;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      transition: all 1s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      visibility: visible; opacity: 1;
+    }
+    .glass-door-overlay.unveiled { visibility: hidden; opacity: 0; pointer-events: none; }
+
+    .door-left, .door-right {
+      position: absolute; top: 0;
+      width: 50%; height: 100%;
+      transition: all 1.2s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      box-shadow: 0 0 60px rgba(0,0,0,0.4);
+      border: 2px solid rgba(255,217,102,0.5);
+      overflow: hidden;
+    }
+    .door-left::before, .door-right::before {
+      content: ''; position: absolute; top: 0; left: 0;
+      width: 100%; height: 100%;
+      background-size: contain; background-position: center;
+      filter: blur(5px); transform: scale(1.15); z-index: 0; opacity: 0.9;
+    }
+    .door-left { left: 0; border-right: 3px solid #FFD966; transform-origin: left; }
+    .door-right { right: 0; border-left: 3px solid #FFD966; transform-origin: right; }
+    .door-left::before { background-image: url('Images/LEO LEFT.jpg'); }
+    .door-right::before { background-image: url('Images/LEO RIGHT.jpg'); }
+    .glass-door-overlay.unveiled .door-left { transform: rotateY(-90deg); }
+    .glass-door-overlay.unveiled .door-right { transform: rotateY(90deg); }
+
+    .pope-door-img {
+      width: 200px; height: 200px;
+      border-radius: 50%; object-fit: cover;
+      border: 4px solid #FFD966;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+      margin-bottom: 20px; transition: transform 0.3s;
+      position: relative; z-index: 10;
+      background: rgba(0,0,0,0.2); backdrop-filter: blur(4px);
+    }
+    .door-left:hover .pope-door-img,
+    .door-right:hover .pope-door-img { transform: scale(1.05); }
+    .door-pope-name {
+      font-size: 1.3rem; font-weight: 700; color: #FFD966;
+      margin-top: 10px; text-align: center;
+      position: relative; z-index: 10;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+      background: rgba(0,0,0,0.3); backdrop-filter: blur(4px);
+      padding: 5px 15px; border-radius: 30px;
+    }
+    .door-pope-title {
+      font-size: 0.8rem; opacity: 0.95; text-align: center;
+      position: relative; z-index: 10;
+      background: rgba(0,0,0,0.3); backdrop-filter: blur(4px);
+      padding: 3px 12px; border-radius: 20px; margin-top: 5px;
+    }
+    .door-handle {
+      position: absolute; width: 60px; height: 60px;
+      background: linear-gradient(135deg, #FFD966, #FFB347);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2rem; color: #1e2f38;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+      animation: pulseHandle 1.5s infinite;
+      cursor: pointer; transition: all 0.3s; z-index: 20;
+    }
+    .door-left .door-handle { right: 30px; top: 50%; transform: translateY(-50%); }
+    .door-right .door-handle { left: 30px; top: 50%; transform: translateY(-50%); }
+    .door-handle:hover { transform: translateY(-50%) scale(1.1); box-shadow: 0 8px 25px rgba(255,217,102,0.6); }
+    @keyframes pulseHandle {
+      0%, 100% { transform: translateY(-50%) scale(1); box-shadow: 0 5px 20px rgba(255,217,102,0.5); }
+      50% { transform: translateY(-50%) scale(1.1); box-shadow: 0 5px 30px rgba(255,217,102,0.8); }
+    }
+    .door-welcome-text {
+      position: absolute; bottom: 15%; left: 50%;
+      transform: translateX(-50%);
+      text-align: center; color: #FFD966;
+      font-size: 1.3rem; font-weight: 600;
+      white-space: nowrap;
+      background: rgba(0,0,0,0.5);
+      padding: 0.8rem 2rem; border-radius: 50px;
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255,217,102,0.6);
+      animation: fadeInUp 1s ease; z-index: 20;
+    }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateX(-50%) translateY(30px); }
+      to { opacity: 1; transform: translateX(-50%) translateY(0); }
+    }
+
+    .main-content {
+      opacity: 0; visibility: hidden;
+      transition: opacity 0.8s ease 0.3s;
+      position: relative; z-index: 1;
+    }
+    .main-content.visible { opacity: 1; visibility: visible; }
+
+    /* NAVBAR */
+    .navbar {
+      background: rgba(10, 25, 30, 0.65);
+      backdrop-filter: blur(14px);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+      padding: 12px 0; z-index: 1000;
+    }
+    .navbar-brand {
+      font-weight: 700; font-size: 1.7rem;
+      background: linear-gradient(135deg, #FFE6B0, #FFC97E);
+      -webkit-background-clip: text; background-clip: text; color: transparent !important;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .logo-icon { font-size: 1.8rem; color: #FFD966; margin-right: 8px; }
+    .navbar-logo-img {
+      height: 45px; width: 45px; object-fit: contain;
+      border-radius: 50%;
+      border: 2px solid rgba(255,217,102,0.5);
+      background: rgba(255,255,255,0.05);
+      padding: 3px; transition: 0.3s;
+    }
+    .navbar-logo-img:hover {
+      transform: scale(1.08);
+      border-color: #FFD966;
+      box-shadow: 0 0 15px rgba(255,217,102,0.5);
+    }
+    .nav-link {
+      color: rgba(255,248,225,0.9) !important;
+      font-weight: 500; margin: 0 6px;
+      transition: 0.3s; position: relative;
+    }
+    .nav-link:hover, .nav-link.active { color: #FFD966 !important; transform: translateY(-2px); }
+    .navbar-toggler { border-color: rgba(255,215,150,0.6); }
+    .navbar-toggler-icon { filter: brightness(0) invert(1); }
+
+    @media (max-width: 991px) {
+      .navbar-collapse {
+        background: rgba(10, 25, 30, 0.95);
+        backdrop-filter: blur(20px);
+        border-radius: 1rem; padding: 1rem; margin-top: 1rem;
+        border: 1px solid rgba(255,215,150,0.3);
+      }
+      .nav-link { padding: 0.8rem 1rem; text-align: center; border-radius: 0.5rem; margin: 2px 0; }
+      .nav-link:hover { background: rgba(255,217,102,0.1); }
+      .navbar-logo-img { height: 38px; width: 38px; }
+    }
+
+    /* HERO */
+    .hero-section {
+      position: relative; width: 100%; min-height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden; padding: 100px 20px;
+    }
+    .hero-bg-blur {
+      position: absolute; top: 0; left: 0;
+      width: 100%; height: 100%;
+      background-size: cover; background-position: center 30%;
+      filter: blur(10px) brightness(0.5);
+      transform: scale(1.05);
+      transition: background-image 0.8s ease-in-out;
+      z-index: 0;
+    }
+    .hero-section::before {
+      content: ''; position: absolute; top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: radial-gradient(circle at center, rgba(0,0,0,0.4), rgba(0,0,0,0.6));
+      z-index: 1;
+    }
+    .vatican-logo-left, .vatican-logo-right {
+      position: absolute; top: 50%; transform: translateY(-50%);
+      width: 85px; height: 85px;
+      background: rgba(0,0,0,0.5); backdrop-filter: blur(8px);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      border: 2px solid rgba(255,217,102,0.6);
+      z-index: 15; transition: all 0.4s;
+      animation: floatLogo 3s ease-in-out infinite;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+    }
+    .vatican-logo-left { left: calc(50% - 280px); }
+    .vatican-logo-right { right: calc(50% - 280px); }
+    .vatican-logo-left:hover, .vatican-logo-right:hover {
+      transform: translateY(-50%) scale(1.1);
+      border-color: #FFD966; background: rgba(255,217,102,0.25);
+    }
+    .vatican-logo-left img, .vatican-logo-right img { width: 55px; height: 55px; object-fit: contain; }
+    @keyframes floatLogo {
+      0%, 100% { transform: translateY(-50%) translateY(0); }
+      50% { transform: translateY(-50%) translateY(-8px); }
+    }
+
+    .portrait-container {
+      position: relative; width: 380px; height: 550px;
+      perspective: 1500px; z-index: 10;
+    }
+    .portrait-card {
+      position: absolute; width: 100%; height: 100%;
+      border-radius: 30px; overflow: hidden;
+      background: rgba(25, 45, 55, 0.4);
+      backdrop-filter: blur(20px);
+      border: 2px solid rgba(255,217,102,0.4);
+      box-shadow: 0 30px 50px rgba(0,0,0,0.4);
+      transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+      cursor: pointer;
+    }
+    .portrait-card:hover {
+      transform: scale(1.02);
+      border-color: #FFD966;
+      box-shadow: 0 40px 60px rgba(0,0,0,0.5), 0 0 0 3px rgba(255,217,102,0.3);
+    }
+    .portrait-card img {
+      width: 100%; height: 100%;
+      object-fit: cover; object-position: center 30%;
+      transition: transform 0.7s ease;
+    }
+    .portrait-card:hover img { transform: scale(1.05); }
+    .portrait-overlay {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      background: linear-gradient(0deg, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.5) 60%, transparent 100%);
+      backdrop-filter: blur(12px);
+      padding: 1.5rem; text-align: center;
+      border-top: 2px solid rgba(255,217,102,0.4);
+    }
+    .portrait-overlay h2 {
+      font-size: 1.5rem; font-weight: 700;
+      background: linear-gradient(135deg, #FFF8E7, #FFE2A4);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+      margin-bottom: 0.3rem;
+    }
+    .portrait-overlay p { font-size: 0.85rem; opacity: 0.9; }
+    .portrait-card { opacity: 0; transform: rotateY(90deg) scale(0.8); }
+    .portrait-card.active { opacity: 1; transform: rotateY(0deg) scale(1); z-index: 10; }
+
+    .wheel-handle {
+      position: absolute; right: 30px; top: 50%;
+      transform: translateY(-50%);
+      background: rgba(0,0,0,0.6); backdrop-filter: blur(12px);
+      border-radius: 60px; padding: 20px 15px;
+      display: flex; flex-direction: column; gap: 20px;
+      align-items: center;
+      border: 1px solid rgba(255,217,102,0.4); z-index: 30;
+    }
+    .wheel-spinner {
+      width: 60px; height: 60px;
+      background: linear-gradient(135deg, #FFD966, #FFB347);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.8rem; color: #1e2f38;
+      transition: all 0.3s; cursor: pointer;
+      animation: subtlePulse 2s infinite;
+    }
+    .wheel-spinner:hover { transform: scale(1.1); box-shadow: 0 0 20px rgba(255,217,102,0.8); }
+    @keyframes subtlePulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(255,217,102,0.4); }
+      50% { box-shadow: 0 0 0 10px rgba(255,217,102,0.2); }
+    }
+    .wheel-counter {
+      font-size: 1.1rem; font-weight: 700; color: #FFD966;
+      text-align: center;
+      background: rgba(0,0,0,0.5);
+      padding: 8px 12px; border-radius: 40px;
+    }
+    .wheel-arrows { display: flex; flex-direction: column; gap: 15px; }
+    .wheel-arrow {
+      width: 50px; height: 50px;
+      background: rgba(255,217,102,0.2);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem; color: #FFD966;
+      cursor: pointer; transition: all 0.3s;
+      border: 1px solid rgba(255,217,102,0.4);
+    }
+    .wheel-arrow:hover { background: #FFD966; color: #1e2f38; transform: scale(1.1); }
+    .timer-progress {
+      position: absolute; bottom: 30px; left: 50%;
+      transform: translateX(-50%);
+      width: 200px; height: 4px;
+      background: rgba(255,255,255,0.3);
+      border-radius: 4px; overflow: hidden; z-index: 30;
+    }
+    .timer-progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, #FFD966, #FFB347);
+      width: 0%; transition: width 0.1s linear;
+    }
+
+    /* WEEKLY CHALLENGE */
+    .weekly-challenge-section {
+      padding: 70px 20px 40px;
+      position: relative; z-index: 1; overflow: hidden;
+    }
+    .challenge-badge {
+      display: inline-block;
+      background: linear-gradient(135deg, #FFD966, #FFB347);
+      color: #1e2f38; font-weight: 800;
+      font-size: 0.75rem; letter-spacing: 2px;
+      padding: 0.4rem 1.2rem; border-radius: 50px;
+      text-transform: uppercase;
+      box-shadow: 0 5px 15px rgba(255,217,102,0.4);
+      animation: badgePulse 2s ease-in-out infinite;
+    }
+    @keyframes badgePulse {
+      0%, 100% { transform: scale(1); box-shadow: 0 5px 15px rgba(255,217,102,0.4); }
+      50% { transform: scale(1.05); box-shadow: 0 8px 25px rgba(255,217,102,0.7); }
+    }
+
+    .challenge-card {
+      background: linear-gradient(135deg, rgba(30, 55, 68, 0.7), rgba(25, 45, 55, 0.5));
+      backdrop-filter: blur(20px);
+      border-radius: 2.5rem;
+      border: 2px solid rgba(255,217,102,0.35);
+      padding: 2.5rem;
+      position: relative; overflow: hidden;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.5),
+                  inset 0 1px 0 rgba(255,255,255,0.15);
+      transition: all 0.5s;
+    }
+    .challenge-card::before {
+      content: ''; position: absolute;
+      top: -50%; right: -50%;
+      width: 100%; height: 200%;
+      background: radial-gradient(circle, rgba(255,217,102,0.08), transparent 60%);
+      animation: rotateSheen 25s linear infinite;
+      pointer-events: none;
+    }
+    @keyframes rotateSheen { 100% { transform: rotate(360deg); } }
+    .challenge-card:hover {
+      border-color: #FFD966;
+      box-shadow: 0 30px 75px rgba(0,0,0,0.6),
+                  0 0 60px rgba(255,217,102,0.2),
+                  inset 0 1px 0 rgba(255,255,255,0.2);
+    }
+    .challenge-week {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      background: rgba(255,217,102,0.15);
+      border: 1px solid rgba(255,217,102,0.5);
+      color: #FFD966; font-size: 0.8rem; font-weight: 700;
+      padding: 0.4rem 1rem; border-radius: 50px;
+      margin-bottom: 1rem;
+      position: relative; z-index: 2;
+    }
+    .challenge-title {
+      font-size: 2.2rem; font-weight: 800;
+      background: linear-gradient(135deg, #FFF6E0, #FFD966);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+      margin-bottom: 1rem;
+      position: relative; z-index: 2; line-height: 1.2;
+    }
+    .challenge-desc {
+      font-size: 1rem; line-height: 1.7; opacity: 0.9;
+      margin-bottom: 1.5rem;
+      position: relative; z-index: 2;
+    }
+    .challenge-meta {
+      display: flex; gap: 1rem; flex-wrap: wrap;
+      margin-bottom: 1.5rem;
+      position: relative; z-index: 2;
+    }
+    .challenge-meta-item {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,217,102,0.25);
+      padding: 0.5rem 1rem; border-radius: 50px;
+      font-size: 0.8rem; font-weight: 500;
+    }
+    .challenge-meta-item i { color: #FFD966; font-size: 1rem; }
+
+    .prize-box {
+      background: linear-gradient(135deg, rgba(255,217,102,0.18), rgba(255,179,71,0.08));
+      border: 2px dashed rgba(255,217,102,0.5);
+      border-radius: 1.5rem;
+      padding: 1.5rem; text-align: center;
+      position: relative; z-index: 2;
+      margin-bottom: 1.5rem;
+    }
+    .prize-box h5 {
+      font-size: 0.85rem; letter-spacing: 2px;
+      color: #FFD966; text-transform: uppercase;
+      font-weight: 700; margin-bottom: 0.5rem;
+    }
+    .prize-value {
+      font-size: 2.5rem; font-weight: 900;
+      background: linear-gradient(135deg, #FFD966, #FFB347);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+      line-height: 1; margin-bottom: 0.5rem;
+    }
+    .prize-points { font-size: 0.85rem; color: #FFE2A4; }
+
+    .btn-join-challenge {
+      background: linear-gradient(135deg, #FFD966, #FFB347);
+      border: none; padding: 1rem 2.5rem;
+      border-radius: 50px; color: #1e2f38;
+      font-weight: 800; font-size: 1rem;
+      letter-spacing: 0.5px;
+      box-shadow: 0 10px 30px rgba(255,217,102,0.4),
+                  inset 0 1px 0 rgba(255,255,255,0.5);
+      transition: all 0.3s;
+      position: relative; z-index: 2;
+      overflow: hidden; cursor: pointer;
+    }
+    .btn-join-challenge::before {
+      content: ''; position: absolute;
+      top: 0; left: -100%;
+      width: 100%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+      transition: 0.6s;
+    }
+    .btn-join-challenge:hover::before { left: 100%; }
+    .btn-join-challenge:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 15px 40px rgba(255,217,102,0.55),
+                  inset 0 1px 0 rgba(255,255,255,0.5);
+      color: #1e2f38;
+    }
+
+    .challenge-illustration {
+      font-size: 8rem; text-align: center;
+      animation: floatIcon 4s ease-in-out infinite;
+      filter: drop-shadow(0 15px 25px rgba(255,217,102,0.3));
+      position: relative; z-index: 2;
+    }
+    @keyframes floatIcon {
+      0%, 100% { transform: translateY(0) rotate(-3deg); }
+      50% { transform: translateY(-15px) rotate(3deg); }
+    }
+
+    /* Winner card */
+    .winner-card {
+      background: linear-gradient(135deg, rgba(255,217,102,0.18), rgba(255,179,71,0.05));
+      border: 2px solid rgba(255,217,102,0.5);
+      border-radius: 2rem;
+      padding: 2rem; text-align: center;
+      position: relative; overflow: hidden;
+      transition: all 0.4s; height: 100%;
+    }
+    .winner-card:hover {
+      transform: translateY(-8px);
+      border-color: #FFD966;
+      box-shadow: 0 20px 45px rgba(0,0,0,0.4),
+                  0 0 40px rgba(255,217,102,0.2);
+    }
+    .winner-card::before {
+      content: '👑'; position: absolute;
+      top: 10px; right: 15px; font-size: 2rem;
+      animation: crownFloat 3s ease-in-out infinite;
+    }
+    @keyframes crownFloat {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(-8px) rotate(10deg); }
+    }
+    .winner-photo {
+      width: 130px; height: 130px;
+      border-radius: 50%; object-fit: cover;
+      border: 4px solid #FFD966;
+      margin: 0 auto 1rem;
+      box-shadow: 0 10px 30px rgba(255,217,102,0.5);
+      display: block;
+    }
+    .winner-name {
+      font-size: 1.3rem; font-weight: 800;
+      background: linear-gradient(135deg, #FFD966, #FFB347);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+      margin-bottom: 0.3rem;
+    }
+    .winner-social {
+      font-size: 0.8rem; color: #FFD966;
+      margin-bottom: 1rem; word-break: break-all;
+    }
+    .winner-social a {
+      color: #FFD966; text-decoration: none;
+      border-bottom: 1px dashed rgba(255,217,102,0.5);
+    }
+    .winner-testimonial {
+      background: rgba(0,0,0,0.25);
+      border-radius: 1rem; padding: 1rem;
+      font-size: 0.85rem; font-style: italic;
+      line-height: 1.6; opacity: 0.9;
+      margin-bottom: 1rem; position: relative;
+    }
+    .winner-testimonial::before {
+      content: '"'; font-size: 3rem; color: #FFD966;
+      opacity: 0.4; position: absolute;
+      top: 5px; left: 10px; line-height: 1;
+    }
+    .winner-stats {
+      display: flex; justify-content: center;
+      gap: 1rem; flex-wrap: wrap;
+    }
+    .winner-stat {
+      background: rgba(255,217,102,0.15);
+      border: 1px solid rgba(255,217,102,0.4);
+      border-radius: 50px; padding: 0.5rem 1rem;
+      font-size: 0.75rem; font-weight: 600;
+      color: #FFE2A4;
+    }
+    .winner-stat i { color: #FFD966; margin-right: 0.3rem; }
+
+    .section-heading {
+      text-align: center; margin-bottom: 3rem;
+      position: relative; z-index: 2;
+    }
+    .section-heading h2 {
+      font-size: 2rem; font-weight: 800;
+      background: linear-gradient(135deg, #FFF6E0, #FFD966);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+      margin-bottom: 0.5rem;
+    }
+    .section-heading p {
+      color: #FFE2A4; font-size: 0.95rem; opacity: 0.9;
+    }
+
+    /* Challenge entry modal */
+    .challenge-modal-content {
+      background: rgba(20, 40, 48, 0.98);
+      backdrop-filter: blur(28px);
+      border: 2px solid #FFD966;
+      border-radius: 1.5rem;
+      color: white;
+    }
+    .challenge-modal-content .modal-header {
+      border-bottom: 1px solid rgba(255,217,102,0.3);
+    }
+    .challenge-modal-content .form-label {
+      color: #FFD966; font-weight: 500;
+      font-size: 0.85rem; margin-bottom: 4px;
+    }
+    .challenge-modal-content .form-control,
+    .challenge-modal-content .form-select {
+      background: rgba(255,255,255,0.08);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255,230,170,0.3);
+      color: white;
+      padding: 0.7rem 1rem;
+      border-radius: 0.8rem;
+      transition: 0.3s;
+    }
+    .challenge-modal-content .form-control:focus,
+    .challenge-modal-content .form-select:focus {
+      background: rgba(255,255,255,0.15);
+      border-color: #FFD966;
+      box-shadow: 0 0 0 3px rgba(255,217,102,0.2);
+      color: white;
+    }
+    .challenge-modal-content .form-control::placeholder { color: rgba(255,255,255,0.5); }
+    .challenge-modal-content .form-select option { background: #1e2f38; color: white; }
+    .btn-submit-entry {
+      background: linear-gradient(135deg, #FFD966, #FFB347);
+      border: none; padding: 0.9rem 2rem;
+      border-radius: 2rem; color: #1e2f38;
+      font-weight: 800; width: 100%; transition: 0.3s;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.4);
+    }
+    .btn-submit-entry:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(255,217,102,0.45),
+                  inset 0 1px 0 rgba(255,255,255,0.4);
+    }
+
+    /* ✅ NEW: Social Media Caption Preview Box */
+    .caption-box {
+      background: linear-gradient(135deg, rgba(255,217,102,0.15), rgba(255,179,71,0.05));
+      border: 1px dashed rgba(255,217,102,0.6);
+      border-radius: 1rem;
+      padding: 1rem;
+      margin-bottom: 1rem;
+    }
+    .caption-box h6 {
+      color: #FFD966; font-weight: 700;
+      font-size: 0.8rem; letter-spacing: 1px;
+      text-transform: uppercase; margin-bottom: 0.6rem;
+    }
+    .caption-text {
+      background: rgba(0,0,0,0.3);
+      border-radius: 0.6rem;
+      padding: 0.8rem;
+      font-size: 0.78rem;
+      line-height: 1.6;
+      color: #f0f3f8;
+      max-height: 150px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      font-family: 'Courier New', monospace;
+      margin-bottom: 0.6rem;
+    }
+    .caption-text .hashtags { color: #FFD966; font-weight: 600; }
+    .copy-caption-btn {
+      background: rgba(255,217,102,0.2);
+      border: 1px solid #FFD966;
+      color: #FFD966;
+      padding: 0.4rem 1rem;
+      border-radius: 2rem;
+      font-weight: 600; font-size: 0.75rem;
+      cursor: pointer; transition: 0.3s;
+      display: inline-flex; align-items: center; gap: 4px;
+    }
+    .copy-caption-btn:hover {
+      background: #FFD966; color: #1e2f38;
+    }
+
+    /* Info Cards */
+    .section { padding: 70px 20px 90px; }
+    .glass-card {
+      background: rgba(25, 45, 55, 0.55);
+      backdrop-filter: blur(12px);
+      border-radius: 2rem;
+      border: 1px solid rgba(255,230,170,0.25);
+      transition: 0.3s;
+      padding: 2rem 1rem;
+    }
+    .glass-card:hover {
+      transform: translateY(-8px);
+      background: rgba(40, 65, 75, 0.65);
+      border-color: #FFD966;
+    }
+    .glass-card i { font-size: 2.5rem; color: #FFD966; margin-bottom: 1rem; }
+
+    footer {
+      background: rgba(5, 20, 25, 0.8);
+      backdrop-filter: blur(12px);
+      padding: 2rem; text-align: center;
+      border-top: 1px solid rgba(255,210,130,0.2);
+      position: relative; z-index: 1;
+    }
+    .news-banner { margin: 20px auto 0; max-width: 1200px; cursor: pointer; }
+    .glass-news-card {
+      background: rgba(25, 45, 55, 0.75);
+      backdrop-filter: blur(20px);
+      border-radius: 2rem;
+      border: 1px solid rgba(255,230,170,0.4);
+      padding: 1.2rem 2rem;
+      transition: all 0.4s;
+    }
+    .glass-news-card:hover { transform: translateY(-8px); border-color: #FFD966; }
+    .news-badge {
+      background: linear-gradient(135deg, #FFD966, #FFB347);
+      padding: 0.3rem 1rem; border-radius: 50px;
+      font-size: 0.7rem; font-weight: 700; color: #1e2f38;
+    }
+
+    /* Pope's Intentions */
+    .pope-intentions-wrapper {
+      position: fixed; bottom: 30px; right: 30px; z-index: 9999;
+    }
+    .pope-intentions-btn {
+      min-width: 200px; height: 55px;
+      background: linear-gradient(135deg, #FFD966, #FFB347);
+      border-radius: 50px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+      transition: all 0.3s ease;
+      animation: pulseGlow 2s infinite;
+      padding: 0 25px; border: none;
+    }
+    .pope-intentions-btn i { font-size: 1.2rem; color: #1e2f38; margin-right: 10px; transition: transform 0.3s; }
+    .pope-intentions-btn span { font-size: 0.9rem; font-weight: 600; color: #1e2f38; letter-spacing: 0.5px; }
+    .pope-intentions-btn:hover { transform: scale(1.05); box-shadow: 0 8px 30px rgba(255,217,102,0.5); }
+    .pope-intentions-btn:hover i { transform: rotate(5deg); }
+    @keyframes pulseGlow {
+      0%, 100% { box-shadow: 0 5px 20px rgba(255,217,102,0.3); }
+      50% { box-shadow: 0 5px 30px rgba(255,217,102,0.6); }
+    }
+    .pope-popup-card {
+      position: absolute; bottom: 75px; right: 0;
+      width: 360px;
+      background: rgba(20, 40, 48, 0.95);
+      backdrop-filter: blur(20px);
+      border-radius: 1.5rem;
+      border: 1px solid #FFD966;
+      padding: 1.5rem;
+      opacity: 0; visibility: hidden;
+      transform: translateY(20px) scale(0.95);
+      transition: all 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+      z-index: 10000;
+    }
+    .pope-intentions-wrapper:hover .pope-popup-card {
+      opacity: 1; visibility: visible;
+      transform: translateY(0) scale(1);
+    }
+    .pope-popup-card h4 {
+      color: #FFD966; font-size: 1.2rem; font-weight: 700;
+      margin-bottom: 0.8rem; text-align: center;
+    }
+    .pope-popup-card p { font-size: 0.85rem; opacity: 0.9; margin-bottom: 1rem; text-align: center; }
+    .pope-intention-list { list-style: none; padding: 0; margin: 0 0 1rem 0; }
+    .pope-intention-list li {
+      font-size: 0.75rem; padding: 0.4rem 0;
+      border-bottom: 1px solid rgba(255,217,102,0.2);
+      display: flex; align-items: center; gap: 0.5rem;
+    }
+    .pope-intention-list li i { color: #FFD966; font-size: 0.6rem; }
+    .button-group { display: flex; gap: 12px; margin-top: 15px; }
+    .view-pdf-btn, .download-pdf-btn {
+      flex: 1; border: none; padding: 0.75rem;
+      border-radius: 2rem; font-weight: 600; font-size: 0.8rem;
+      transition: all 0.3s; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+    }
+    .view-pdf-btn { background: rgba(255,217,102,0.15); border: 1px solid #FFD966; color: #FFD966; }
+    .view-pdf-btn:hover { background: #FFD966; color: #1e2f38; transform: translateY(-2px); }
+    .download-pdf-btn { background: linear-gradient(135deg, #FFD966, #FFB347); color: #1e2f38; }
+    .download-pdf-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(255,217,102,0.4); }
+
+    .image-modal-content {
+      background: rgba(20, 40, 48, 0.98);
+      backdrop-filter: blur(20px);
+      border: 1px solid #FFD966;
+      border-radius: 1.5rem;
+      color: white;
+    }
+    .image-detail-img { width: 100%; border-radius: 1rem; max-height: 400px; object-fit: cover; }
+    .scripture-verse {
+      background: rgba(255,217,102,0.15);
+      padding: 1rem; border-radius: 1rem;
+      border-left: 4px solid #FFD966;
+    }
+
+    @media (max-width: 768px) {
+      .portrait-container { width: 280px; height: 420px; }
+      .wheel-handle { right: 10px; padding: 12px 8px; }
+      .wheel-spinner { width: 45px; height: 45px; font-size: 1.3rem; }
+      .wheel-arrow { width: 40px; height: 40px; font-size: 1rem; }
+      .pope-door-img { width: 120px; height: 120px; }
+      .vatican-logo-left, .vatican-logo-right { width: 60px; height: 60px; }
+      .vatican-logo-left img, .vatican-logo-right img { width: 40px; height: 40px; }
+      .door-handle { width: 45px; height: 45px; font-size: 1.5rem; }
+      .door-welcome-text { font-size: 0.8rem; white-space: nowrap; padding: 0.5rem 1rem; }
+      .pope-popup-card { width: 320px; right: -10px; }
+      .pope-intentions-btn { min-width: 180px; height: 48px; padding: 0 18px; }
+      .pope-intentions-btn span { font-size: 0.8rem; }
+      .button-group { flex-direction: column; gap: 8px; }
+      .logo-bg-layer { background-size: 200px 200px; }
+      .hero-logo-watermark { width: 420px; height: 420px; }
+      .challenge-card { padding: 1.8rem; }
+      .challenge-title { font-size: 1.5rem; }
+      .challenge-illustration { font-size: 5rem; }
+      .prize-value { font-size: 1.8rem; }
+      .winner-photo { width: 100px; height: 100px; }
+      .winner-name { font-size: 1.05rem; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="logo-bg-layer"></div>
+<div class="logo-bg-overlay"></div>
+
+<!-- GLASS DOOR OVERLAY -->
+<div class="glass-door-overlay" id="glassDoor">
+  <div class="door-left">
+    <img src="Images/LEO LEFT.jpg" alt="Pope Leo XIII" class="pope-door-img" onerror="this.src='https://randomuser.me/api/portraits/men/32.jpg'">
+    <div class="door-pope-name">Pope Leo XIII</div>
+    <div class="door-pope-title">Bishop of Rome · 1810-1903</div>
+    <div class="door-handle" id="doorHandleLeft"><i class="fas fa-hand-peace"></i></div>
+  </div>
+  <div class="door-right">
+    <img src="Images/LEO RIGHT.jpg" alt="Pope Leo XIII" class="pope-door-img" onerror="this.src='https://randomuser.me/api/portraits/men/32.jpg'">
+    <div class="door-pope-name">Pope Leo XIII</div>
+    <div class="door-pope-title">Servant of the Servants of God</div>
+    <div class="door-handle" id="doorHandleRight"><i class="fas fa-door-open"></i></div>
+  </div>
+  <div class="door-welcome-text"><i class="fas fa-chevron-right me-2"></i> CLICK THE HANDLE TO OPEN THE SACRED DOORS <i class="fas fa-chevron-left ms-2"></i></div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="main-content" id="mainContent">
+  <nav class="navbar navbar-expand-lg fixed-top">
+    <div class="container">
+      <a class="navbar-brand d-flex align-items-center" href="index.html">
+        <img src="Images/main logo.jpeg"
+             alt="Pontifical Mission Society Logo"
+             class="navbar-logo-img"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
+        <i class="fas fa-church logo-icon" style="display: none;"></i>
+        <span>Pontifical Mission Society</span>
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="mainNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link active" href="index.html"><i class="fas fa-home me-1"></i>Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="about.html"><i class="fas fa-heart me-1"></i>About</a></li>
+          <li class="nav-item"><a class="nav-link" href="animators.html"><i class="fas fa-users me-1"></i>Animators</a></li>
+          <li class="nav-item"><a class="nav-link" href="projects.html"><i class="fas fa-hands-helping me-1"></i>Projects</a></li>
+          <li class="nav-item"><a class="nav-link" href="news.html"><i class="fas fa-newspaper me-1"></i>News</a></li>
+          <li class="nav-item"><a class="nav-link" href="contact.html"><i class="fas fa-envelope me-1"></i>Contact</a></li>
+          <li class="nav-item"><a class="nav-link" href="gallery.html"><i class="fas fa-images me-1"></i>Gallery</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- HERO SECTION -->
+  <div class="hero-section">
+    <div class="hero-bg-blur" id="heroBgBlur"></div>
+    <div class="hero-logo-watermark"></div>
+    <div class="vatican-logo-left"><img src="Images/CATHOLIC FLAG.png" alt="Vatican Logo" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/0/00/Emblem_of_the_Holy_See_usual.svg/800px-Emblem_of_the_Holy_See_usual.svg.png'"></div>
+    <div class="vatican-logo-right"><img src="Images/CATHOLIC FLAG.png" alt="Vatican Logo" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/0/00/Emblem_of_the_Holy_See_usual.svg/800px-Emblem_of_the_Holy_See_usual.svg.png'"></div>
+    <div class="portrait-container" id="portraitContainer"></div>
+    <div class="wheel-handle">
+      <div class="wheel-spinner" id="wheelSpinner"><i class="fas fa-cog"></i></div>
+      <div class="wheel-counter" id="wheelCounter">1/11</div>
+      <div class="wheel-arrows">
+        <div class="wheel-arrow" id="prevWheel"><i class="fas fa-chevron-up"></i></div>
+        <div class="wheel-arrow" id="nextWheel"><i class="fas fa-chevron-down"></i></div>
+      </div>
+    </div>
+    <div class="timer-progress"><div class="timer-progress-bar" id="timerBar"></div></div>
+  </div>
+
+  <!-- WEEKLY CHALLENGE SECTION -->
+  <section class="weekly-challenge-section" id="weeklyChallenge">
+    <div class="container">
+      <div class="section-heading" data-aos="fade-up">
+        <div class="challenge-badge mb-3">
+          <i class="fas fa-fire me-1"></i> WEEKLY CHALLENGE
+        </div>
+        <h2>🎯 Take Part & Win Big!</h2>
+        <p>Complete this week's challenge, share on social media, and win points you can convert to cash</p>
+      </div>
+
+      <div class="challenge-card mb-5" data-aos="fade-up" data-aos-delay="100" id="challengeCard">
+        <div class="row align-items-center g-4">
+          <div class="col-lg-8 order-2 order-lg-1">
+            <div id="challengeContent">
+              <div class="text-center py-5">
+                <div class="spinner-border text-warning"></div>
+                <p class="mt-3" style="opacity:0.7;">Loading this week's challenge...</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-4 order-1 order-lg-2">
+            <div class="challenge-illustration" id="challengeEmoji">🏆</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-heading mt-5" data-aos="fade-up">
+        <h2>👑 Previous Winners</h2>
+        <p>One champion per challenge — celebrating our anointed winners</p>
+      </div>
+
+      <div class="row g-4" id="winnersGrid" data-aos="fade-up" data-aos-delay="100">
+        <div class="col-12 text-center py-4">
+          <div class="spinner-border text-warning"></div>
+          <p class="mt-3" style="opacity:0.7;">Loading winners...</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- POPE'S INTENTIONS -->
+  <div class="pope-intentions-wrapper">
+    <div class="pope-intentions-btn">
+      <i class="fas fa-praying-hands"></i>
+      <span>Pope's Yearly Prayer Intentions</span>
+    </div>
+    <div class="pope-popup-card">
+      <h4><i class="fas fa-pope me-2"></i>Pope's Yearly Prayer Intentions</h4>
+      <p>The Holy Father's prayer intentions for the current year</p>
+      <ul class="pope-intention-list">
+        <li><i class="fas fa-circle"></i> <strong>January:</strong> For prayer with the Word of God</li>
+        <li><i class="fas fa-circle"></i> <strong>February:</strong> For children with incurable diseases</li>
+        <li><i class="fas fa-circle"></i> <strong>March:</strong> For disarmament and peace</li>
+        <li><i class="fas fa-circle"></i> <strong>April:</strong> For priests in crisis</li>
+        <li><i class="fas fa-circle"></i> <strong>May:</strong> That everyone might have food</li>
+        <li><i class="fas fa-circle"></i> <strong>June:</strong> For the values of sports</li>
+        <li><i class="fas fa-circle"></i> <strong>July:</strong> For respect for human life</li>
+        <li><i class="fas fa-circle"></i> <strong>August:</strong> For evangelization in the city</li>
+        <li><i class="fas fa-circle"></i> <strong>September:</strong> For the care of water</li>
+        <li><i class="fas fa-circle"></i> <strong>October:</strong> For mental health ministry</li>
+        <li><i class="fas fa-circle"></i> <strong>November:</strong> For the proper use of wealth</li>
+        <li><i class="fas fa-circle"></i> <strong>December:</strong> For single-parent families</li>
+      </ul>
+      <div class="button-group">
+        <button class="view-pdf-btn" id="viewPdfBtn"><i class="fas fa-eye"></i> View PDF</button>
+        <button class="download-pdf-btn" id="downloadIntentionsBtn"><i class="fas fa-download"></i> Download PDF</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- NEWS BANNER -->
+  <div class="container news-banner" data-aos="fade-up">
+    <div class="glass-news-card d-flex align-items-center justify-content-between flex-wrap gap-3" id="newsBannerClick">
+      <div class="d-flex align-items-center flex-wrap gap-2">
+        <span class="news-badge"><i class="fas fa-bolt me-1"></i> LATEST NEWS</span>
+        <span style="color: #FFE2A4; font-weight: 600;">🔥 Youth Fire Conference 2026</span>
+        <span style="font-size: 0.9rem;">March 28-30 | Powerful speakers, life-changing worship!</span>
+      </div>
+      <div style="background: rgba(255,217,102,0.2); width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+        <i class="fas fa-arrow-right" style="color: #FFD966;"></i>
+      </div>
+    </div>
+  </div>
+
+  <!-- QUICK INFO -->
+  <section class="section" data-aos="fade-up">
+    <div class="container">
+      <div class="row g-4">
+        <div class="col-md-4"><div class="glass-card text-center"><i class="fas fa-clock"></i><h4>Holy Mass Times</h4><p>Sunday Mass:<br>First Mass: 6:00 AM<br>Second Mass: 9:00 AM<br>Third Mass: 10:00 AM</p></div></div>
+        <div class="col-md-4"><div class="glass-card text-center"><i class="fas fa-map-marker-alt"></i><h4>Our Location</h4><p>Christ The King Parish, Gwagwalada<br>Abuja, Nigeria</p></div></div>
+        <div class="col-md-4"><div class="glass-card text-center"><i class="fas fa-calendar-alt"></i><h4>Weekly Masses</h4><p>Mondays - Fridays<br>6:00 PM</p></div></div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <p><i class="fas fa-cross me-1"></i> © 2026 Pontifical Mission Society · Spreading the Gospel Worldwide</p>
+    <p style="opacity:0.7;">Designed with <i class="fas fa-heart" style="color:#FFD966;"></i> by BerryRay Technologies</p>
+  </footer>
+</div>
+
+<!-- CHALLENGE ENTRY MODAL -->
+<div class="modal fade" id="challengeEntryModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content challenge-modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" style="color:#FFD966;">
+          <i class="fas fa-fire me-2"></i>Join This Week's Challenge
+        </h4>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div id="challengeEntryIntro" style="background: rgba(255,217,102,0.1); border-left: 3px solid #FFD966; padding: 0.9rem; border-radius: 0.6rem; margin-bottom: 1.2rem;">
+          <div style="font-size: 0.8rem; opacity: 0.85;">
+            <i class="fas fa-info-circle text-warning me-1"></i>
+            Fill in the form below with your social media post URL to enter. Only <strong style="color:#FFD966;">ONE winner</strong> per challenge will be chosen!
+          </div>
+        </div>
+
+        <!-- ✅ NEW: Social Media Caption Box -->
+        <div class="caption-box" id="captionBox" style="display: none;">
+          <h6><i class="fas fa-magic me-1"></i> Ready-to-Use Social Caption</h6>
+          <div class="caption-text" id="captionTextPreview"></div>
+          <button type="button" class="copy-caption-btn" id="copyCaptionBtn">
+            <i class="fas fa-copy"></i> Copy Caption + Hashtags
+          </button>
+        </div>
+
+        <form id="challengeEntryForm">
+          <input type="hidden" id="entryChallengeId">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label"><i class="fas fa-user me-1"></i>Your Full Name *</label>
+              <input type="text" class="form-control" id="entryName" required placeholder="Enter your name">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label"><i class="fas fa-envelope me-1"></i>Email Address *</label>
+              <input type="email" class="form-control" id="entryEmail" required placeholder="your@email.com">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label"><i class="fas fa-share-alt me-1"></i>Social Platform *</label>
+              <select class="form-select" id="entryPlatform" required>
+                <option value="" disabled selected>Select platform</option>
+                <option value="Instagram">Instagram</option>
+                <option value="Facebook">Facebook</option>
+                <option value="TikTok">TikTok</option>
+                <option value="X (Twitter)">X (Twitter)</option>
+                <option value="YouTube">YouTube</option>
+                <option value="LinkedIn">LinkedIn</option>
+                <option value="WhatsApp Status">WhatsApp Status</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label"><i class="fas fa-link me-1"></i>Post URL *</label>
+              <input type="url" class="form-control" id="entryUrl" required placeholder="https://instagram.com/p/...">
+            </div>
+            <div class="col-12">
+              <div style="background: rgba(255,217,102,0.08); border-radius: 0.8rem; padding: 0.8rem; font-size: 0.8rem;">
+                <i class="fas fa-trophy text-warning me-1"></i>
+                <strong style="color:#FFD966;">One Winner Only:</strong>
+                <span style="opacity: 0.85;">Each challenge has exactly ONE champion. Every 1 point = ₦100, added to the winner's wallet and convertible to cash.</span>
+              </div>
+            </div>
+            <div class="col-12">
+              <button type="submit" class="btn-submit-entry" id="submitEntryBtn">
+                <i class="fas fa-paper-plane me-2"></i>Submit My Entry
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- IMAGE DETAIL MODAL -->
+<div class="modal fade" id="imageDetailModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content image-modal-content">
+      <div class="modal-header border-warning">
+        <h4 class="modal-title" id="modalImageTitle" style="color:#FFD966;"></h4>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-md-6">
+            <img id="modalImageDetail" class="image-detail-img" alt="Image Detail">
+          </div>
+          <div class="col-md-6">
+            <h5 style="color:#FFD966;"><i class="fas fa-info-circle me-2"></i>About This Moment</h5>
+            <p id="modalImageDescription" class="mt-2"></p>
+            <div class="scripture-verse mt-3">
+              <i class="fas fa-bible me-2" style="color:#FFD966;"></i>
+              <span id="modalScripture"></span>
+            </div>
+            <div class="mt-3">
+              <i class="fas fa-calendar-alt me-2" style="color:#FFD966;"></i>
+              <span id="modalDate"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer border-warning">
+        <button type="button" class="btn btn-outline-gold" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+<script>
+  AOS.init({ once: true, offset: 80, duration: 700 });
+
+  // ==========================================
+  // 🔧 SUPABASE CONFIG
+  // ==========================================
+  const SUPABASE_URL = 'https://ekhzbclqpelsrfefufpv.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVraHpiY2xxcGVsc3JmZWZ1ZnB2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY4NjQ2MjUsImV4cCI6MjA5MjQ0MDYyNX0.7dJiDcV4q8Ss_4Ua19-L-VFSxThJKNLyBv__bfdx02M';
+  const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  const PDF_FILE_PATH = 'Images/prayer.pdf';
+  function viewPDF() { window.open(PDF_FILE_PATH, '_blank'); }
+  function downloadPDF() {
+    const link = document.createElement('a');
+    link.href = PDF_FILE_PATH;
+    link.download = PDF_FILE_PATH.split('/').pop();
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+  document.getElementById('viewPdfBtn')?.addEventListener('click', viewPDF);
+  document.getElementById('downloadIntentionsBtn')?.addEventListener('click', downloadPDF);
+
+  // ==========================================
+  // PORTRAIT SLIDES
+  // ==========================================
+  const slides = [
+    { img: "Images/jesus.jpg", title: "Jesus Christ", desc: "The Prince Of Heaven", fullDescription: "Jesus Christ, the Son of God, came to earth to save humanity from sin. His life, death, and resurrection are the foundation of our faith.", scripture: "John 3:16 - 'For God so loved the world...'", date: "Throughout the Year" },
+    { img: "Images/mary.jpg", title: "Mary, Mother of God", desc: "Queen Of Angels", fullDescription: "The Blessed Virgin Mary, Mother of Jesus, is honored as the Mother of God. Her 'yes' to God's plan brought salvation into the world.", scripture: "Luke 1:28 - 'Hail, full of grace...'", date: "Feast Days: January 1, August 15, December 8" },
+    { img: "Images/LEO LEFT.jpg", title: "Pope Leo XIII", desc: "Bishop of Rome", fullDescription: "Pope Leo XIII served as Pope from 1878 to 1903. He was known for his intellectual contributions to Catholic social teaching.", scripture: "Matthew 16:18 - 'You are Peter...'", date: "Papacy: 1878-1903" },
+    { img: "Images/archbishop kaigma.jpg", title: "His Grace Most Rev. Dr. Ignatius Kaigama", desc: "Catholic Archbishop Of Abuja Archdiocese", fullDescription: "Archbishop Ignatius Kaigama is the Metropolitan Archbishop of Abuja, a respected leader and peace advocate.", scripture: "Jeremiah 3:15 - 'And I will give you shepherds...'", date: "Installed: November 2019" },
+    { img: "Images/his lord.png", title: "His Lordship Most Rev. Dr. Anselm Umoren MSP", desc: "Catholic Auxiliary Bishop Of Abuja", fullDescription: "Bishop Anselm Umoren serves as the Auxiliary Bishop of Abuja Archdiocese, dedicated to evangelization.", scripture: "Acts 1:8 - 'But you will receive power...'", date: "Consecrated: March 2024" },
+    { img: "Images/father.png", title: "Rev. Fr. Samson Adachabo", desc: "Pontifical Mission Society Director", fullDescription: "Rev. Fr. Samson Adachabo is the current Director of the Pontifical Mission Societies in Abuja Archdiocese.", scripture: "Romans 10:14-15 - 'How can they believe...'", date: "Current PMS Director" },
+    { img: "Images/16.jpeg", title: "Rev. Fr. Hilary Ugwuanyi", desc: "P.O.F Coordinator/YOMM Chaplain", fullDescription: "Rev. Fr. Hilary Ugwuanyi serves as the Propagation of the Faith Coordinator and Chaplain for YOMM.", scripture: "1 Timothy 4:12 - 'Don't let anyone look down on you...'", date: "YOMM Chaplain" },
+    { img: "Images/nsu.jpeg", title: "Rev. Fr. Michael Nzume", desc: "PMU & SPU Archdiocesan Coordinator", fullDescription: "Rev. Fr. Michael Nzume serves as the Archdiocesan Coordinator for the Pontifical Mission Societies.", scripture: "Psalm 96:3 - 'Declare his glory among the nations...'", date: "PMS Archdiocesan Coordinator" },
+    { img: "Images/sis1.jpg", title: "Sr. Ahaiwe Angelina, CCSSP", desc: "Holy Childhood Association Coordinator", fullDescription: "Sr. Ahaiwe Angelina serves as the Holy Childhood Association Coordinator.", scripture: "Matthew 19:14 - 'Let the little children come to me...'", date: "HCA Coordinator" },
+    { img: "Images/sis.jpeg", title: "Sr Mary Lawrentine Amaefule, IHM", desc: "HCA Archdiocesan Coordinator", fullDescription: "Sr. Mary Lawrentine Amaefule serves as the Holy Childhood Association Archdiocesan Coordinator.", scripture: "Matthew 25:40 - 'Whatever you did for one of the least of these...'", date: "HCA Archdiocesan Coordinator" },
+    { img: "Images/4.jpeg", title: "Bro. Charles Moses Amaghionyeodiwe", desc: "YOMM LAY COORDINATOR", fullDescription: "A beautiful moment honoring Our Lady of Grace. Replace this description with your own text about the new picture.", scripture: "Luke 1:48 - 'All generations will call me blessed.'", date: "Feast: Add date here" }
+  ];
+
+  let currentIndex = 0;
+  let timeRemaining = 10;
+  let timerRunning = false;
+  let animationFrame = null;
+
+  const container = document.getElementById('portraitContainer');
+  const wheelCounter = document.getElementById('wheelCounter');
+  const timerBar = document.getElementById('timerBar');
+  const heroBgBlur = document.getElementById('heroBgBlur');
+
+  function updateBlurBackground() { if (heroBgBlur) heroBgBlur.style.backgroundImage = `url('${slides[currentIndex].img}')`; }
+
+  function renderPortraits() {
+    container.innerHTML = '';
+    slides.forEach((slide, idx) => {
+      const card = document.createElement('div');
+      card.className = `portrait-card ${idx === currentIndex ? 'active' : ''}`;
+      card.setAttribute('data-slide-idx', idx);
+      card.innerHTML = `
+        <img src="${slide.img}" alt="${slide.title}" loading="lazy" onerror="this.src='https://images.pexels.com/photos/2704081/pexels-photo-2704081.jpeg?w=600&h=900&fit=crop'">
+        <div class="portrait-overlay">
+          <h2>${escapeHtml(slide.title)}</h2>
+          <p><i class="fas fa-cross me-1"></i> ${escapeHtml(slide.desc)}</p>
+        </div>
+      `;
+      card.addEventListener('click', (e) => { e.stopPropagation(); openImageDetailModal(idx); });
+      container.appendChild(card);
+    });
+    updateCounter();
+    updateBlurBackground();
+  }
+
+  function openImageDetailModal(index) {
+    const slide = slides[index];
+    document.getElementById('modalImageTitle').innerHTML = `<i class="fas fa-image me-2"></i>${escapeHtml(slide.title)}`;
+    document.getElementById('modalImageDetail').src = slide.img;
+    document.getElementById('modalImageDescription').innerHTML = escapeHtml(slide.fullDescription);
+    document.getElementById('modalScripture').innerHTML = escapeHtml(slide.scripture);
+    document.getElementById('modalDate').innerHTML = escapeHtml(slide.date);
+    new bootstrap.Modal(document.getElementById('imageDetailModal')).show();
+  }
+
+  function escapeHtml(str) { if (!str) return ''; return String(str).replace(/[&<>]/g, m => m === '&' ? '&amp;' : m === '<' ? '&lt;' : '&gt;'); }
+  function updateCounter() { if (wheelCounter) wheelCounter.textContent = `${currentIndex + 1}/${slides.length}`; }
+  function updateActiveSlide() {
+    document.querySelectorAll('.portrait-card').forEach((card, idx) => {
+      if (idx === currentIndex) card.classList.add('active');
+      else card.classList.remove('active');
+    });
+    updateCounter();
+    updateBlurBackground();
+  }
+  function goToSlide(index) { currentIndex = (index + slides.length) % slides.length; updateActiveSlide(); resetTimer(); }
+  function nextSlide() { goToSlide(currentIndex + 1); }
+  function prevSlide() { goToSlide(currentIndex - 1); }
+
+  function startTimer() {
+    stopTimer(); timerRunning = true; timeRemaining = 10; updateTimerBar(100);
+    const startTime = Date.now(), startRemaining = 10;
+    function updateTimer() {
+      if (!timerRunning) return;
+      const elapsed = (Date.now() - startTime) / 1000;
+      const newRemaining = Math.max(0, startRemaining - elapsed);
+      timeRemaining = newRemaining; updateTimerBar((timeRemaining / 10) * 100);
+      if (newRemaining <= 0) { stopTimer(); nextSlide(); startTimer(); }
+      else animationFrame = requestAnimationFrame(updateTimer);
+    }
+    if (animationFrame) cancelAnimationFrame(animationFrame);
+    animationFrame = requestAnimationFrame(updateTimer);
+  }
+  function stopTimer() { timerRunning = false; if (animationFrame) { cancelAnimationFrame(animationFrame); animationFrame = null; } }
+  function resetTimer() { stopTimer(); startTimer(); }
+  function updateTimerBar(percent) { if (timerBar) timerBar.style.width = `${percent}%`; }
+
+  renderPortraits(); startTimer();
+
+  document.getElementById('prevWheel')?.addEventListener('click', (e) => { e.stopPropagation(); prevSlide(); });
+  document.getElementById('nextWheel')?.addEventListener('click', (e) => { e.stopPropagation(); nextSlide(); });
+  document.getElementById('wheelSpinner')?.addEventListener('click', (e) => { e.stopPropagation(); resetTimer(); });
+
+  const portraitContainer = document.getElementById('portraitContainer');
+  if (portraitContainer) {
+    portraitContainer.addEventListener('mouseenter', () => stopTimer());
+    portraitContainer.addEventListener('mouseleave', () => startTimer());
+  }
+
+  // Door unveil
+  const glassDoor = document.getElementById('glassDoor'), mainContent = document.getElementById('mainContent');
+  const doorHandleLeft = document.getElementById('doorHandleLeft'), doorHandleRight = document.getElementById('doorHandleRight');
+  function unveilDesign() { glassDoor.classList.add('unveiled'); setTimeout(() => mainContent.classList.add('visible'), 500); }
+  doorHandleLeft?.addEventListener('click', (e) => { e.stopPropagation(); unveilDesign(); });
+  doorHandleRight?.addEventListener('click', (e) => { e.stopPropagation(); unveilDesign(); });
+  glassDoor?.addEventListener('click', (e) => { if (e.target === glassDoor || e.target.classList.contains('door-left') || e.target.classList.contains('door-right')) unveilDesign(); });
+
+  document.getElementById('newsBannerClick')?.addEventListener('click', () => window.location.href = 'news.html');
+
+  // ============================================
+  // 🎯 WEEKLY CHALLENGE SYSTEM
+  // ============================================
+
+  let currentChallenge = null;
+
+  const CHALLENGE_EMOJIS = ['🏆', '🎯', '🔥', '⭐', '🎁', '📖', '🙏', '✨', '🌟', '💫'];
+
+  // ============================================
+  // 📸 SOCIAL MEDIA CAPTION GENERATOR
+  // ============================================
+  const BASE_HASHTAGS = [
+    '#PontificalMissionSociety', '#PMS', '#PMSChallenge', '#WeeklyChallenge',
+    '#CatholicChurch', '#MissionaryWork', '#Gospel', '#Faith', '#CatholicLife',
+    '#SpreadTheGospel', '#Mission', '#CatholicFaith', '#CatholicCommunity',
+    '#ChurchFamily', '#PraiseGod', '#GodIsGood', '#Blessed', '#Catholic',
+    '#Church', '#Evangelization', '#CatholicYouth', '#FaithChallenge'
+  ];
+
+  const PLATFORM_HASHTAGS = {
+    instagram: ['#Instagram', '#CatholicInstagram', '#CatholicReels', '#FaithGram', '#InstaCatholic'],
+    facebook: ['#Facebook', '#CatholicFacebook', '#CatholicCommunity'],
+    tiktok: ['#TikTokCatholic', '#CatholicTikTok', '#FaithTok', '#FYP', '#ForYou', '#Viral'],
+    twitter: ['#CatholicTwitter', '#CathoTwitter', '#Faith'],
+    youtube: ['#CatholicYouTube', '#FaithVideos', '#CatholicVlog'],
+    linkedin: ['#CatholicLeadership', '#FaithAndWork', '#MissionDriven'],
+    whatsapp: ['#WhatsApp', '#Blessings', '#Amin']
+  };
+
+  const PLATFORM_TONES = {
+    instagram: '🙏 Taking part in this week\'s PMS Challenge!',
+    facebook: '✨ Blessed to share my entry for the weekly PMS Challenge!',
+    tiktok: '🔥 My entry for the PMS Weekly Challenge!',
+    twitter: '✝️ Joining the PMS Weekly Challenge!',
+    youtube: '📖 Sharing my heart for the PMS Weekly Challenge!',
+    linkedin: '🙏 Honored to take part in this faith-driven challenge.',
+    whatsapp: '🙏 Sharing my challenge entry with you!',
+    other: '✨ Sharing my entry for the PMS Weekly Challenge!'
+  };
+
+  function toHashtag(str) {
+    if (!str) return '';
+    const cleaned = String(str)
+      .replace(/[^a-zA-Z0-9\s]/g, '')
+      .split(/\s+/)
+      .map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+      .join('');
+    return cleaned ? '#' + cleaned : '';
+  }
+
+  function buildChallengeCaption(challenge, platform) {
+    const platformKey = (platform || 'other').toLowerCase().replace(/\s.*$/, '');
+    const tone = PLATFORM_TONES[platformKey] || PLATFORM_TONES.other;
+    const platformTags = PLATFORM_HASHTAGS[platformKey] || [];
+
+    // Build dynamic hashtags from challenge title + week label
+    const titleTag = toHashtag(challenge.title);
+    const weekTag = toHashtag(challenge.week_label);
+
+    const allTags = [...new Set([
+      titleTag,
+      weekTag,
+      ...platformTags,
+      ...BASE_HASHTAGS
+    ])].filter(Boolean);
+
+    let caption = `${tone}\n\n`;
+    caption += `🎯 *${challenge.title}*\n`;
+    caption += `📅 ${challenge.week_label}\n\n`;
+    caption += `${challenge.description}\n\n`;
+    caption += `🏆 Prize: ${challenge.prize_cash || '₦10,000'}\n\n`;
+    caption += `👉 Join us at Pontifical Mission Society\n\n`;
+
+    return {
+      caption,
+      hashtags: allTags.join(' '),
+      fullText: caption + allTags.join(' ')
+    };
+  }
+
+  // ============================================
+  // LOAD CURRENT CHALLENGE
+  // ============================================
+  async function loadCurrentChallenge() {
+    const containerEl = document.getElementById('challengeContent');
+    if (!containerEl) return;
+
+    try {
+      const { data, error } = await supabaseClient
+        .from('challenges')
+        .select('*')
+        .eq('is_active', true)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .single();
+
+      if (error || !data) {
+        console.warn('No active challenge found:', error);
+        containerEl.innerHTML = `
+          <div class="text-center py-4">
+            <div style="font-size: 3rem; margin-bottom: 1rem;">🎯</div>
+            <h4 style="color:#FFD966;">No Active Challenge Yet</h4>
+            <p style="opacity:0.8;">A new challenge will be posted soon. Check back later!</p>
+          </div>
+        `;
+        document.getElementById('challengeEmoji').textContent = '⏳';
+        return;
+      }
+
+      currentChallenge = data;
+      const emoji = CHALLENGE_EMOJIS[data.id % CHALLENGE_EMOJIS.length];
+      document.getElementById('challengeEmoji').textContent = emoji;
+
+      const startDate = data.start_date ? new Date(data.start_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : 'TBA';
+      const endDate = data.end_date ? new Date(data.end_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : 'TBA';
+
+      containerEl.innerHTML = `
+        <div class="challenge-week">
+          <i class="fas fa-calendar-week"></i> ${escapeHtml(data.week_label || 'This Week')}
+        </div>
+        <h2 class="challenge-title">${escapeHtml(data.title)}</h2>
+        <p class="challenge-desc">${escapeHtml(data.description)}</p>
+
+        <div class="challenge-meta">
+          <div class="challenge-meta-item">
+            <i class="fas fa-calendar-alt"></i>
+            <span>${startDate} → ${endDate}</span>
+          </div>
+          <div class="challenge-meta-item">
+            <i class="fas fa-trophy"></i>
+            <span>ONE winner only</span>
+          </div>
+        </div>
+
+        <div class="prize-box">
+          <h5><i class="fas fa-gift me-2"></i>This Week's Prize</h5>
+          <div class="prize-value">${escapeHtml(data.prize_cash || '₦10,000')}</div>
+          <div class="prize-points">
+            <i class="fas fa-star text-warning"></i>
+            ${data.prize_points || 100} points = ₦${(data.prize_points || 100) * 100}
+          </div>
+        </div>
+
+        <button class="btn-join-challenge" onclick="openChallengeEntry(${data.id})">
+          <i class="fas fa-fire me-2"></i>JOIN THIS CHALLENGE
+        </button>
+      `;
+
+    } catch (err) {
+      console.error('Error loading challenge:', err);
+      containerEl.innerHTML = `
+        <div class="text-center py-4">
+          <p style="opacity:0.7;">Unable to load challenge. Please refresh.</p>
+        </div>
+      `;
+    }
+  }
+
+  // ============================================
+  // LOAD WINNERS (ONE PER CHALLENGE)
+  // ============================================
+  async function loadWinners() {
+    const grid = document.getElementById('winnersGrid');
+    if (!grid) return;
+
+    try {
+      // The UNIQUE constraint on challenge_id ensures only ONE winner per challenge
+      // But we still limit to the latest 3 challenges so the section stays clean
+      const { data, error } = await supabaseClient
+        .from('challenge_winners')
+        .select('*, challenges(title, week_label)')
+        .order('awarded_at', { ascending: false })
+        .limit(3);
+
+      if (error || !data || data.length === 0) {
+        grid.innerHTML = `
+          <div class="col-12 text-center py-4">
+            <div style="font-size: 3rem; margin-bottom: 1rem;">👑</div>
+            <p style="opacity:0.8;">No winners announced yet. Be the first champion!</p>
+          </div>
+        `;
+        return;
+      }
+
+      grid.innerHTML = data.map(winner => {
+        const photo = winner.winner_photo || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(winner.winner_name) + '&background=FFD966&color=1e2f38&size=200&bold=true';
+        return `
+          <div class="col-md-6 col-lg-4">
+            <div class="winner-card">
+              <img src="${photo}" alt="${escapeHtml(winner.winner_name)}" class="winner-photo"
+                   onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(winner.winner_name)}&background=FFD966&color=1e2f38&size=200&bold=true'">
+              <div class="winner-name">${escapeHtml(winner.winner_name)}</div>
+              ${winner.challenges ? `<div style="font-size:0.75rem; color:#FFE2A4; opacity:0.8; margin-bottom:0.5rem;">
+                <i class="fas fa-trophy" style="color:#FFD966;"></i> ${escapeHtml(winner.challenges.week_label || winner.challenges.title)}
+              </div>` : ''}
+              ${winner.winner_social_url ? `<div class="winner-social">
+                <a href="${escapeHtml(winner.winner_social_url)}" target="_blank" rel="noopener">
+                  <i class="fas fa-external-link-alt me-1"></i>View their winning post
+                </a>
+              </div>` : ''}
+              ${winner.testimonial ? `<div class="winner-testimonial">${escapeHtml(winner.testimonial)}</div>` : ''}
+              <div class="winner-stats">
+                <div class="winner-stat">
+                  <i class="fas fa-star"></i>${winner.points_awarded || 0} pts
+                </div>
+                <div class="winner-stat">
+                  <i class="fas fa-money-bill-wave"></i>${escapeHtml(winner.cash_value || '₦' + ((winner.points_awarded || 0) * 100))}
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+    } catch (err) {
+      console.error('Error loading winners:', err);
+    }
+  }
+
+  // ============================================
+  // OPEN CHALLENGE ENTRY MODAL (WITH CAPTION)
+  // ============================================
+  window.openChallengeEntry = function(challengeId) {
+    document.getElementById('entryChallengeId').value = challengeId;
+    document.getElementById('challengeEntryForm').reset();
+
+    if (currentChallenge) {
+      document.getElementById('challengeEntryIntro').innerHTML = `
+        <div style="font-size: 0.85rem;">
+          <i class="fas fa-fire text-warning me-1"></i>
+          <strong style="color:#FFD966;">${escapeHtml(currentChallenge.title)}</strong>
+          <span style="opacity:0.85;"> — Submit your social media post URL below. Only <strong>ONE winner</strong> gets ${escapeHtml(currentChallenge.prize_cash || '₦10,000')}!</span>
+        </div>
+      `;
+
+      // Show caption preview with default Instagram caption
+      const preview = buildChallengeCaption(currentChallenge, 'Instagram');
+      document.getElementById('captionBox').style.display = 'block';
+      document.getElementById('captionTextPreview').innerHTML = 
+        escapeHtml(preview.caption) + 
+        `<span class="hashtags">${escapeHtml(preview.hashtags.substring(0, 250))}...</span>`;
+    }
+
+    const modal = new bootstrap.Modal(document.getElementById('challengeEntryModal'));
+    modal.show();
+  };
+
+  // Update caption preview when user changes platform
+  document.getElementById('entryPlatform')?.addEventListener('change', function() {
+    if (!currentChallenge) return;
+    const platform = this.value || 'Other';
+    const preview = buildChallengeCaption(currentChallenge, platform);
+    document.getElementById('captionTextPreview').innerHTML = 
+      escapeHtml(preview.caption) + 
+      `<span class="hashtags">${escapeHtml(preview.hashtags.substring(0, 250))}...</span>`;
+  });
+
+  // Copy caption button
+  document.getElementById('copyCaptionBtn')?.addEventListener('click', async () => {
+    if (!currentChallenge) return;
+    const platform = document.getElementById('entryPlatform').value || 'Instagram';
+    const preview = buildChallengeCaption(currentChallenge, platform);
+
+    try {
+      await navigator.clipboard.writeText(preview.fullText);
+      Swal.fire({
+        icon: 'success',
+        title: 'Caption Copied! 📋',
+        html: `
+          <p style="font-size:0.9rem; opacity:0.85;">
+            Your ready-to-use caption + hashtags have been copied. Paste it when sharing on ${escapeHtml(platform)}!
+          </p>
+        `,
+        background: 'rgba(20,40,48,0.98)',
+        color: '#f0f3f8',
+        confirmButtonColor: '#FFD966',
+        timer: 2500,
+        showConfirmButton: false
+      });
+    } catch (err) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Copy Failed',
+        text: 'Your browser blocked clipboard access. Please copy manually.',
+        background: 'rgba(20,40,48,0.98)',
+        color: '#f0f3f8',
+        confirmButtonColor: '#FFD966'
+      });
+    }
+  });
+
+  // ============================================
+  // HANDLE ENTRY FORM SUBMISSION
+  // ============================================
+  document.getElementById('challengeEntryForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+
+    const challengeId = document.getElementById('entryChallengeId').value;
+    const name = document.getElementById('entryName').value.trim();
+    const email = document.getElementById('entryEmail').value.trim();
+    const platform = document.getElementById('entryPlatform').value;
+    const url = document.getElementById('entryUrl').value.trim();
+
+    if (!name || !email || !platform || !url) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Missing Fields',
+        text: 'Please fill in all required fields',
+        background: 'rgba(20,40,48,0.98)',
+        color: '#f0f3f8',
+        confirmButtonColor: '#FFD966'
+      });
+      return;
+    }
+
+    try {
+      new URL(url);
+    } catch {
+      Swal.fire({
+        icon: 'error',
+        title: 'Invalid URL',
+        text: 'Please enter a valid social media post URL',
+        background: 'rgba(20,40,48,0.98)',
+        color: '#f0f3f8',
+        confirmButtonColor: '#FFD966'
+      });
+      return;
+    }
+
+    const submitBtn = document.getElementById('submitEntryBtn');
+    const originalBtn = submitBtn.innerHTML;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Submitting...';
+    submitBtn.disabled = true;
+
+    try {
+      const { data, error } = await supabaseClient
+        .from('challenge_entries')
+        .insert([{
+          challenge_id: parseInt(challengeId),
+          user_name: name,
+          user_email: email,
+          social_url: url,
+          social_platform: platform,
+          status: 'pending'
+        }])
+        .select();
+
+      if (error) throw error;
+
+      console.log('✅ Entry saved:', data);
+
+      // Build a share-ready caption for the user to copy
+      const preview = buildChallengeCaption(currentChallenge, platform);
+      const encodedCaption = encodeURIComponent(preview.fullText);
+      const pageUrl = encodeURIComponent('https://your-domain.com/gallery.html');
+
+      // Build platform share URLs
+      let shareUrl = '';
+      const platformKey = (platform || '').toLowerCase().replace(/\s.*$/, '');
+
+      if (platformKey === 'instagram' || platformKey === 'tiktok') {
+        shareUrl = ''; // Instagram/TikTok don't have web share; user copies caption manually
+      } else if (platformKey === 'facebook') {
+        shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${pageUrl}&quote=${encodedCaption}`;
+      } else if (platformKey === 'twitter') {
+        shareUrl = `https://twitter.com/intent/tweet?text=${encodedCaption}&url=${pageUrl}`;
+      } else if (platformKey === 'whatsapp') {
+        shareUrl = `https://wa.me/?text=${encodedCaption}%0A%0A${pageUrl}`;
+      } else if (platformKey === 'linkedin') {
+        shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${pageUrl}`;
+      } else if (platformKey === 'youtube') {
+        shareUrl = ''; // YouTube has no direct share
+      }
+
+      // Show success + offer to share or copy caption
+      const result = await Swal.fire({
+        icon: 'success',
+        title: 'Entry Submitted! 🎉',
+        html: `
+          <p>Thank you, <strong>${escapeHtml(name)}</strong>!</p>
+          <p style="font-size: 0.9rem; opacity: 0.85; margin-top: 0.5rem;">
+            Your entry has been received. Only <strong style="color:#FFD966;">ONE winner</strong> will be chosen per challenge.
+          </p>
+          <p style="font-size: 0.8rem; opacity: 0.75; margin-top: 0.8rem;">
+            <i class="fas fa-star" style="color:#FFD966;"></i>
+            Winner gets <strong>${currentChallenge?.prize_cash || '₦10,000'}</strong>
+          </p>
+          ${shareUrl ? `
+            <p style="font-size: 0.8rem; color:#FFD966; margin-top: 1rem;">
+              📸 Help us grow the challenge — share it with your friends!
+            </p>
+          ` : `
+            <p style="font-size: 0.8rem; color:#FFD966; margin-top: 1rem;">
+              📋 Your caption + hashtags are ready. Tap <strong>Copy Caption</strong> to share on ${escapeHtml(platform)}.
+            </p>
+          `}
+        `,
+        background: 'rgba(20,40,48,0.98)',
+        color: '#f0f3f8',
+        confirmButtonColor: '#FFD966',
+        confirmButtonText: shareUrl ? '<i class="fas fa-share-alt me-1"></i>Share Challenge' : '<i class="fas fa-copy me-1"></i>Copy Caption',
+        showCancelButton: true,
+        cancelButtonText: 'Close',
+        cancelButtonColor: '#6c757d'
+      });
+
+      if (result.isConfirmed) {
+        if (shareUrl) {
+          window.open(shareUrl, '_blank');
+        } else {
+          // Copy caption for Instagram/TikTok/YouTube
+          try {
+            await navigator.clipboard.writeText(preview.fullText);
+            Swal.fire({
+              icon: 'success',
+              title: 'Caption Copied! 📋',
+              text: 'Paste it when you share on ' + platform,
+              background: 'rgba(20,40,48,0.98)',
+              color: '#f0f3f8',
+              confirmButtonColor: '#FFD966',
+              timer: 2000,
+              showConfirmButton: false
+            });
+          } catch (err) {
+            console.error('Copy failed:', err);
+          }
+        }
+      }
+
+      this.reset();
+      bootstrap.Modal.getInstance(document.getElementById('challengeEntryModal')).hide();
+
+    } catch (err) {
+      console.error('❌ Entry submission error:', err);
+      Swal.fire({
+        icon: 'error',
+        title: 'Submission Failed',
+        text: err.message || 'Something went wrong. Please try again.',
+        background: 'rgba(20,40,48,0.98)',
+        color: '#f0f3f8',
+        confirmButtonColor: '#FFD966'
+      });
+    } finally {
+      submitBtn.innerHTML = originalBtn;
+      submitBtn.disabled = false;
+    }
+  });
+
+  // Load challenge + winners on page load
+  loadCurrentChallenge();
+  loadWinners();
+
+  console.log('%c✨ Weekly Challenge System Loaded ✨', 'color: #FFD966; font-size: 16px');
+  console.log('%c🏆 Only ONE winner per challenge (enforced by database constraint)', 'color: #FFB347; font-size: 12px');
+  console.log('%c📸 Auto-generates social captions + hashtags for every platform', 'color: #FFB347; font-size: 12px');
+</script>
+
+<style>
+  .main-content { opacity: 0; visibility: hidden; }
+  .main-content.visible { opacity: 1; visibility: visible; }
+  .btn-outline-gold { border: 1px solid #FFD966; background: transparent; color: #FFD966; border-radius: 40px; padding: 8px 28px; transition: 0.25s; }
+  .btn-outline-gold:hover { background: #FFD966; color: #1e2f38; }
+</style>
+</body>
+</html>

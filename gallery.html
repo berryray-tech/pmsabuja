@@ -1,0 +1,1357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Pontifical Mission Society Gallery</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(145deg, #0b1a22 0%, #132b34 50%, #1e3e4a 100%);
+      color: #f0f3f8;
+      overflow-x: hidden;
+      min-height: 100vh;
+      position: relative;
+    }
+
+    .logo-bg-layer {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      opacity: 0.04;
+      background-image: url('Images/main logo.jpeg');
+      background-repeat: repeat; background-size: 320px 320px;
+      background-position: center center;
+      filter: brightness(1.4) contrast(0.9);
+      mix-blend-mode: lighten;
+    }
+    .logo-bg-overlay {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background:
+        radial-gradient(circle at 20% 20%, rgba(255,217,102,0.06), transparent 45%),
+        radial-gradient(circle at 80% 80%, rgba(95,176,212,0.06), transparent 45%),
+        linear-gradient(180deg, rgba(11,26,34,0.55) 0%, rgba(11,26,34,0.15) 50%, rgba(11,26,34,0.55) 100%);
+    }
+    .hero-logo-watermark {
+      position: absolute; top: 55%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 520px; height: 520px; max-width: 80vw; max-height: 80vw;
+      background-image: url('Images/main logo.jpeg');
+      background-size: contain; background-repeat: no-repeat; background-position: center;
+      opacity: 0.06; pointer-events: none; z-index: 0;
+      filter: blur(0.5px) brightness(1.5);
+      animation: watermarkFloat 14s ease-in-out infinite;
+    }
+    @keyframes watermarkFloat {
+      0%, 100% { transform: translate(-50%, -50%) scale(1) rotate(0deg); }
+      50% { transform: translate(-50%, -50%) scale(1.05) rotate(3deg); }
+    }
+
+    .bg-orbs { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+    .bg-orb { position: absolute; border-radius: 50%; filter: blur(70px); opacity: 0.3; }
+    .orb-gold-1 { width: 450px; height: 450px; background: radial-gradient(circle, #FFD966, transparent 70%); top: -150px; left: -120px; animation: floatOrb1 20s ease-in-out infinite; }
+    .orb-blue { width: 550px; height: 550px; background: radial-gradient(circle, #5fb0d4, transparent 70%); bottom: -200px; right: -150px; animation: floatOrb2 24s ease-in-out infinite; }
+    .orb-gold-2 { width: 350px; height: 350px; background: radial-gradient(circle, #FFB347, transparent 70%); top: 45%; right: 8%; animation: floatOrb3 22s ease-in-out infinite; opacity: 0.18; }
+    @keyframes floatOrb1 { 0%, 100% { transform: translate(0,0) scale(1); } 33% { transform: translate(70px, 90px) scale(1.1); } 66% { transform: translate(-50px, 60px) scale(0.95); } }
+    @keyframes floatOrb2 { 0%, 100% { transform: translate(0,0) scale(1); } 50% { transform: translate(-90px, -70px) scale(1.15); } }
+    @keyframes floatOrb3 { 0%, 100% { transform: translate(0,0); } 50% { transform: translate(-60px, 50px); } }
+
+    .navbar, .page-header, .gallery-section, footer { position: relative; z-index: 1; }
+
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); }
+    ::-webkit-scrollbar-thumb { background: rgba(255,215,150,0.5); border-radius: 10px; }
+
+    .navbar {
+      background: rgba(10, 25, 30, 0.55);
+      backdrop-filter: blur(22px) saturate(180%);
+      -webkit-backdrop-filter: blur(22px) saturate(180%);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.08);
+      border-bottom: 1px solid rgba(255,217,102,0.15);
+      padding: 12px 0;
+      z-index: 1050;
+    }
+    .navbar-brand {
+      font-weight: 700; font-size: 1.7rem;
+      background: linear-gradient(135deg, #FFE6B0, #FFC97E);
+      -webkit-background-clip: text; background-clip: text; color: transparent !important;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .logo-icon { font-size: 1.8rem; color: #FFD966; margin-right: 8px; }
+    .navbar-logo-img {
+      height: 45px; width: 45px; object-fit: contain;
+      border-radius: 50%;
+      border: 2px solid rgba(255,217,102,0.5);
+      background: rgba(255,255,255,0.06);
+      backdrop-filter: blur(6px);
+      padding: 3px; transition: 0.3s;
+      animation: logoFloat 4s ease-in-out infinite;
+    }
+    @keyframes logoFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
+    .navbar-logo-img:hover { transform: scale(1.1) rotate(5deg); border-color: #FFD966; box-shadow: 0 0 20px rgba(255,217,102,0.55); }
+
+    .navbar-toggler { border-color: rgba(255,215,150,0.6); background: rgba(255,217,102,0.08); padding: 6px 10px; }
+    .navbar-toggler:focus { box-shadow: 0 0 0 3px rgba(255,217,102,0.25); outline: none; }
+    .navbar-toggler-icon {
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(255,217,102,1)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important;
+    }
+
+    .nav-link { color: rgba(255,248,225,0.9) !important; font-weight: 500; margin: 0 6px; transition: 0.3s; }
+    .nav-link:hover, .nav-link.active { color: #FFD966 !important; transform: translateY(-2px); }
+
+    @media (max-width: 991px) {
+      .navbar-logo-img { height: 38px; width: 38px; }
+      .navbar-brand { font-size: 1.3rem; }
+      .navbar-collapse {
+        background: rgba(10, 25, 30, 0.98);
+        backdrop-filter: blur(20px);
+        border-radius: 1rem; padding: 1rem; margin-top: 1rem;
+        border: 1px solid rgba(255,217,102,0.3);
+        box-shadow: 0 15px 40px rgba(0,0,0,0.5);
+      }
+      .nav-link { padding: 0.8rem 1rem; text-align: center; border-radius: 0.5rem; margin: 3px 0; }
+      .nav-link:hover, .nav-link.active { background: rgba(255,217,102,0.12); transform: none; }
+    }
+
+    .page-header { position: relative; padding: 140px 20px 60px; text-align: center; z-index: 1; overflow: hidden; }
+    .glass-header {
+      background: rgba(20, 40, 48, 0.4);
+      backdrop-filter: blur(28px) saturate(180%);
+      -webkit-backdrop-filter: blur(28px) saturate(180%);
+      border-radius: 3rem; padding: 2.5rem 3rem;
+      border: 1px solid rgba(255,230,170,0.35);
+      display: inline-block;
+      box-shadow: 0 25px 55px -12px rgba(0,0,0,0.5),
+                  inset 0 1px 0 rgba(255,255,255,0.15),
+                  inset 0 -1px 0 rgba(0,0,0,0.15);
+      position: relative; overflow: hidden;
+      animation: headerFloat 5s ease-in-out infinite;
+      z-index: 2;
+    }
+    @keyframes headerFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+    .glass-header::before {
+      content: ''; position: absolute;
+      top: 0; left: -50%; width: 200%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.07), transparent);
+      animation: shineSweep 7s ease-in-out infinite; pointer-events: none;
+    }
+    @keyframes shineSweep { 0%, 100% { transform: translateX(-100%); } 50% { transform: translateX(100%); } }
+    .glass-header h1 {
+      font-size: 3rem; font-weight: 800;
+      background: linear-gradient(135deg, #FFF6E0, #FFDA88);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+      position: relative; z-index: 1;
+    }
+    .glass-header p { font-size: 1.2rem; opacity: 0.95; position: relative; z-index: 1; }
+
+    .gallery-section { padding: 40px 20px 80px; position: relative; z-index: 1; }
+    .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 30px; }
+
+    .gallery-card {
+      background: rgba(25, 45, 55, 0.4);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      border-radius: 1.5rem;
+      border: 1px solid rgba(255,230,170,0.25);
+      overflow: hidden;
+      transition: all 0.5s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+      position: relative; cursor: pointer;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.3),
+                  inset 0 1px 0 rgba(255,255,255,0.12),
+                  inset 0 -1px 0 rgba(0,0,0,0.1);
+    }
+    .gallery-card::before {
+      content: ''; position: absolute; inset: 0;
+      border-radius: 1.5rem; padding: 1.5px;
+      background: linear-gradient(135deg, transparent, transparent);
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor; mask-composite: exclude;
+      transition: 0.5s; pointer-events: none; z-index: 3;
+    }
+    .gallery-card:hover::before {
+      background: linear-gradient(135deg, #FFD966, #FFB347, #FFD966);
+      background-size: 200% 200%;
+      animation: borderGlow 1.5s ease infinite;
+    }
+    @keyframes borderGlow {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    .gallery-card:hover {
+      transform: translateY(-10px) scale(1.02);
+      background: rgba(35, 65, 78, 0.65);
+      border-color: #FFD966;
+      box-shadow: 0 30px 55px rgba(0,0,0,0.5),
+                  0 0 40px rgba(255,217,102,0.15),
+                  inset 0 1px 0 rgba(255,255,255,0.15);
+    }
+
+    .image-container { position: relative; width: 100%; height: 240px; overflow: hidden; }
+    .gallery-img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s ease; }
+    .gallery-card:hover .gallery-img { transform: scale(1.08); }
+    .image-container::after {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(180deg, transparent 50%, rgba(0,0,0,0.5) 100%);
+      pointer-events: none;
+    }
+
+    .image-overlay {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      background: linear-gradient(0deg, rgba(0,0,0,0.85), transparent);
+      padding: 1.2rem 1rem 0.8rem;
+      transform: translateY(100%); transition: transform 0.4s ease;
+      z-index: 2;
+    }
+    .gallery-card:hover .image-overlay { transform: translateY(0); }
+
+    .share-bar {
+      position: absolute; top: 0; left: 0; right: 0;
+      background: linear-gradient(180deg, rgba(0,0,0,0.75), transparent);
+      padding: 0.6rem;
+      display: flex; justify-content: center; gap: 6px;
+      transform: translateY(-100%); transition: transform 0.4s ease;
+      z-index: 2; flex-wrap: wrap;
+    }
+    .gallery-card:hover .share-bar { transform: translateY(0); }
+
+    .share-btn {
+      width: 32px; height: 32px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(255,255,255,0.12);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.2);
+      color: white; font-size: 0.8rem;
+      text-decoration: none;
+      transition: all 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+      cursor: pointer;
+    }
+    .share-btn:hover { transform: translateY(-3px) scale(1.15); box-shadow: 0 6px 15px rgba(0,0,0,0.4); }
+    .share-btn.whatsapp:hover { background: #25D366; border-color: #25D366; }
+    .share-btn.facebook:hover { background: #1877F2; border-color: #1877F2; }
+    .share-btn.twitter:hover { background: #000; border-color: #000; }
+    .share-btn.telegram:hover { background: #0088cc; border-color: #0088cc; }
+    .share-btn.linkedin:hover { background: #0A66C2; border-color: #0A66C2; }
+    .share-btn.pinterest:hover { background: #E60023; border-color: #E60023; }
+    .share-btn.tiktok:hover { background: #000; border-color: #25F4EE; color: #25F4EE; }
+    .share-btn.email:hover { background: #FFD966; color: #1e2f38; border-color: #FFD966; }
+    .share-btn.copy:hover { background: #FFD966; color: #1e2f38; border-color: #FFD966; }
+
+    .card-content { padding: 1.2rem; position: relative; z-index: 1; }
+    .event-title { font-size: 1.05rem; font-weight: 700; color: #FFE2A4; margin-bottom: 0.3rem; }
+    .event-organizer { font-size: 0.78rem; color: #FFD966; margin-bottom: 0.3rem; }
+    .event-organizer i { margin-right: 6px; font-size: 0.7rem; }
+    .event-date { font-size: 0.72rem; opacity: 0.8; margin-bottom: 0.8rem; }
+    .event-date i { margin-right: 6px; }
+
+    .btn-group-card { display: flex; gap: 8px; margin-top: 0.5rem; flex-wrap: wrap; }
+    .btn-glass {
+      background: rgba(255,217,102,0.12); backdrop-filter: blur(8px);
+      border: 1px solid rgba(255,217,102,0.4);
+      border-radius: 30px; padding: 0.4rem 1rem;
+      font-size: 0.75rem; font-weight: 500; color: #FFD966;
+      transition: all 0.3s; text-decoration: none;
+      display: inline-flex; align-items: center; gap: 6px; cursor: pointer;
+    }
+    .btn-glass:hover {
+      background: linear-gradient(135deg, #FFD966, #FFB347);
+      color: #1e2f38; transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(255,217,102,0.4);
+    }
+    .btn-download {
+      background: rgba(255,217,102,0.12); backdrop-filter: blur(8px);
+      border: 1px solid rgba(255,217,102,0.4);
+      border-radius: 30px; padding: 0.4rem 1rem;
+      font-size: 0.75rem; font-weight: 500; color: #FFD966;
+      transition: all 0.3s; cursor: pointer;
+    }
+    .btn-download:hover {
+      background: linear-gradient(135deg, #FFD966, #FFB347);
+      color: #1e2f38; transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(255,217,102,0.4);
+    }
+
+    footer {
+      background: rgba(5, 20, 25, 0.7);
+      backdrop-filter: blur(16px);
+      padding: 2rem; text-align: center;
+      border-top: 1px solid rgba(255,210,130,0.2);
+      margin-top: 2rem; position: relative; z-index: 1;
+    }
+
+    .btn-outline-gold {
+      border: 1px solid #FFD966; background: transparent;
+      color: #FFD966; border-radius: 40px;
+      padding: 8px 28px; transition: 0.25s;
+    }
+    .btn-outline-gold:hover { background: #FFD966; color: #1e2f38; }
+    .image-overlay { pointer-events: none; }
+
+    .support-btn {
+      position: fixed; bottom: 30px; left: 30px; height: 55px;
+      background: linear-gradient(135deg, #FFD966, #FFB347);
+      border-radius: 50px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; z-index: 999;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.35), 0 0 25px rgba(255,217,102,0.3), inset 0 1px 0 rgba(255,255,255,0.4);
+      padding: 0 22px; transition: all 0.3s;
+      animation: supportPulse 2.5s ease-in-out infinite;
+      gap: 8px; border: none;
+    }
+    @keyframes supportPulse {
+      0%, 100% { box-shadow: 0 8px 25px rgba(0,0,0,0.35), 0 0 25px rgba(255,217,102,0.3), inset 0 1px 0 rgba(255,255,255,0.4); }
+      50% { box-shadow: 0 8px 25px rgba(0,0,0,0.35), 0 0 40px rgba(255,217,102,0.55), inset 0 1px 0 rgba(255,255,255,0.4); }
+    }
+    .support-btn:hover { transform: scale(1.08) translateY(-3px); }
+    .support-btn i { font-size: 1.3rem; color: #1e2f38; }
+    .support-btn span { font-size: 0.85rem; font-weight: 700; color: #1e2f38; letter-spacing: 0.3px; }
+
+    .ticket-modal-content {
+      background: rgba(20, 40, 48, 0.98);
+      backdrop-filter: blur(28px);
+      border: 1px solid #FFD966;
+      border-radius: 1.5rem;
+      color: white;
+    }
+    .ticket-modal-content .modal-header { border-bottom: 1px solid rgba(255,217,102,0.3); }
+    .ticket-modal-content .form-label { color: #FFD966; font-weight: 500; font-size: 0.85rem; margin-bottom: 4px; }
+    .ticket-modal-content .form-control,
+    .ticket-modal-content .form-select {
+      background: rgba(255,255,255,0.08); backdrop-filter: blur(8px);
+      border: 1px solid rgba(255,230,170,0.3);
+      color: white; padding: 0.7rem 1rem;
+      border-radius: 0.8rem; transition: 0.3s;
+    }
+    .ticket-modal-content .form-control:focus,
+    .ticket-modal-content .form-select:focus {
+      background: rgba(255,255,255,0.15);
+      border-color: #FFD966;
+      box-shadow: 0 0 0 3px rgba(255,217,102,0.2);
+      color: white;
+    }
+    .ticket-modal-content .form-control::placeholder { color: rgba(255,255,255,0.5); }
+    .ticket-modal-content .form-select option { background: #1e2f38; color: white; }
+    .btn-submit-ticket {
+      background: linear-gradient(135deg, #FFD966, #FFB347);
+      border: none; padding: 0.85rem 2rem;
+      border-radius: 2rem; color: #1e2f38;
+      font-weight: 700; width: 100%; transition: 0.3s;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.4);
+    }
+    .btn-submit-ticket:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(255,217,102,0.45), inset 0 1px 0 rgba(255,255,255,0.4);
+    }
+
+    .caption-preview {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,217,102,0.3);
+      border-radius: 1rem;
+      padding: 1rem;
+      margin-top: 1rem;
+      text-align: left;
+      font-size: 0.85rem;
+      line-height: 1.6;
+      color: #f0f3f8;
+      max-height: 200px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      font-family: 'Poppins', sans-serif;
+    }
+    .caption-preview .hashtags {
+      color: #FFD966;
+      font-weight: 600;
+    }
+    .copy-caption-btn {
+      background: rgba(255,217,102,0.15);
+      border: 1px solid #FFD966;
+      color: #FFD966;
+      padding: 0.5rem 1.2rem;
+      border-radius: 2rem;
+      font-weight: 600;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: 0.3s;
+      margin-top: 0.8rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .copy-caption-btn:hover {
+      background: #FFD966;
+      color: #1e2f38;
+      transform: translateY(-2px);
+    }
+
+    @media (max-width: 768px) {
+      .glass-header h1 { font-size: 2rem; }
+      .glass-header { padding: 1.5rem 1.8rem; }
+      .gallery-grid { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
+      .image-container { height: 200px; }
+      .share-btn { width: 28px; height: 28px; font-size: 0.7rem; }
+      .logo-bg-layer { background-size: 200px 200px; }
+      .hero-logo-watermark { width: 380px; height: 380px; }
+      .support-btn { bottom: 20px; left: 20px; height: 48px; padding: 0 16px; }
+      .support-btn span { font-size: 0.75rem; }
+      .support-btn i { font-size: 1.1rem; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="logo-bg-layer"></div>
+<div class="logo-bg-overlay"></div>
+
+<div class="bg-orbs">
+  <div class="bg-orb orb-gold-1"></div>
+  <div class="bg-orb orb-blue"></div>
+  <div class="bg-orb orb-gold-2"></div>
+</div>
+
+<!-- NAVBAR -->
+<nav class="navbar navbar-expand-lg fixed-top">
+  <div class="container">
+    <a class="navbar-brand d-flex align-items-center" href="index.html">
+      <img src="Images/main logo.jpeg"
+           alt="Pontifical Mission Society Logo"
+           class="navbar-logo-img"
+           onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
+      <i class="fas fa-church logo-icon" style="display: none;"></i>
+      <span>Pontifical Mission Society</span>
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="mainNav">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item"><a class="nav-link" href="index.html"><i class="fas fa-home me-1"></i>Home</a></li>
+        <li class="nav-item"><a class="nav-link" href="about.html"><i class="fas fa-heart me-1"></i>About</a></li>
+        <li class="nav-item"><a class="nav-link" href="animators.html"><i class="fas fa-users me-1"></i>Animators</a></li>
+        <li class="nav-item"><a class="nav-link" href="projects.html"><i class="fas fa-hands-helping me-1"></i>Projects</a></li>
+        <li class="nav-item"><a class="nav-link" href="news.html"><i class="fas fa-newspaper me-1"></i>News</a></li>
+        <li class="nav-item"><a class="nav-link" href="contact.html"><i class="fas fa-envelope me-1"></i>Contact</a></li>
+        <li class="nav-item"><a class="nav-link active" href="gallery.html"><i class="fas fa-images me-1"></i>Gallery</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- PAGE HEADER -->
+<div class="page-header">
+  <div class="hero-logo-watermark"></div>
+  <div class="container">
+    <div class="glass-header" data-aos="fade-up">
+      <h1><i class="fas fa-images me-2"></i>Pontifical Mission Society Gallery</h1>
+      <p>Capturing moments of faith, fellowship, and missionary spirit</p>
+      <div class="mt-3">
+        <i class="fas fa-calendar-alt" style="color:#FFD966;"></i>
+        <span class="mx-2">•</span>
+        <i class="fas fa-users" style="color:#FFD966;"></i>
+        <span class="mx-2">•</span>
+        <i class="fas fa-heart" style="color:#FFD966;"></i>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- GALLERY GRID -->
+<section class="gallery-section">
+  <div class="container">
+    <div class="gallery-grid" id="galleryGrid"></div>
+  </div>
+</section>
+
+<footer>
+  <p><i class="fas fa-cross me-1"></i> © 2026 Pontifical Mission Society · Spreading the Gospel Worldwide</p>
+  <p style="opacity:0.7;">Designed with <i class="fas fa-heart" style="color:#FFD966;"></i> by BerryRay Technologies</p>
+</footer>
+
+<!-- SUPPORT BUTTON -->
+<button class="support-btn" id="supportBtn" title="Raise a Support Ticket">
+  <i class="fas fa-headset"></i>
+  <span>Support</span>
+</button>
+
+<!-- SUPPORT TICKET MODAL -->
+<div class="modal fade" id="supportModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content ticket-modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" style="color:#FFD966;">
+          <i class="fas fa-ticket-alt me-2"></i>Raise a Support Ticket
+        </h4>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <p style="opacity:0.85; font-size:0.9rem; margin-bottom:1.2rem;">
+          <i class="fas fa-info-circle text-warning me-1"></i>
+          Fill in the form below and our team will get back to you shortly. All tickets are logged and tracked.
+        </p>
+
+        <form id="ticketForm">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label"><i class="fas fa-user me-1"></i>Full Name *</label>
+              <input type="text" class="form-control" id="ticketName" required placeholder="Enter your full name">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label"><i class="fas fa-envelope me-1"></i>Email *</label>
+              <input type="email" class="form-control" id="ticketEmail" required placeholder="your@email.com">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label"><i class="fas fa-phone me-1"></i>Phone / WhatsApp</label>
+              <input type="tel" class="form-control" id="ticketPhone" placeholder="+234 XXX XXX XXXX">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label"><i class="fas fa-tag me-1"></i>Category *</label>
+              <select class="form-select" id="ticketCategory" required>
+                <option value="" disabled selected>Select category</option>
+                <option value="General Inquiry">General Inquiry</option>
+                <option value="Technical Issue">Technical Issue</option>
+                <option value="Prayer Request">Prayer Request</option>
+                <option value="Donation / Support">Donation / Support</option>
+                <option value="Gallery Inquiry">Gallery Inquiry</option>
+                <option value="Event Information">Event Information</option>
+                <option value="Complaint">Complaint</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            <div class="col-12">
+              <label class="form-label"><i class="fas fa-heading me-1"></i>Subject *</label>
+              <input type="text" class="form-control" id="ticketSubject" required placeholder="Brief summary of your issue">
+            </div>
+            <div class="col-12">
+              <label class="form-label"><i class="fas fa-comment-dots me-1"></i>Description *</label>
+              <textarea class="form-control" id="ticketMessage" rows="5" required placeholder="Describe your issue or request in detail..."></textarea>
+            </div>
+            <div class="col-12">
+              <button type="submit" class="btn-submit-ticket" id="submitTicketBtn">
+                <i class="fas fa-paper-plane me-2"></i>Submit Ticket
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+<script>
+  AOS.init({ once: true, offset: 60, duration: 700 });
+
+  const WHATSAPP_NUMBER = '2348091234567';  // ← CHANGE
+  const SUPABASE_URL = 'https://ekhzbclqpelsrfefufpv.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVraHpiY2xxcGVsc3JmZWZ1ZnB2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY4NjQ2MjUsImV4cCI6MjA5MjQ0MDYyNX0.7dJiDcV4q8Ss_4Ua19-L-VFSxThJKNLyBv__bfdx02M';
+
+  const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  // ============================================
+  // ORIGINAL 12 GALLERY ITEMS
+  // ============================================
+  const baseGalleryData = [
+    { id: 1, imageUrl: "https://images.pexels.com/photos/267950/pexels-photo-267950.jpeg?w=800&h=500&fit=crop", title: "YOMM National Congress 2025", organizer: "YOMM Nigeria", date: "December 10-15, 2025" },
+    { id: 2, imageUrl: "https://images.pexels.com/photos/267951/pexels-photo-267951.jpeg?w=800&h=500&fit=crop", title: "Missionary Formation Workshop", organizer: "Pontifical Mission Society", date: "October 5-7, 2025" },
+    { id: 3, imageUrl: "https://images.pexels.com/photos/267952/pexels-photo-267952.jpeg?w=800&h=500&fit=crop", title: "Youth Evangelization Outreach", organizer: "YOMM Abuja Province", date: "August 20, 2025" },
+    { id: 4, imageUrl: "https://images.pexels.com/photos/267953/pexels-photo-267953.jpeg?w=800&h=500&fit=crop", title: "Leadership Training Camp", organizer: "Catholic Youth Organization", date: "June 15-18, 2025" },
+    { id: 5, imageUrl: "https://images.pexels.com/photos/267954/pexels-photo-267954.jpeg?w=800&h=500&fit=crop", title: "Prayer Vigil for Missions", organizer: "Holy Childhood Association", date: "May 30, 2025" },
+    { id: 6, imageUrl: "https://images.pexels.com/photos/267955/pexels-photo-267955.jpeg?w=800&h=500&fit=crop", title: "Charity Outreach Program", organizer: "YOMM Charity Arm", date: "April 12, 2025" },
+    { id: 7, imageUrl: "https://images.pexels.com/photos/267956/pexels-photo-267956.jpeg?w=800&h=500&fit=crop", title: "Missionary Quiz Competition", organizer: "Pontifical Mission Union", date: "March 22, 2025" },
+    { id: 8, imageUrl: "https://images.pexels.com/photos/267957/pexels-photo-267957.jpeg?w=800&h=500&fit=crop", title: "Cultural Fiesta", organizer: "YOMM Cultural Committee", date: "February 14, 2025" },
+    { id: 9, imageUrl: "https://images.pexels.com/photos/267958/pexels-photo-267958.jpeg?w=800&h=500&fit=crop", title: "Retreat for Animators", organizer: "Society for Propagation of Faith", date: "January 25-27, 2025" },
+    { id: 10, imageUrl: "https://images.pexels.com/photos/267959/pexels-photo-267959.jpeg?w=800&h=500&fit=crop", title: "World Mission Sunday", organizer: "Pontifical Mission Society", date: "October 20, 2024" },
+    { id: 11, imageUrl: "https://images.pexels.com/photos/267960/pexels-photo-267960.jpeg?w=800&h=500&fit=crop", title: "Seminar on Evangelization", organizer: "Pontifical Mission Union", date: "September 8, 2024" },
+    { id: 12, imageUrl: "https://images.pexels.com/photos/267961/pexels-photo-267961.jpeg?w=800&h=500&fit=crop", title: "Youth Festival 2024", organizer: "YOMM National", date: "August 5-8, 2024" }
+  ];
+
+  function generateExtraImages(count = 100) {
+    const titles = [
+      "Annual General Meeting", "Easter Celebration", "Christmas Carol Night",
+      "Baptism Ceremony", "First Holy Communion", "Confirmation Mass",
+      "Catechist Training", "Choir Festival", "Bible Study Retreat",
+      "Rosary Procession", "Adoration Night", "Youth Camp",
+      "Community Outreach", "Food Drive", "Medical Mission",
+      "School Visit", "Orphanage Visit", "Prison Ministry",
+      "Hospital Visitation", "Elderly Care Visit", "Clean-Up Drive",
+      "Tree Planting", "Blood Donation Drive", "Awareness Campaign",
+      "Mission Sunday Celebration", "Vocation Sunday", "Palm Sunday Procession",
+      "Holy Week Retreat", "Good Friday Service", "Divine Mercy Sunday",
+      "Pentecost Celebration", "Corpus Christi Procession", "Feast of Assumption",
+      "All Saints Day Mass", "Christ the King Feast", "Immaculate Conception",
+      "New Year Thanksgiving", "Harvest Festival", "Cultural Day",
+      "Youth Rally", "Teens Encounter", "Kids Missionary Day",
+      "Family Life Seminar", "Marriage Enrichment Retreat", "Singles Forum",
+      "Men's Fellowship", "Women's Guild Meeting", "Catholic Women Organization",
+      "Knights of St. Mulumba Event", "Catholic Men Organization",
+      "Legion of Mary Meeting", "St. Vincent de Paul Outreach",
+      "Charismatic Renewal Prayer", "Youth Bible Quiz",
+      "Children's Talent Show", "Drama Ministry Performance",
+      "Dance Ministry Showcase", "Music Concert", "Gospel Fest",
+      "Anniversary Celebration", "Ordination Ceremony", "Religious Profession",
+      "Diaconate Ordination", "Seminary Visit", "Convent Visit",
+      "Catechetical Week", "Bible Week", "Mission Awareness Week",
+      "Faith Formation Class", "Youth Leadership Summit",
+      "Women's Day Celebration", "Father's Day Event",
+      "Mother's Day Celebration", "Children's Day Party",
+      "Independence Day Mass", "Democracy Day Prayer",
+      "Peace Prayer Meeting", "Interfaith Dialogue",
+      "Ecology Awareness Day", "Laudato Si' Seminar",
+      "Charity Bazaar", "Fundraising Dinner", "Cultural Fiesta",
+      "Talent Showcase Night", "Thanksgiving Service",
+      "Harvest Thanksgiving", "Bazaar Day", "Family Fun Fair",
+      "Sports Festival", "Football Tournament", "Basketball Championship",
+      "Athletics Meet", "Youth Games", "Inter-Parish Competition",
+      "Christmas Play", "Nativity Scene", "Carol Service"
+    ];
+
+    const organizers = [
+      "Pontifical Mission Society", "YOMM National", "YOMM Abuja Province",
+      "Holy Childhood Association", "Pontifical Mission Union",
+      "Society for Propagation of Faith", "St. Patrick's Parish",
+      "Christ the King Parish", "Holy Trinity Parish",
+      "Catholic Youth Organization", "Catholic Women Organization",
+      "Catholic Men Organization", "Knights of St. Mulumba",
+      "Legion of Mary", "St. Vincent de Paul", "Charismatic Renewal",
+      "Archdiocesan Catechetical Commission", "Youth Ministry Council",
+      "Family Life Commission", "Liturgical Commission",
+      "St. Augustine's Parish", "St. Michael's Parish",
+      "Our Lady Queen of Nigeria", "Sacred Heart Parish",
+      "Holy Family Parish", "St. Joseph's Parish",
+      "St. Thomas More Parish", "SS. Peter & Paul Parish",
+      "St. Paul's Parish", "Our Lady of Fatima Parish"
+    ];
+
+    const dates = [
+      "January 2025", "February 2025", "March 2025", "April 2025",
+      "May 2025", "June 2025", "July 2025", "August 2025",
+      "September 2025", "October 2025", "November 2025", "December 2025",
+      "January 2024", "February 2024", "March 2024", "April 2024",
+      "May 2024", "June 2024", "July 2024", "August 2024",
+      "September 2024", "October 2024", "November 2024", "December 2024"
+    ];
+
+    const imagePool = [
+      "https://images.unsplash.com/photo-1507692049790-de58290a4334?w=800&h=500&fit=crop",
+      "https://images.unsplash.com/photo-1438032005730-c779502df39b?w=800&h=500&fit=crop",
+      "https://images.unsplash.com/photo-1548625149-fc4a29cf7092?w=800&h=500&fit=crop",
+      "https://images.unsplash.com/photo-1497486751825-1233686d5d80?w=800&h=500&fit=crop",
+      "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=800&h=500&fit=crop",
+      "https://images.unsplash.com/photo-1541544741938-0af808871cc0?w=800&h=500&fit=crop",
+      "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&h=500&fit=crop",
+      "https://images.unsplash.com/photo-1524230572899-a752b3835840?w=800&h=500&fit=crop",
+      "https://images.unsplash.com/photo-1490730141103-6cac27aaab94?w=800&h=500&fit=crop",
+      "https://images.unsplash.com/photo-1509909756405-be0199881695?w=800&h=500&fit=crop",
+      "https://images.unsplash.com/photo-1519892300165-cb5542fb47c7?w=800&h=500&fit=crop",
+      "https://images.unsplash.com/photo-1490127252417-7c393f993ee4?w=800&h=500&fit=crop",
+      "https://images.unsplash.com/photo-1489493585363-d69421e0edd3?w=800&h=500&fit=crop",
+      "https://images.unsplash.com/photo-1504198453319-5ce911bafcde?w=800&h=500&fit=crop",
+      "https://images.unsplash.com/photo-1544427920-c49ccfb85579?w=800&h=500&fit=crop",
+      "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=800&h=500&fit=crop",
+      "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800&h=500&fit=crop",
+      "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=500&fit=crop",
+      "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=800&h=500&fit=crop",
+      "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=800&h=500&fit=crop",
+      "https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?w=800&h=500&fit=crop",
+      "https://images.unsplash.com/photo-1519681393784-d120267933ba?w=800&h=500&fit=crop",
+      "https://images.unsplash.com/photo-1465101046530-73398c7f28ca?w=800&h=500&fit=crop",
+      "https://images.unsplash.com/photo-1502716119720-b23a93e5fe1b?w=800&h=500&fit=crop",
+      "https://images.unsplash.com/photo-1499750310159-5b5f6c3b4d6a?w=800&h=500&fit=crop",
+      "https://images.unsplash.com/photo-1524758631624-e2822e304c36?w=800&h=500&fit=crop",
+      "https://images.unsplash.com/photo-1543269865-cbf427effbad?w=800&h=500&fit=crop",
+      "https://images.unsplash.com/photo-1511632765486-a01980e01a18?w=800&h=500&fit=crop",
+      "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=800&h=500&fit=crop",
+      "https://images.unsplash.com/photo-1517048676732-d65bc937f952?w=800&h=500&fit=crop",
+      "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=800&h=500&fit=crop",
+      "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=800&h=500&fit=crop",
+      "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=800&h=500&fit=crop",
+      "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=800&h=500&fit=crop",
+      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&h=500&fit=crop",
+      "https://images.unsplash.com/photo-1508186225823-0963cf9ab0de?w=800&h=500&fit=crop",
+      "https://images.unsplash.com/photo-1478147427282-58a87a120781?w=800&h=500&fit=crop",
+      "https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?w=800&h=500&fit=crop",
+      "https://images.unsplash.com/photo-1528605248644-14dd04022da1?w=800&h=500&fit=crop",
+      "https://images.unsplash.com/photo-1513151233558-d860c5398176?w=800&h=500&fit=crop",
+      "https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?w=800&h=500&fit=crop",
+      "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=800&h=500&fit=crop",
+      "https://images.unsplash.com/photo-1522512115668-c09775d6f424?w=800&h=500&fit=crop",
+      "https://images.unsplash.com/photo-1495837174058-628aafc7d610?w=800&h=500&fit=crop",
+      "https://images.unsplash.com/photo-1517457373958-b7bdd4587205?w=800&h=500&fit=crop",
+      "https://images.unsplash.com/photo-1531058020387-3be344556be6?w=800&h=500&fit=crop",
+      "https://images.unsplash.com/photo-1533228100845-08145b01de14?w=800&h=500&fit=crop",
+      "https://images.unsplash.com/photo-1516997121675-4c2d1684aa3e?w=800&h=500&fit=crop",
+      "https://images.unsplash.com/photo-1483721310020-03333e577078?w=800&h=500&fit=crop",
+      "https://images.unsplash.com/photo-1469571486292-0ba58a3f068b?w=800&h=500&fit=crop"
+    ];
+
+    const extra = [];
+    for (let i = 0; i < count; i++) {
+      const title = titles[i % titles.length];
+      const organizer = organizers[i % organizers.length];
+      const date = dates[i % dates.length];
+      const baseImg = imagePool[i % imagePool.length];
+      const imageUrl = baseImg + `&sig=${i+13}`;
+
+      extra.push({
+        id: 13 + i,
+        imageUrl,
+        title: `${title} #${i+1}`,
+        organizer,
+        date
+      });
+    }
+    return extra;
+  }
+
+  const galleryData = [...baseGalleryData, ...generateExtraImages(100)];
+
+  // ============================================
+  // 📸 SOCIAL MEDIA CAPTION & HASHTAG GENERATOR
+  // ============================================
+  const BASE_HASHTAGS = [
+    '#PontificalMissionSociety', '#PMS', '#CatholicChurch', '#MissionaryWork',
+    '#Gospel', '#Faith', '#CatholicLife', '#SpreadTheGospel', '#Mission',
+    '#CatholicFaith', '#CatholicCommunity', '#ChurchFamily', '#PraiseGod',
+    '#GodIsGood', '#Blessed', '#Catholic', '#Church', '#Evangelization'
+  ];
+
+  const PLATFORM_HASHTAGS = {
+    whatsapp: ['#WhatsApp', '#Blessings', '#Amin'],
+    facebook: ['#Facebook', '#CatholicFacebook', '#CatholicCommunity'],
+    twitter: ['#CatholicTwitter', '#CathoTwitter', '#Faith'],
+    telegram: ['#Telegram', '#CatholicChannel'],
+    linkedin: ['#CatholicLeadership', '#FaithAndWork', '#MissionDriven'],
+    pinterest: ['#CatholicPins', '#FaithInspiration', '#ChristianArt', '#CatholicLife'],
+    tiktok: ['#TikTokCatholic', '#CatholicTikTok', '#FaithTok', '#FYP', '#ForYou', '#Viral'],
+    email: [],
+    copy: []
+  };
+
+  const PLATFORM_TONES = {
+    whatsapp: '🙏 Sharing a blessed moment with you!',
+    facebook: '✨ Blessed to share this beautiful moment with our faith family!',
+    twitter: '✝️ A moment of faith, fellowship, and mission!',
+    telegram: '📖 Sharing a moment of grace with the community!',
+    linkedin: '🙏 Honored to share this milestone from our missionary work.',
+    pinterest: '✨ Inspiring moments of Catholic faith and community.',
+    tiktok: '🙏 A blessed moment from our missionary journey!',
+    email: 'Greetings in Christ,',
+    copy: '📸 Sharing a moment from the Pontifical Mission Society:'
+  };
+
+  function toHashtag(str) {
+    if (!str) return '';
+    const cleaned = String(str)
+      .replace(/[^a-zA-Z0-9\s]/g, '')
+      .split(/\s+/)
+      .map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+      .join('');
+    return cleaned ? '#' + cleaned : '';
+  }
+
+  /**
+   * Build a caption + hashtags for a specific platform
+   */
+  function buildSocialPost(item, platform) {
+    const tone = PLATFORM_TONES[platform] || PLATFORM_TONES.copy;
+
+    const titleTag = toHashtag(item.title);
+    const organizerTag = toHashtag(item.organizer);
+    const dateTag = toHashtag(item.date.replace(/\s/g, ''));
+
+    const platformTags = PLATFORM_HASHTAGS[platform] || [];
+
+    const allTags = [...new Set([
+      titleTag,
+      organizerTag,
+      dateTag,
+      ...platformTags,
+      ...BASE_HASHTAGS
+    ])].filter(Boolean);
+
+    let caption = `${tone}\n\n`;
+    caption += `📸 *${item.title}*\n`;
+    caption += `🏛️ Organized by: ${item.organizer}\n`;
+    caption += `📅 ${item.date}\n\n`;
+    caption += `May this moment of faith and fellowship inspire us all to continue spreading the Gospel to the ends of the earth. 🙏\n\n`;
+
+    const hashtagsLine = allTags.join(' ');
+    const fullText = `${caption}${hashtagsLine}`;
+
+    return { caption, hashtags: hashtagsLine, fullText, allTags };
+  }
+
+  /**
+   * Plain text version for email (no emojis, uses real newlines)
+   */
+  function buildPlainTextPost(item) {
+    const titleTag = toHashtag(item.title);
+    const organizerTag = toHashtag(item.organizer);
+    const dateTag = toHashtag(item.date.replace(/\s/g, ''));
+    const allTags = [...new Set([titleTag, organizerTag, dateTag, ...BASE_HASHTAGS])].filter(Boolean);
+
+    let text = `Greetings in Christ,\n\n`;
+    text += `Sharing a moment from the Pontifical Mission Society:\n\n`;
+    text += `Event: ${item.title}\n`;
+    text += `Organized by: ${item.organizer}\n`;
+    text += `Date: ${item.date}\n\n`;
+    text += `May this moment of faith and fellowship inspire us all to continue spreading the Gospel to the ends of the earth.\n\n`;
+    text += `Image: ${item.imageUrl}\n\n`;
+    text += allTags.join(' ');
+
+    return text;
+  }
+
+  // ============================================
+  // DOWNLOAD FUNCTION
+  // ============================================
+  async function downloadImage(imageUrl, eventTitle) {
+    try {
+      Swal.fire({
+        title: 'Downloading...',
+        text: 'Preparing your image for download',
+        allowOutsideClick: false,
+        didOpen: () => Swal.showLoading()
+      });
+
+      const response = await fetch(imageUrl, { mode: 'cors' });
+      const blob = await response.blob();
+
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `${eventTitle.replace(/[^a-z0-9]/gi, '_')}.jpg`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+
+      Swal.fire({
+        title: 'Downloaded!',
+        text: 'Image saved successfully',
+        icon: 'success',
+        confirmButtonColor: '#FFD966'
+      });
+    } catch (error) {
+      console.error('Download failed:', error);
+      Swal.fire({
+        title: 'Error!',
+        text: 'Failed to download image. Please try again.',
+        icon: 'error',
+        confirmButtonColor: '#d33'
+      });
+    }
+  }
+
+  // ============================================
+  // OPEN FULL IMAGE PREVIEW
+  // ============================================
+  function openImagePreview(imageUrl, title) {
+    const modalHtml = `
+      <div class="modal fade" id="imagePreviewModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+          <div class="modal-content" style="background: rgba(20, 40, 48, 0.9); backdrop-filter: blur(24px); border: 2px solid #FFD966; border-radius: 1.5rem;">
+            <div class="modal-header border-warning">
+              <h5 class="modal-title" style="color:#FFD966;">${escapeHtml(title)}</h5>
+              <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center">
+              <img src="${imageUrl}" alt="${escapeHtml(title)}" style="width:100%; border-radius: 1rem;">
+            </div>
+            <div class="modal-footer">
+              <button class="btn btn-outline-gold" data-bs-dismiss="modal">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    const existingModal = document.getElementById('imagePreviewModal');
+    if (existingModal) existingModal.remove();
+
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+    const modal = new bootstrap.Modal(document.getElementById('imagePreviewModal'));
+    modal.show();
+
+    document.getElementById('imagePreviewModal').addEventListener('hidden.bs.modal', function() {
+      this.remove();
+    });
+  }
+
+  function escapeHtml(str) {
+    if (!str) return '';
+    return String(str).replace(/[&<>"']/g, m => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'
+    }[m]));
+  }
+
+  // ============================================
+  // SHARE HANDLER — with proper per-platform fixes
+  // ============================================
+  function shareImage(platform, item) {
+    const pageUrl = window.location.href;
+    const post = buildSocialPost(item, platform);
+    const encodedText = encodeURIComponent(post.fullText);
+    const encodedUrl = encodeURIComponent(pageUrl);
+    const encodedImg = encodeURIComponent(item.imageUrl);
+    const encodedTitle = encodeURIComponent(item.title);
+
+    let shareUrl = '';
+
+    switch (platform) {
+      // ✅ WHATSAPP — now includes the image URL inside the message so the preview renders
+      case 'whatsapp': {
+        const waText =
+          `${post.caption}` +
+          `🔗 ${pageUrl}\n` +
+          `🖼️ ${item.imageUrl}\n\n` +
+          `${post.hashtags}`;
+        shareUrl = `https://wa.me/?text=${encodeURIComponent(waText)}`;
+        break;
+      }
+
+      // ✅ LINKEDIN — using shareArticle with proper title + summary + source
+      case 'linkedin': {
+        // LinkedIn's shareArticle endpoint reads OG tags from the URL you share.
+        // We pass the LinkedIn share URL with proper parameters.
+        // Note: the actual preview (image + title) comes from OG meta tags on the shared URL.
+        // To ensure LinkedIn shows the image, the page being shared (this gallery) needs OG meta tags pointing to the image.
+        // For a direct post, we open LinkedIn's create-post page which lets the user paste.
+        shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`;
+        break;
+      }
+
+      // ✅ EMAIL — plain text body with proper line breaks (%0D%0A) and image URL included
+      case 'email': {
+        const emailBody = buildPlainTextPost(item);
+        const emailSubject = `${item.title} — Pontifical Mission Society`;
+        shareUrl = `mailto:?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`;
+        break;
+      }
+
+      case 'facebook':
+        shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}&quote=${encodedText}`;
+        break;
+
+      case 'twitter': {
+        const twitterText = `📸 ${item.title}\n📍 ${item.organizer}\n📅 ${item.date}\n\n${post.allTags.slice(0, 6).join(' ')}`;
+        shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(twitterText)}&url=${encodedUrl}`;
+        break;
+      }
+
+      case 'telegram':
+        shareUrl = `https://t.me/share/url?url=${encodedUrl}&text=${encodedText}`;
+        break;
+
+      case 'pinterest':
+        shareUrl = `https://pinterest.com/pin/create/button/?url=${encodedUrl}&media=${encodedImg}&description=${encodedText}`;
+        break;
+
+      // ✅ TIKTOK — no web share URL exists. Copy caption + open TikTok upload page
+      case 'tiktok': {
+        navigator.clipboard.writeText(post.fullText).then(() => {
+          Swal.fire({
+            icon: 'info',
+            title: 'Caption Copied for TikTok! 🎵',
+            html: `
+              <p style="font-size:0.9rem; opacity:0.85;">
+                TikTok doesn't support direct web sharing. Your caption + hashtags have been <strong>copied</strong>.
+              </p>
+              <p style="font-size:0.85rem; opacity:0.75; margin-top:0.6rem;">
+                1. Click the button below to open TikTok<br>
+                2. Upload the image<br>
+                3. Paste the caption (already in your clipboard)
+              </p>
+            `,
+            background: 'rgba(20,40,48,0.98)',
+            color: '#f0f3f8',
+            confirmButtonColor: '#FFD966',
+            confirmButtonText: '<i class="fab fa-tiktok"></i> Open TikTok',
+            showCancelButton: true,
+            cancelButtonText: 'Cancel',
+            cancelButtonColor: '#6c757d'
+          }).then((result) => {
+            if (result.isConfirmed) {
+              window.open('https://www.tiktok.com/upload', '_blank');
+            }
+          });
+        }).catch(err => {
+          console.error('Copy failed:', err);
+          window.open('https://www.tiktok.com/upload', '_blank');
+        });
+        return;
+      }
+
+      case 'copy':
+        navigator.clipboard.writeText(`${post.fullText}\n\n${pageUrl}`).then(() => {
+          Swal.fire({
+            icon: 'success',
+            title: 'Post Copied! 📋',
+            html: `
+              <p style="font-size:0.9rem; opacity:0.85;">Your caption + hashtags have been copied. Paste it into any social media app!</p>
+              <div class="caption-preview" style="margin-top:1rem; font-size:0.75rem;">
+                ${escapeHtml(post.caption.substring(0, 200))}...
+              </div>
+            `,
+            background: 'rgba(20,40,48,0.98)',
+            color: '#f0f3f8',
+            confirmButtonColor: '#FFD966',
+            timer: 3000,
+            showConfirmButton: false
+          });
+        }).catch(err => {
+          console.error('Copy failed:', err);
+          Swal.fire({
+            icon: 'error',
+            title: 'Copy Failed',
+            text: 'Your browser blocked clipboard access.',
+            background: 'rgba(20,40,48,0.98)',
+            color: '#f0f3f8',
+            confirmButtonColor: '#FFD966'
+          });
+        });
+        return;
+    }
+
+    if (shareUrl) {
+      window.open(shareUrl, '_blank', 'width=650,height=550,noopener,noreferrer');
+    }
+  }
+
+  // ============================================
+  // SHARE PREVIEW MODAL
+  // ============================================
+  async function showSharePreview(item) {
+    const whatsappPost = buildSocialPost(item, 'whatsapp');
+
+    await Swal.fire({
+      title: '📸 Share this Photo',
+      width: '700px',
+      html: `
+        <div style="text-align:left; margin-top:1rem;">
+          <img src="${item.imageUrl}"
+               style="width:100%; max-height:200px; object-fit:cover; border-radius:0.8rem; margin-bottom:1rem;"
+               onerror="this.style.display='none';">
+
+          <div style="background: rgba(255,217,102,0.1); border-left: 3px solid #FFD966; padding: 0.8rem; border-radius: 0.5rem; margin-bottom:1rem;">
+            <div style="font-weight:700; color:#FFD966;">${escapeHtml(item.title)}</div>
+            <div style="font-size:0.8rem; opacity:0.85;">${escapeHtml(item.organizer)} • ${escapeHtml(item.date)}</div>
+          </div>
+
+          <div style="font-size:0.8rem; opacity:0.75; margin-bottom:0.5rem;">
+            <i class="fas fa-quote-left"></i> Preview of the caption that will be shared:
+          </div>
+          <div class="caption-preview" style="max-height:150px; font-size:0.8rem;">
+${escapeHtml(whatsappPost.caption)}<span class="hashtags">${escapeHtml(whatsappPost.hashtags.substring(0, 200))}...</span>
+          </div>
+
+          <button class="copy-caption-btn" id="copyCaptionBtn">
+            <i class="fas fa-copy"></i> Copy Caption + Hashtags
+          </button>
+
+          <div style="margin-top:1.5rem; padding-top:1rem; border-top:1px dashed rgba(255,217,102,0.3);">
+            <div style="font-size:0.85rem; opacity:0.85; margin-bottom:0.8rem;">
+              <i class="fas fa-share-alt" style="color:#FFD966;"></i> Choose a platform:
+            </div>
+            <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:center;">
+              <button class="swal-share-btn" data-platform="whatsapp" title="WhatsApp" style="background:#25D366; color:white; border:none; border-radius:50%; width:44px; height:44px; font-size:1.2rem;"><i class="fab fa-whatsapp"></i></button>
+              <button class="swal-share-btn" data-platform="facebook" title="Facebook" style="background:#1877F2; color:white; border:none; border-radius:50%; width:44px; height:44px; font-size:1.2rem;"><i class="fab fa-facebook-f"></i></button>
+              <button class="swal-share-btn" data-platform="twitter" title="X (Twitter)" style="background:#000; color:white; border:none; border-radius:50%; width:44px; height:44px; font-size:1.2rem;"><i class="fab fa-x-twitter"></i></button>
+              <button class="swal-share-btn" data-platform="telegram" title="Telegram" style="background:#0088cc; color:white; border:none; border-radius:50%; width:44px; height:44px; font-size:1.2rem;"><i class="fab fa-telegram-plane"></i></button>
+              <button class="swal-share-btn" data-platform="linkedin" title="LinkedIn" style="background:#0A66C2; color:white; border:none; border-radius:50%; width:44px; height:44px; font-size:1.2rem;"><i class="fab fa-linkedin-in"></i></button>
+              <button class="swal-share-btn" data-platform="pinterest" title="Pinterest" style="background:#E60023; color:white; border:none; border-radius:50%; width:44px; height:44px; font-size:1.2rem;"><i class="fab fa-pinterest-p"></i></button>
+              <button class="swal-share-btn" data-platform="tiktok" title="TikTok" style="background:#000; color:#25F4EE; border:1px solid #25F4EE; border-radius:50%; width:44px; height:44px; font-size:1.2rem;"><i class="fab fa-tiktok"></i></button>
+              <button class="swal-share-btn" data-platform="email" title="Email" style="background:#FFD966; color:#1e2f38; border:none; border-radius:50%; width:44px; height:44px; font-size:1.2rem;"><i class="fas fa-envelope"></i></button>
+              <button class="swal-share-btn" data-platform="copy" title="Copy Caption" style="background:#FFD966; color:#1e2f38; border:none; border-radius:50%; width:44px; height:44px; font-size:1.2rem;"><i class="fas fa-link"></i></button>
+            </div>
+          </div>
+        </div>
+      `,
+      background: 'rgba(20,40,48,0.98)',
+      color: '#f0f3f8',
+      showConfirmButton: false,
+      showCloseButton: true,
+      didOpen: () => {
+        document.getElementById('copyCaptionBtn').addEventListener('click', () => {
+          navigator.clipboard.writeText(`${whatsappPost.fullText}\n\n${window.location.href}`).then(() => {
+            Swal.fire({
+              icon: 'success',
+              title: 'Caption Copied! 📋',
+              text: 'Paste it wherever you like!',
+              background: 'rgba(20,40,48,0.98)',
+              color: '#f0f3f8',
+              confirmButtonColor: '#FFD966',
+              timer: 1500,
+              showConfirmButton: false
+            });
+          });
+        });
+
+        document.querySelectorAll('.swal-share-btn').forEach(b => {
+          b.addEventListener('click', () => {
+            Swal.close();
+            shareImage(b.getAttribute('data-platform'), item);
+          });
+        });
+      }
+    });
+  }
+
+  // ============================================
+  // RENDER GALLERY
+  // ============================================
+  function renderGallery() {
+    const grid = document.getElementById('galleryGrid');
+    if (!grid) return;
+
+    grid.innerHTML = '';
+
+    galleryData.forEach((item, index) => {
+      const card = document.createElement('div');
+      card.className = 'gallery-card';
+      card.setAttribute('data-aos', 'fade-up');
+      card.setAttribute('data-aos-delay', ((index % 6) * 60).toString());
+
+      card.innerHTML = `
+        <div class="image-container">
+          <div class="share-bar">
+            <button class="share-btn whatsapp" title="Share on WhatsApp" data-share="whatsapp" data-id="${item.id}"><i class="fab fa-whatsapp"></i></button>
+            <button class="share-btn facebook" title="Share on Facebook" data-share="facebook" data-id="${item.id}"><i class="fab fa-facebook-f"></i></button>
+            <button class="share-btn twitter" title="Share on X" data-share="twitter" data-id="${item.id}"><i class="fab fa-x-twitter"></i></button>
+            <button class="share-btn telegram" title="Share on Telegram" data-share="telegram" data-id="${item.id}"><i class="fab fa-telegram-plane"></i></button>
+            <button class="share-btn linkedin" title="Share on LinkedIn" data-share="linkedin" data-id="${item.id}"><i class="fab fa-linkedin-in"></i></button>
+            <button class="share-btn pinterest" title="Share on Pinterest" data-share="pinterest" data-id="${item.id}"><i class="fab fa-pinterest-p"></i></button>
+            <button class="share-btn tiktok" title="Share on TikTok" data-share="tiktok" data-id="${item.id}"><i class="fab fa-tiktok"></i></button>
+            <button class="share-btn email" title="Share via Email" data-share="email" data-id="${item.id}"><i class="fas fa-envelope"></i></button>
+            <button class="share-btn copy" title="Copy caption + hashtags" data-share="copy" data-id="${item.id}"><i class="fas fa-link"></i></button>
+          </div>
+
+          <img src="${item.imageUrl}" alt="${escapeHtml(item.title)}" class="gallery-img" loading="lazy"
+               onerror="this.src='https://images.unsplash.com/photo-1438032005730-c779502df39b?w=800&h=500&fit=crop'">
+          <div class="image-overlay">
+            <small style="color:#FFE2A4;"><i class="fas fa-search-plus me-1"></i>Click to view full size</small>
+          </div>
+        </div>
+        <div class="card-content">
+          <h3 class="event-title">${escapeHtml(item.title)}</h3>
+          <div class="event-organizer"><i class="fas fa-users"></i> ${escapeHtml(item.organizer)}</div>
+          <div class="event-date"><i class="fas fa-calendar-alt"></i> ${escapeHtml(item.date)}</div>
+          <div class="btn-group-card">
+            <button class="btn-glass view-btn" data-id="${item.id}">
+              <i class="fas fa-eye"></i> View
+            </button>
+            <button class="btn-download download-btn" data-id="${item.id}">
+              <i class="fas fa-download"></i> Download
+            </button>
+            <button class="btn-glass share-main-btn" data-id="${item.id}">
+              <i class="fas fa-share-alt"></i> Share
+            </button>
+          </div>
+        </div>
+      `;
+
+      grid.appendChild(card);
+    });
+
+    document.querySelectorAll('.share-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const platform = btn.getAttribute('data-share');
+        const id = parseInt(btn.getAttribute('data-id'));
+        const item = galleryData.find(i => i.id === id);
+        if (item) shareImage(platform, item);
+      });
+    });
+
+    document.querySelectorAll('.view-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const id = parseInt(btn.getAttribute('data-id'));
+        const item = galleryData.find(i => i.id === id);
+        if (item) openImagePreview(item.imageUrl, item.title);
+      });
+    });
+
+    document.querySelectorAll('.download-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const id = parseInt(btn.getAttribute('data-id'));
+        const item = galleryData.find(i => i.id === id);
+        if (item) downloadImage(item.imageUrl, item.title);
+      });
+    });
+
+    document.querySelectorAll('.share-main-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const id = parseInt(btn.getAttribute('data-id'));
+        const item = galleryData.find(i => i.id === id);
+        if (item) showSharePreview(item);
+      });
+    });
+
+    document.querySelectorAll('.gallery-card').forEach(card => {
+      card.addEventListener('click', (e) => {
+        if (!e.target.closest('.btn-glass') &&
+            !e.target.closest('.btn-download') &&
+            !e.target.closest('.share-btn') &&
+            !e.target.closest('.share-main-btn')) {
+          const viewBtn = card.querySelector('.view-btn');
+          if (viewBtn) {
+            const id = parseInt(viewBtn.getAttribute('data-id'));
+            const item = galleryData.find(i => i.id === id);
+            if (item) openImagePreview(item.imageUrl, item.title);
+          }
+        }
+      });
+    });
+  }
+
+  renderGallery();
+
+  // ============================================
+  // SUPPORT TICKET SYSTEM
+  // ============================================
+  document.getElementById('supportBtn').addEventListener('click', () => {
+    const modal = new bootstrap.Modal(document.getElementById('supportModal'));
+    modal.show();
+  });
+
+  document.getElementById('ticketForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+
+    const name = document.getElementById('ticketName').value.trim();
+    const email = document.getElementById('ticketEmail').value.trim();
+    const phone = document.getElementById('ticketPhone').value.trim() || 'Not provided';
+    const category = document.getElementById('ticketCategory').value;
+    const subject = document.getElementById('ticketSubject').value.trim();
+    const message = document.getElementById('ticketMessage').value.trim();
+
+    if (!name || !email || !category || !subject || !message) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Missing Fields',
+        text: 'Please fill in all required fields (*)',
+        background: 'rgba(20,40,48,0.98)',
+        color: '#f0f3f8',
+        confirmButtonColor: '#FFD966'
+      });
+      return;
+    }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Invalid Email',
+        text: 'Please enter a valid email address',
+        background: 'rgba(20,40,48,0.98)',
+        color: '#f0f3f8',
+        confirmButtonColor: '#FFD966'
+      });
+      return;
+    }
+
+    const submitBtn = document.getElementById('submitTicketBtn');
+    const originalBtn = submitBtn.innerHTML;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Submitting...';
+    submitBtn.disabled = true;
+
+    try {
+      const ticketData = {
+        name: name,
+        email: email,
+        phone: phone,
+        category: category,
+        subject: subject,
+        message: message,
+        status: 'open'
+      };
+
+      const { data, error } = await supabaseClient
+        .from('support_tickets')
+        .insert([ticketData])
+        .select();
+
+      if (error) {
+        console.error('Supabase ticket insert error:', error);
+        throw new Error('Failed to save ticket: ' + error.message);
+      }
+
+      console.log('✅ Ticket saved to Supabase:', data);
+
+      const waMessage = 
+        `🎫 *NEW SUPPORT TICKET*\n\n` +
+        `👤 *Name:* ${name}\n` +
+        `📧 *Email:* ${email}\n` +
+        `📱 *Phone:* ${phone}\n` +
+        `📂 *Category:* ${category}\n` +
+        `📌 *Subject:* ${subject}\n\n` +
+        `💬 *Message:*\n${message}\n\n` +
+        `🆔 Ticket ID: #${data && data[0] ? data[0].id : 'N/A'}\n` +
+        `⏰ Submitted: ${new Date().toLocaleString()}`;
+
+      const waUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(waMessage)}`;
+
+      const result = await Swal.fire({
+        icon: 'success',
+        title: 'Ticket Submitted! 🎉',
+        html: `
+          <p>Thank you, <strong>${escapeHtml(name)}</strong>!</p>
+          <p style="font-size:0.9rem; opacity:0.85; margin-top:0.5rem;">
+            Your ticket has been logged and our team will get back to you shortly.
+          </p>
+          <p style="font-size:0.8rem; opacity:0.7; margin-top:0.8rem;">
+            <i class="fas fa-ticket-alt" style="color:#FFD966;"></i>
+            Ticket ID: <strong>#${data && data[0] ? data[0].id : 'N/A'}</strong>
+          </p>
+        `,
+        background: 'rgba(20,40,48,0.98)',
+        color: '#f0f3f8',
+        confirmButtonColor: '#FFD966',
+        confirmButtonText: '<i class="fab fa-whatsapp"></i> Notify on WhatsApp',
+        showCancelButton: true,
+        cancelButtonText: 'Close',
+        cancelButtonColor: '#6c757d'
+      });
+
+      if (result.isConfirmed) {
+        window.open(waUrl, '_blank');
+      }
+
+      this.reset();
+      bootstrap.Modal.getInstance(document.getElementById('supportModal')).hide();
+
+    } catch (err) {
+      console.error('❌ Ticket submission error:', err);
+      Swal.fire({
+        icon: 'error',
+        title: 'Submission Failed',
+        text: 'Something went wrong. Please try again or contact us via WhatsApp.',
+        background: 'rgba(20,40,48,0.98)',
+        color: '#f0f3f8',
+        confirmButtonColor: '#FFD966'
+      });
+    } finally {
+      submitBtn.innerHTML = originalBtn;
+      submitBtn.disabled = false;
+    }
+  });
+
+  console.log('%c✨ Gallery Loaded | Social Captions + TikTok enabled ✨', 'color: #FFD966; font-size: 16px');
+</script>
+
+<style>
+  .image-overlay { pointer-events: none; }
+  .gallery-card { cursor: pointer; }
+</style>
+</body>
+</html>

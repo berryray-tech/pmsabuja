@@ -1,0 +1,1403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Contact Us | Pontifical Mission Society - Reach Out to Us</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(145deg, #0b1a22 0%, #132b34 50%, #1e3e4a 100%);
+      color: #f0f3f8;
+      overflow-x: hidden;
+      min-height: 100vh;
+      position: relative;
+    }
+
+    /* Logo background layers */
+    .logo-bg-layer {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      opacity: 0.04;
+      background-image: url('Images/main logo.jpeg');
+      background-repeat: repeat;
+      background-size: 320px 320px;
+      background-position: center center;
+      filter: brightness(1.4) contrast(0.9);
+      mix-blend-mode: lighten;
+    }
+    .logo-bg-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(circle at 20% 20%, rgba(255,217,102,0.06), transparent 45%),
+        radial-gradient(circle at 80% 80%, rgba(95,176,212,0.06), transparent 45%),
+        linear-gradient(180deg, rgba(11,26,34,0.55) 0%, rgba(11,26,34,0.15) 50%, rgba(11,26,34,0.55) 100%);
+    }
+
+    .hero-logo-watermark {
+      position: absolute;
+      top: 55%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 520px;
+      height: 520px;
+      max-width: 80vw;
+      max-height: 80vw;
+      background-image: url('Images/main logo.jpeg');
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+      opacity: 0.06;
+      pointer-events: none;
+      z-index: 0;
+      filter: blur(0.5px) brightness(1.5);
+      animation: watermarkFloat 14s ease-in-out infinite;
+    }
+    @keyframes watermarkFloat {
+      0%, 100% { transform: translate(-50%, -50%) scale(1) rotate(0deg); }
+      50% { transform: translate(-50%, -50%) scale(1.05) rotate(3deg); }
+    }
+
+    .bg-orbs {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+    .bg-orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(60px);
+      opacity: 0.35;
+    }
+    .orb-gold-1 {
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(circle, #FFD966, transparent 70%);
+      top: -100px;
+      left: -100px;
+      animation: floatOrb1 18s ease-in-out infinite;
+    }
+    .orb-blue {
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, #5fb0d4, transparent 70%);
+      bottom: -150px;
+      right: -150px;
+      animation: floatOrb2 22s ease-in-out infinite;
+    }
+    .orb-gold-2 {
+      width: 300px;
+      height: 300px;
+      background: radial-gradient(circle, #FFB347, transparent 70%);
+      top: 40%;
+      right: 10%;
+      animation: floatOrb3 20s ease-in-out infinite;
+      opacity: 0.2;
+    }
+    @keyframes floatOrb1 {
+      0%, 100% { transform: translate(0,0) scale(1); }
+      33% { transform: translate(60px, 80px) scale(1.1); }
+      66% { transform: translate(-40px, 50px) scale(0.95); }
+    }
+    @keyframes floatOrb2 {
+      0%, 100% { transform: translate(0,0) scale(1); }
+      50% { transform: translate(-80px, -60px) scale(1.15); }
+    }
+    @keyframes floatOrb3 {
+      0%, 100% { transform: translate(0,0); }
+      50% { transform: translate(-50px, 40px); }
+    }
+
+    .navbar, .page-header, .contact-section, footer { position: relative; z-index: 1; }
+
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); }
+    ::-webkit-scrollbar-thumb { background: rgba(255,215,150,0.5); border-radius: 10px; }
+
+    /* NAVBAR */
+    .navbar {
+      background: rgba(10, 25, 30, 0.55);
+      backdrop-filter: blur(22px) saturate(180%);
+      -webkit-backdrop-filter: blur(22px) saturate(180%);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.3),
+                  inset 0 1px 0 rgba(255,255,255,0.08);
+      border-bottom: 1px solid rgba(255,217,102,0.15);
+      transition: 0.3s;
+      padding: 12px 0;
+      z-index: 1050;
+    }
+    .navbar-brand {
+      font-weight: 700;
+      font-size: 1.7rem;
+      letter-spacing: -0.5px;
+      background: linear-gradient(135deg, #FFE6B0, #FFC97E);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent !important;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .logo-icon { font-size: 1.8rem; color: #FFD966; margin-right: 8px; }
+
+    .navbar-logo-img {
+      height: 45px;
+      width: 45px;
+      object-fit: contain;
+      border-radius: 50%;
+      border: 2px solid rgba(255,217,102,0.5);
+      background: rgba(255,255,255,0.06);
+      backdrop-filter: blur(6px);
+      padding: 3px;
+      transition: 0.3s;
+      animation: logoFloat 4s ease-in-out infinite;
+    }
+    @keyframes logoFloat {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-3px); }
+    }
+    .navbar-logo-img:hover {
+      transform: scale(1.1) rotate(5deg);
+      border-color: #FFD966;
+      box-shadow: 0 0 20px rgba(255,217,102,0.55);
+    }
+
+    /* ✅ FIXED MOBILE TOGGLER */
+    .navbar-toggler {
+      border-color: rgba(255,215,150,0.6);
+      background: rgba(255,217,102,0.08);
+      padding: 6px 10px;
+    }
+    .navbar-toggler:focus {
+      box-shadow: 0 0 0 3px rgba(255,217,102,0.25);
+      outline: none;
+    }
+    .navbar-toggler-icon {
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(255,217,102,1)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important;
+    }
+
+    .nav-link {
+      color: rgba(255,248,225,0.9) !important;
+      font-weight: 500;
+      margin: 0 6px;
+      transition: 0.3s;
+    }
+    .nav-link:hover, .nav-link.active {
+      color: #FFD966 !important;
+      transform: translateY(-2px);
+    }
+
+    @media (max-width: 991px) {
+      .navbar-logo-img { height: 38px; width: 38px; }
+      .navbar-brand { font-size: 1.3rem; }
+      .navbar-collapse {
+        background: rgba(10, 25, 30, 0.98);
+        backdrop-filter: blur(20px);
+        border-radius: 1rem;
+        padding: 1rem;
+        margin-top: 1rem;
+        border: 1px solid rgba(255,217,102,0.3);
+        box-shadow: 0 15px 40px rgba(0,0,0,0.5);
+      }
+      .nav-link {
+        padding: 0.8rem 1rem;
+        text-align: center;
+        border-radius: 0.5rem;
+        margin: 3px 0;
+      }
+      .nav-link:hover, .nav-link.active {
+        background: rgba(255,217,102,0.12);
+        transform: none;
+      }
+    }
+
+    /* Page Header */
+    .page-header {
+      position: relative;
+      padding: 140px 20px 60px;
+      text-align: center;
+      overflow: hidden;
+      z-index: 1;
+    }
+    .glass-header {
+      background: rgba(20, 40, 48, 0.4);
+      backdrop-filter: blur(28px) saturate(180%);
+      -webkit-backdrop-filter: blur(28px) saturate(180%);
+      border-radius: 3rem;
+      padding: 2.5rem 3rem;
+      border: 1px solid rgba(255,230,170,0.35);
+      display: inline-block;
+      box-shadow: 0 25px 55px -12px rgba(0,0,0,0.5),
+                  inset 0 1px 0 rgba(255,255,255,0.15),
+                  inset 0 -1px 0 rgba(0,0,0,0.15);
+      position: relative;
+      overflow: hidden;
+      animation: headerFloat 5s ease-in-out infinite;
+      z-index: 2;
+    }
+    @keyframes headerFloat {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-6px); }
+    }
+    .glass-header::before {
+      content: '';
+      position: absolute;
+      top: 0; left: -50%;
+      width: 200%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.07), transparent);
+      animation: shineSweep 7s ease-in-out infinite;
+      pointer-events: none;
+    }
+    @keyframes shineSweep {
+      0%, 100% { transform: translateX(-100%); }
+      50% { transform: translateX(100%); }
+    }
+    .glass-header h1 {
+      font-size: 3.2rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #FFF6E0, #FFDA88);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      margin-bottom: 0.5rem;
+      position: relative;
+      z-index: 1;
+    }
+    .glass-header p { font-size: 1.2rem; opacity: 0.95; position: relative; z-index: 1; }
+
+    .contact-section { padding: 40px 20px 80px; position: relative; z-index: 1; }
+
+    .info-card {
+      background: rgba(25, 45, 55, 0.4);
+      backdrop-filter: blur(22px) saturate(180%);
+      -webkit-backdrop-filter: blur(22px) saturate(180%);
+      border-radius: 1.5rem;
+      border: 1px solid rgba(255,230,170,0.25);
+      padding: 1.8rem;
+      text-align: center;
+      transition: all 0.5s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+      height: 100%;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.3),
+                  inset 0 1px 0 rgba(255,255,255,0.12),
+                  inset 0 -1px 0 rgba(0,0,0,0.1);
+      position: relative;
+      overflow: hidden;
+    }
+    .info-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 1.5rem;
+      padding: 1.5px;
+      background: linear-gradient(135deg, transparent, transparent);
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      transition: 0.5s;
+      pointer-events: none;
+    }
+    .info-card:hover::before {
+      background: linear-gradient(135deg, #FFD966, #FFB347, #FFD966);
+      background-size: 200% 200%;
+      animation: borderGlow 1.5s ease infinite;
+    }
+    @keyframes borderGlow {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    .info-card:hover {
+      transform: translateY(-10px) scale(1.02);
+      background: rgba(35, 65, 78, 0.6);
+      border-color: #FFD966;
+      box-shadow: 0 30px 55px rgba(0,0,0,0.5),
+                  0 0 40px rgba(255,217,102,0.15),
+                  inset 0 1px 0 rgba(255,255,255,0.15);
+    }
+    .info-icon {
+      width: 70px;
+      height: 70px;
+      background: rgba(255,217,102,0.15);
+      backdrop-filter: blur(8px);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1.2rem;
+      font-size: 2rem;
+      color: #FFD966;
+      transition: 0.4s;
+      border: 1px solid rgba(255,217,102,0.35);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.15);
+    }
+    .info-card:hover .info-icon {
+      background: linear-gradient(135deg, #FFD966, #FFB347);
+      color: #1e2f38;
+      transform: scale(1.15) rotate(-8deg);
+      box-shadow: 0 10px 25px rgba(255,217,102,0.5);
+    }
+    .info-card h3 { font-size: 1.3rem; font-weight: 700; margin-bottom: 0.8rem; }
+    .info-card p { margin-bottom: 0.3rem; font-size: 0.9rem; opacity: 0.9; }
+
+    .info-link {
+      color: #f0f3f8;
+      text-decoration: none;
+      transition: 0.3s;
+      display: inline-block;
+      border-bottom: 1px dashed transparent;
+    }
+    .info-link:hover {
+      color: #FFD966;
+      border-bottom-color: #FFD966;
+      transform: translateX(3px);
+    }
+
+    /* LAMP */
+    .lamp-container {
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    }
+    .lamp {
+      position: relative;
+      width: 180px;
+      height: 180px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.4s ease;
+    }
+    .lamp-base {
+      width: 50px;
+      height: 60px;
+      background: linear-gradient(135deg, #8B7355, #5D3A1A);
+      border-radius: 8px 8px 15px 15px;
+      position: relative;
+      z-index: 2;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    }
+    .lamp-stand {
+      width: 12px;
+      height: 70px;
+      background: linear-gradient(90deg, #C9A87C, #9B7B4C);
+      position: absolute;
+      bottom: 60px;
+      left: 50%;
+      transform: translateX(-50%);
+      border-radius: 10px;
+    }
+    .lamp-bulb {
+      position: absolute;
+      bottom: 115px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 70px;
+      height: 70px;
+      background: radial-gradient(circle, #FFF9E6, #FFE8B5);
+      border-radius: 50%;
+      box-shadow: 0 0 20px rgba(255,217,102,0.5);
+      transition: all 0.4s ease;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .lamp-bulb i { font-size: 2rem; color: #FFB347; transition: all 0.3s; }
+    .lamp-glow {
+      position: absolute;
+      width: 120px;
+      height: 120px;
+      background: radial-gradient(circle, rgba(255,217,102,0.6), transparent);
+      border-radius: 50%;
+      bottom: 90px;
+      left: 50%;
+      transform: translateX(-50%);
+      opacity: 0;
+      transition: all 0.5s ease;
+      pointer-events: none;
+    }
+    .lamp-container.active .lamp-glow { opacity: 1; animation: pulseGlow 1.5s infinite; }
+    .lamp-container.active .lamp-bulb {
+      background: radial-gradient(circle, #FFE55C, #FFB347);
+      box-shadow: 0 0 40px rgba(255,200,50,0.8),
+                  0 0 80px rgba(255,200,50,0.4);
+    }
+    .lamp-container.active .lamp-bulb i { color: #FFD700; text-shadow: 0 0 10px rgba(255,215,0,0.5); }
+    @keyframes pulseGlow {
+      0%, 100% { transform: translateX(-50%) scale(1); opacity: 0.6; }
+      50% { transform: translateX(-50%) scale(1.3); opacity: 1; }
+    }
+    .lamp-text {
+      margin-top: 20px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: #FFD966;
+      text-align: center;
+      animation: textPulse 2.5s ease-in-out infinite;
+    }
+    @keyframes textPulse {
+      0%, 100% { opacity: 0.85; }
+      50% { opacity: 1; text-shadow: 0 0 12px rgba(255,217,102,0.6); }
+    }
+
+    /* FORM */
+    .form-container {
+      max-height: 0;
+      opacity: 0;
+      overflow: hidden;
+      transition: all 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+      transform: translateY(30px);
+    }
+    .form-container.active {
+      max-height: 1600px;
+      opacity: 1;
+      transform: translateY(0);
+      margin-top: 2rem;
+    }
+    .glass-form {
+      background: rgba(25, 45, 55, 0.45);
+      backdrop-filter: blur(24px) saturate(180%);
+      -webkit-backdrop-filter: blur(24px) saturate(180%);
+      border-radius: 2rem;
+      border: 1px solid rgba(255,230,170,0.35);
+      padding: 2rem;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.4),
+                  inset 0 1px 0 rgba(255,255,255,0.12);
+      position: relative;
+      overflow: hidden;
+    }
+    .glass-form::before {
+      content: '';
+      position: absolute;
+      top: -50%; left: -50%;
+      width: 200%; height: 200%;
+      background: conic-gradient(from 0deg, transparent, rgba(255,217,102,0.06), transparent 30%);
+      animation: rotateSheen 15s linear infinite;
+      pointer-events: none;
+    }
+    @keyframes rotateSheen {
+      100% { transform: rotate(360deg); }
+    }
+
+    .form-control, .form-select {
+      background: rgba(255,255,255,0.08);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255,230,170,0.3);
+      color: white;
+      padding: 0.8rem 1rem;
+      border-radius: 1rem;
+      transition: all 0.3s;
+      position: relative;
+      z-index: 1;
+    }
+    .form-control:focus, .form-select:focus {
+      background: rgba(255,255,255,0.15);
+      border-color: #FFD966;
+      box-shadow: 0 0 0 4px rgba(255,217,102,0.18),
+                  0 0 20px rgba(255,217,102,0.15);
+      color: white;
+      transform: translateY(-1px);
+    }
+    .form-control::placeholder { color: rgba(255,255,255,0.55); }
+    textarea.form-control { resize: none; }
+
+    .btn-send {
+      background: linear-gradient(135deg, #FFD966, #FFB347);
+      border: none;
+      padding: 0.9rem 2rem;
+      border-radius: 2rem;
+      color: #1e2f38;
+      font-weight: 600;
+      transition: all 0.3s;
+      width: 100%;
+      position: relative;
+      overflow: hidden;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.4),
+                  0 5px 15px rgba(255,217,102,0.25);
+      z-index: 1;
+    }
+    .btn-send::before {
+      content: '';
+      position: absolute;
+      top: 0; left: -100%;
+      width: 100%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.35), transparent);
+      transition: 0.6s;
+    }
+    .btn-send:hover::before { left: 100%; }
+    .btn-send:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 30px rgba(255,217,102,0.5),
+                  inset 0 1px 0 rgba(255,255,255,0.4);
+    }
+    .btn-send:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
+    .form-label {
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+      color: #FFD966;
+      position: relative;
+      z-index: 1;
+    }
+
+    .direct-email {
+      margin-top: 1.5rem;
+      padding-top: 1.5rem;
+      border-top: 1px dashed rgba(255,230,170,0.3);
+      text-align: center;
+      position: relative;
+      z-index: 1;
+    }
+    .direct-email p {
+      font-size: 0.85rem;
+      opacity: 0.75;
+      margin-bottom: 0.8rem;
+    }
+    .btn-email-direct {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.7rem 1.8rem;
+      border-radius: 2rem;
+      background: rgba(255,217,102,0.15);
+      backdrop-filter: blur(8px);
+      border: 1px solid #FFD966;
+      color: #FFD966;
+      font-weight: 600;
+      text-decoration: none;
+      transition: 0.3s;
+      position: relative;
+      overflow: hidden;
+    }
+    .btn-email-direct:hover {
+      background: #FFD966;
+      color: #1e2f38;
+      transform: translateY(-3px);
+      box-shadow: 0 10px 25px rgba(255,217,102,0.45);
+    }
+
+    .map-card {
+      background: rgba(25, 45, 55, 0.4);
+      backdrop-filter: blur(20px) saturate(180%);
+      border-radius: 1.5rem;
+      border: 1px solid rgba(255,230,170,0.25);
+      overflow: hidden;
+      padding: 1rem;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.1);
+    }
+    .map-placeholder {
+      background: linear-gradient(135deg, #2c5364, #203a43);
+      border-radius: 1rem;
+      padding: 3rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .map-placeholder::before {
+      content: '';
+      position: absolute;
+      top: -50%; left: -50%;
+      width: 200%; height: 200%;
+      background: radial-gradient(circle, rgba(255,217,102,0.08), transparent 60%);
+      animation: rotateSheen 20s linear infinite reverse;
+    }
+
+    footer {
+      background: rgba(5, 20, 25, 0.7);
+      backdrop-filter: blur(16px);
+      padding: 2rem;
+      text-align: center;
+      border-top: 1px solid rgba(255,210,130,0.2);
+      font-size: 0.9rem;
+      margin-top: 2rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .btn-outline-warning {
+      background: rgba(255,217,102,0.06) !important;
+      backdrop-filter: blur(8px);
+      border-color: rgba(255,217,102,0.5) !important;
+      transition: all 0.35s cubic-bezier(0.2, 0.9, 0.4, 1.1) !important;
+      position: relative;
+      overflow: hidden;
+    }
+    .btn-outline-warning:hover {
+      background: linear-gradient(135deg, #FFD966, #FFB347) !important;
+      color: #1e2f38 !important;
+      transform: translateY(-4px) !important;
+      box-shadow: 0 10px 25px rgba(255,217,102,0.45) !important;
+      border-color: #FFD966 !important;
+    }
+
+    /* ============================================
+       ✅ SUPPORT BUTTON + TICKET MODAL
+       ============================================ */
+    .support-btn {
+      position: fixed;
+      bottom: 30px;
+      left: 30px;
+      height: 55px;
+      background: linear-gradient(135deg, #FFD966, #FFB347);
+      border-radius: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 999;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.35),
+                  0 0 25px rgba(255,217,102,0.3),
+                  inset 0 1px 0 rgba(255,255,255,0.4);
+      padding: 0 22px;
+      transition: all 0.3s;
+      animation: supportPulse 2.5s ease-in-out infinite;
+      gap: 8px;
+      border: none;
+    }
+    @keyframes supportPulse {
+      0%, 100% { box-shadow: 0 8px 25px rgba(0,0,0,0.35), 0 0 25px rgba(255,217,102,0.3), inset 0 1px 0 rgba(255,255,255,0.4); }
+      50% { box-shadow: 0 8px 25px rgba(0,0,0,0.35), 0 0 40px rgba(255,217,102,0.55), inset 0 1px 0 rgba(255,255,255,0.4); }
+    }
+    .support-btn:hover { transform: scale(1.08) translateY(-3px); }
+    .support-btn i { font-size: 1.3rem; color: #1e2f38; }
+    .support-btn span { font-size: 0.85rem; font-weight: 700; color: #1e2f38; letter-spacing: 0.3px; }
+
+    .ticket-modal-content {
+      background: rgba(20, 40, 48, 0.98);
+      backdrop-filter: blur(28px);
+      border: 1px solid #FFD966;
+      border-radius: 1.5rem;
+      color: white;
+    }
+    .ticket-modal-content .modal-header { border-bottom: 1px solid rgba(255,217,102,0.3); }
+    .ticket-modal-content .form-label {
+      color: #FFD966;
+      font-weight: 500;
+      font-size: 0.85rem;
+      margin-bottom: 4px;
+    }
+    .ticket-modal-content .form-control,
+    .ticket-modal-content .form-select {
+      background: rgba(255,255,255,0.08);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255,230,170,0.3);
+      color: white;
+      padding: 0.7rem 1rem;
+      border-radius: 0.8rem;
+      transition: 0.3s;
+    }
+    .ticket-modal-content .form-control:focus,
+    .ticket-modal-content .form-select:focus {
+      background: rgba(255,255,255,0.15);
+      border-color: #FFD966;
+      box-shadow: 0 0 0 3px rgba(255,217,102,0.2);
+      color: white;
+    }
+    .ticket-modal-content .form-control::placeholder { color: rgba(255,255,255,0.5); }
+    .ticket-modal-content .form-select option { background: #1e2f38; color: white; }
+    .btn-submit-ticket {
+      background: linear-gradient(135deg, #FFD966, #FFB347);
+      border: none;
+      padding: 0.85rem 2rem;
+      border-radius: 2rem;
+      color: #1e2f38;
+      font-weight: 700;
+      width: 100%;
+      transition: 0.3s;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.4);
+    }
+    .btn-submit-ticket:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(255,217,102,0.45),
+                  inset 0 1px 0 rgba(255,255,255,0.4);
+    }
+
+    @media (max-width: 768px) {
+      .glass-header h1 { font-size: 2rem; }
+      .glass-header { padding: 1.5rem 1.8rem; }
+      .lamp { width: 140px; height: 140px; }
+      .lamp-bulb { width: 55px; height: 55px; bottom: 95px; }
+      .lamp-bulb i { font-size: 1.5rem; }
+      .lamp-glow { width: 90px; height: 90px; bottom: 75px; }
+      .logo-bg-layer { background-size: 200px 200px; }
+      .hero-logo-watermark { width: 380px; height: 380px; }
+      .support-btn {
+        bottom: 20px;
+        left: 20px;
+        height: 48px;
+        padding: 0 16px;
+      }
+      .support-btn span { font-size: 0.75rem; }
+      .support-btn i { font-size: 1.1rem; }
+    }
+  </style>
+</head>
+
+<body>
+
+<!-- Logo background -->
+<div class="logo-bg-layer"></div>
+<div class="logo-bg-overlay"></div>
+
+<!-- Animated orbs -->
+<div class="bg-orbs">
+  <div class="bg-orb orb-gold-1"></div>
+  <div class="bg-orb orb-blue"></div>
+  <div class="bg-orb orb-gold-2"></div>
+</div>
+
+<!-- NAVBAR -->
+<nav class="navbar navbar-expand-lg fixed-top">
+  <div class="container">
+    <a class="navbar-brand d-flex align-items-center" href="index.html">
+      <img src="Images/main logo.jpeg"
+           alt="Pontifical Mission Society Logo"
+           class="navbar-logo-img"
+           onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
+      <i class="fas fa-church logo-icon" style="display: none;"></i>
+      <span>Pontifical Mission Society</span>
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="mainNav">
+      <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+        <li class="nav-item"><a class="nav-link" href="index.html"><i class="fas fa-home me-1"></i>Home</a></li>
+        <li class="nav-item"><a class="nav-link" href="about.html"><i class="fas fa-heart me-1"></i>About</a></li>
+        <li class="nav-item"><a class="nav-link" href="animators.html"><i class="fas fa-users me-1"></i>Animators</a></li>
+        <li class="nav-item"><a class="nav-link" href="projects.html"><i class="fas fa-hands-helping me-1"></i>Projects</a></li>
+        <li class="nav-item"><a class="nav-link" href="news.html"><i class="fas fa-newspaper me-1"></i>News</a></li>
+        <li class="nav-item"><a class="nav-link active" href="contact.html"><i class="fas fa-envelope me-1"></i>Contact</a></li>
+        <li class="nav-item"><a class="nav-link" href="gallery.html"><i class="fas fa-images me-1"></i>Gallery</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- PAGE HEADER -->
+<div class="page-header">
+  <div class="hero-logo-watermark"></div>
+  <div class="container">
+    <div class="glass-header" data-aos="fade-up" data-aos-duration="800">
+      <h1><i class="fas fa-envelope-open-text me-2" style="font-size: 2rem;"></i>Get In Touch</h1>
+      <p>We'd love to hear from you! Reach out with prayer requests, questions, or just to say hello</p>
+      <div class="mt-3">
+        <i class="fas fa-pray" style="color:#FFD966;"></i>
+        <span class="mx-2">•</span>
+        <i class="fas fa-heart" style="color:#FFD966;"></i>
+        <span class="mx-2">•</span>
+        <i class="fas fa-church" style="color:#FFD966;"></i>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CONTACT SECTION -->
+<section class="contact-section">
+  <div class="container">
+    <div class="row g-4 mb-5" data-aos="fade-up">
+      <div class="col-md-4">
+        <div class="info-card">
+          <div class="info-icon"><i class="fas fa-map-marker-alt"></i></div>
+          <h3>Our Location</h3>
+          <p><a class="info-link" href="https://maps.google.com/?q=12+Grace+Avenue,+Wuse+Zone+5,+Abuja" target="_blank" rel="noopener">12 Grace Avenue, Wuse Zone 5</a></p>
+          <p><a class="info-link" href="https://maps.google.com/?q=Abuja,+Nigeria" target="_blank" rel="noopener">Abuja, Nigeria</a></p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="info-card">
+          <div class="info-icon"><i class="fas fa-phone-alt"></i></div>
+          <h3>Call Us</h3>
+          <p><a class="info-link" href="tel:+2347046020189">+234 704 602 0189</a></p>
+          <p><a class="info-link" href="tel:+2348034567890">+234 803 456 7890</a></p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="info-card">
+          <div class="info-icon"><i class="fas fa-envelope"></i></div>
+          <h3>Email Us</h3>
+          <p><a class="info-link" href="mailto:pmsabujaarchdiocese@gmail.com">pmsabujaarchdiocese@gmail.com</a></p>
+          <p><a class="info-link" href="mailto:pmsabujaarchdiocese@gmail.com">pmsabujaarchdiocese@gmail.com</a></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="row justify-content-center" data-aos="fade-up" data-aos-delay="100">
+      <div class="col-lg-8">
+        <div class="text-center mb-4">
+          <div class="lamp-container" id="lampContainer">
+            <div class="lamp">
+              <div class="lamp-stand"></div>
+              <div class="lamp-bulb" id="lampBulb"><i class="fas fa-lightbulb"></i></div>
+              <div class="lamp-glow"></div>
+              <div class="lamp-base"></div>
+            </div>
+            <div class="lamp-text" id="lampText">
+              <i class="fas fa-hand-point-up me-2"></i>Click the lamp to light up the contact form!
+            </div>
+          </div>
+        </div>
+
+        <div class="form-container" id="formContainer">
+          <div class="glass-form">
+            <h3 class="text-center mb-4" style="color: #FFD966; position: relative; z-index: 1;">
+              <i class="fas fa-pen-alt me-2"></i>Send Us a Message
+            </h3>
+            <form id="contactForm" style="position: relative; z-index: 1;">
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label class="form-label"><i class="fas fa-user me-2"></i>Full Name *</label>
+                  <input type="text" class="form-control" id="name" name="from_name" required placeholder="Enter your full name">
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label"><i class="fas fa-envelope me-2"></i>Email Address *</label>
+                  <input type="email" class="form-control" id="email" name="from_email" required placeholder="your@email.com">
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label"><i class="fas fa-phone me-2"></i>Phone Number</label>
+                  <input type="tel" class="form-control" id="phone" name="phone" placeholder="+234 XXX XXX XXXX">
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label"><i class="fas fa-tag me-2"></i>Subject *</label>
+                  <select class="form-select" id="subject" name="subject" required>
+                    <option value="" disabled selected>Select a subject</option>
+                    <option value="Prayer Request">Prayer Request</option>
+                    <option value="General Inquiry">General Inquiry</option>
+                    <option value="Share a Testimony">Share a Testimony</option>
+                    <option value="Volunteer Opportunity">Volunteer Opportunity</option>
+                    <option value="Partnership/Support">Partnership/Support</option>
+                  </select>
+                </div>
+                <div class="col-12">
+                  <label class="form-label"><i class="fas fa-comment me-2"></i>Your Message *</label>
+                  <textarea class="form-control" id="message" name="message" rows="5" required placeholder="Type your message here..."></textarea>
+                </div>
+                <div class="col-12">
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="newsletter" name="newsletter" style="background-color: rgba(255,255,255,0.1); border-color: #FFD966;">
+                    <label class="form-check-label" for="newsletter" style="color: rgba(255,255,255,0.8);">
+                      Subscribe to our newsletter for updates and prayer points
+                    </label>
+                  </div>
+                </div>
+                <div class="col-12">
+                  <button type="submit" class="btn-send" id="submitBtn">
+                    <i class="fas fa-paper-plane me-2"></i>Send Message
+                  </button>
+                </div>
+              </div>
+            </form>
+
+            <div class="direct-email">
+              <p><i class="fas fa-info-circle me-1"></i> Prefer to use your own email app? No problem.</p>
+              <a href="mailto:info@glorioustemple.org?subject=Website%20Contact%20Form%20Inquiry&body=Hello%20Glorious%20Temple%20Team%2C%0A%0AMy%20name%20is%20________________.%0A%0A"
+                 class="btn-email-direct"
+                 id="directEmailBtn">
+                <i class="fas fa-envelope-open-text"></i> Email Us Directly
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row mt-5" data-aos="fade-up" data-aos-delay="200">
+      <div class="col-lg-6 mb-4">
+        <div class="info-card" style="height: 100%;">
+          <div class="info-icon" style="width: 60px; height: 60px;"><i class="fas fa-map"></i></div>
+          <h3>Find Us</h3>
+          <div class="map-card mt-3">
+            <div class="map-placeholder">
+              <i class="fas fa-map-marked-alt" style="font-size: 3rem; color: #FFD966; margin-bottom: 1rem; display: block; position: relative; z-index: 1;"></i>
+              <p style="position: relative; z-index: 1;"><strong>Glorious Temple Church</strong><br>12 Grace Avenue, Wuse Zone 5<br>Abuja, Nigeria</p>
+              <p class="mt-2" style="position: relative; z-index: 1;"><i class="fas fa-clock me-2"></i>Service Times:<br>Sunday: 9:00 AM & 11:00 AM<br>Wednesday: 6:00 PM (Prayer Meeting)</p>
+              <a href="https://maps.google.com/?q=12+Grace+Avenue,+Wuse+Zone+5,+Abuja" target="_blank" rel="noopener" class="btn btn-outline-warning mt-2" style="border-radius: 30px; position: relative; z-index: 1;"><i class="fas fa-directions me-2"></i>Get Directions</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-6 mb-4">
+        <div class="info-card" style="height: 100%;">
+          <div class="info-icon" style="width: 60px; height: 60px;"><i class="fas fa-share-alt"></i></div>
+          <h3>Connect With Us</h3>
+          <div class="row g-3 mt-3">
+            <div class="col-6">
+              <a href="https://facebook.com/pms Abujaarchdiocese" target="_blank" rel="noopener" class="btn btn-outline-warning w-100" style="border-radius: 50px; padding: 0.8rem;">
+                <i class="fab fa-facebook-f me-2"></i>Facebook
+              </a>
+            </div>
+            <div class="col-6">
+              <a href="https://instagram.com/pms_abuja_archdiocese" target="_blank" rel="noopener" class="btn btn-outline-warning w-100" style="border-radius: 50px; padding: 0.8rem;">
+                <i class="fab fa-instagram me-2"></i>Instagram
+              </a>
+            </div>
+            <div class="col-6">
+              <a href="https://tiktok.com/@abuja_archdiocese_pms" target="_blank" rel="noopener" class="btn btn-outline-warning w-100" style="border-radius: 50px; padding: 0.8rem;">
+                <i class="fab fa-tiktok me-2"></i>TikTok
+              </a>
+            </div>
+            <div class="col-6">
+              <a href="https://wa.me/2347046020189" target="_blank" rel="noopener" class="btn btn-outline-warning w-100" style="border-radius: 50px; padding: 0.8rem;">
+                <i class="fab fa-whatsapp me-2"></i>WhatsApp
+              </a>
+            </div>
+          </div>
+          <div class="mt-4 pt-3 border-top border-warning border-opacity-25">
+            <p><i class="fas fa-praying-hands me-2" style="color:#FFD966;"></i> Prayer Line: <strong>+234 809 123 4567</strong> (Available 24/7)</p>
+            <p><i class="fas fa-clock me-2" style="color:#FFD966;"></i> Office Hours: Monday - Friday, 9:00 AM - 5:00 PM</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <p class="mb-1"><i class="fas fa-cross me-1"></i> © 2026 Pontifical Mission Society · Spreading the Gospel, WorldWide.</p>
+  <p class="mb-0" style="opacity:0.7;">Designed with <i class="fas fa-heart" style="color:#FFD966;"></i> by <strong>BerryRay Technologies</strong></p>
+</footer>
+
+<!-- ============================================ -->
+<!-- 🎫 FLOATING SUPPORT BUTTON -->
+<!-- ============================================ -->
+<button class="support-btn" id="supportBtn" title="Raise a Support Ticket">
+  <i class="fas fa-headset"></i>
+  <span>Support</span>
+</button>
+
+<!-- ============================================ -->
+<!-- 🎫 SUPPORT TICKET MODAL -->
+<!-- ============================================ -->
+<div class="modal fade" id="supportModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content ticket-modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" style="color:#FFD966;">
+          <i class="fas fa-ticket-alt me-2"></i>Raise a Support Ticket
+        </h4>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <p style="opacity:0.85; font-size:0.9rem; margin-bottom:1.2rem;">
+          <i class="fas fa-info-circle text-warning me-1"></i>
+          Fill in the form below and our team will get back to you shortly. All tickets are logged and tracked.
+        </p>
+
+        <form id="ticketForm">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label"><i class="fas fa-user me-1"></i>Full Name *</label>
+              <input type="text" class="form-control" id="ticketName" required placeholder="Enter your full name">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label"><i class="fas fa-envelope me-1"></i>Email *</label>
+              <input type="email" class="form-control" id="ticketEmail" required placeholder="your@email.com">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label"><i class="fas fa-phone me-1"></i>Phone / WhatsApp</label>
+              <input type="tel" class="form-control" id="ticketPhone" placeholder="+234 XXX XXX XXXX">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label"><i class="fas fa-tag me-1"></i>Category *</label>
+              <select class="form-select" id="ticketCategory" required>
+                <option value="" disabled selected>Select category</option>
+                <option value="General Inquiry">General Inquiry</option>
+                <option value="Technical Issue">Technical Issue</option>
+                <option value="Prayer Request">Prayer Request</option>
+                <option value="Donation / Support">Donation / Support</option>
+                <option value="Contact Inquiry">Contact Inquiry</option>
+                <option value="Event Information">Event Information</option>
+                <option value="Complaint">Complaint</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            <div class="col-12">
+              <label class="form-label"><i class="fas fa-heading me-1"></i>Subject *</label>
+              <input type="text" class="form-control" id="ticketSubject" required placeholder="Brief summary of your issue">
+            </div>
+            <div class="col-12">
+              <label class="form-label"><i class="fas fa-comment-dots me-1"></i>Description *</label>
+              <textarea class="form-control" id="ticketMessage" rows="5" required placeholder="Describe your issue or request in detail..."></textarea>
+            </div>
+            <div class="col-12">
+              <button type="submit" class="btn-submit-ticket" id="submitTicketBtn">
+                <i class="fas fa-paper-plane me-2"></i>Submit Ticket
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+
+<script>
+  // ==========================================
+  // 🔧 CONFIGURATION
+  // ==========================================
+  const EMAILJS_PUBLIC_KEY  = 'YOUR_PUBLIC_KEY';
+  const EMAILJS_SERVICE_ID  = 'YOUR_SERVICE_ID';
+  const EMAILJS_TEMPLATE_ID = 'YOUR_TEMPLATE_ID';
+  const RECEIVING_EMAIL = 'info@glorioustemple.org';
+  const WHATSAPP_NUMBER = '2348091234567';  // ← CHANGE to your WhatsApp number
+
+  const SUPABASE_URL = 'https://ekhzbclqpelsrfefufpv.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVraHpiY2xxcGVsc3JmZWZ1ZnB2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY4NjQ2MjUsImV4cCI6MjA5MjQ0MDYyNX0.7dJiDcV4q8Ss_4Ua19-L-VFSxThJKNLyBv__bfdx02M';
+
+  const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
+
+  AOS.init({ once: true, offset: 60, duration: 700, easing: 'ease-out-cubic' });
+
+  // ==========================================
+  // LAMP INTERACTION
+  // ==========================================
+  const lampContainer = document.getElementById('lampContainer');
+  const formContainer = document.getElementById('formContainer');
+  const lampText = document.getElementById('lampText');
+  const lampBulb = document.getElementById('lampBulb');
+  let isFormVisible = false;
+
+  function toggleForm() {
+    isFormVisible = !isFormVisible;
+    if (isFormVisible) {
+      lampContainer.classList.add('active');
+      formContainer.classList.add('active');
+      lampText.innerHTML = '<i class="fas fa-lightbulb me-2" style="color: #FFD966;"></i>The lamp is lit! Fill out the form below ✨';
+      lampBulb.style.animation = 'pulseGlow 0.5s ease';
+      setTimeout(() => { lampBulb.style.animation = ''; }, 500);
+    } else {
+      lampContainer.classList.remove('active');
+      formContainer.classList.remove('active');
+      lampText.innerHTML = '<i class="fas fa-hand-point-up me-2"></i>Click the lamp to light up the contact form!';
+    }
+  }
+
+  lampBulb.addEventListener('click', (e) => { e.stopPropagation(); toggleForm(); });
+  lampContainer.addEventListener('click', (e) => {
+    if (e.target === lampContainer || e.target.classList.contains('lamp-text') || e.target.parentElement?.classList.contains('lamp-text')) {
+      toggleForm();
+    }
+  });
+
+  // ==========================================
+  // CONTACT FORM SUBMISSION
+  // ==========================================
+  const contactForm = document.getElementById('contactForm');
+  const submitBtn = document.getElementById('submitBtn');
+
+  contactForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const name       = document.getElementById('name').value.trim();
+    const email      = document.getElementById('email').value.trim();
+    const phone      = document.getElementById('phone').value.trim() || 'Not provided';
+    const subject    = document.getElementById('subject').value;
+    const message    = document.getElementById('message').value.trim();
+    const newsletter = document.getElementById('newsletter').checked ? 'Yes' : 'No';
+
+    if (!name || !email || !subject || !message) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Missing Fields',
+        text: 'Please fill in all required fields (*)',
+        background: 'rgba(20,40,48,0.98)',
+        color: '#f0f3f8',
+        confirmButtonColor: '#FFD966'
+      });
+      return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Invalid Email',
+        text: 'Please enter a valid email address',
+        background: 'rgba(20,40,48,0.98)',
+        color: '#f0f3f8',
+        confirmButtonColor: '#FFD966'
+      });
+      return;
+    }
+
+    const originalBtn = submitBtn.innerHTML;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Sending...';
+    submitBtn.disabled = true;
+
+    const templateParams = {
+      from_name:  name,
+      from_email: email,
+      phone:      phone,
+      subject:    subject,
+      message:    message,
+      newsletter: newsletter,
+      to_email:   RECEIVING_EMAIL
+    };
+
+    try {
+      await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, templateParams);
+
+      Swal.fire({
+        icon: 'success',
+        title: 'Message Sent!',
+        html: `Thank you, <strong>${name}</strong>!<br>Your message has been sent to <strong>${RECEIVING_EMAIL}</strong>.<br>We'll get back to you soon. 🙏`,
+        background: 'rgba(20,40,48,0.98)',
+        color: '#f0f3f8',
+        confirmButtonColor: '#FFD966',
+        confirmButtonText: 'Amen'
+      });
+
+      contactForm.reset();
+
+    } catch (error) {
+      console.error('❌ EmailJS error:', error);
+
+      const mailtoFallback = `mailto:${RECEIVING_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(
+        `Name: ${name}\nEmail: ${email}\nPhone: ${phone}\nSubject: ${subject}\nNewsletter: ${newsletter}\n\nMessage:\n${message}`
+      )}`;
+
+      Swal.fire({
+        icon: 'error',
+        title: 'Could Not Send Automatically',
+        html: `Sorry, we couldn't send your message automatically.<br><br>
+               <a href="${mailtoFallback}" style="color:#FFD966; font-weight:600; text-decoration:underline;">
+                 <i class="fas fa-envelope"></i> Click here to send via your email app
+               </a>`,
+        background: 'rgba(20,40,48,0.98)',
+        color: '#f0f3f8',
+        confirmButtonColor: '#FFD966'
+      });
+    } finally {
+      submitBtn.innerHTML = originalBtn;
+      submitBtn.disabled = false;
+    }
+  });
+
+  // Direct email button
+  document.getElementById('directEmailBtn').addEventListener('click', function(e) {
+    e.preventDefault();
+
+    const name    = document.getElementById('name').value.trim() || '[Your name]';
+    const email   = document.getElementById('email').value.trim() || '[Your email]';
+    const phone   = document.getElementById('phone').value.trim() || '[Your phone]';
+    const subject = document.getElementById('subject').value || 'Website Contact Form Inquiry';
+    const message = document.getElementById('message').value.trim() || '[Your message]';
+
+    const mailto = `mailto:${RECEIVING_EMAIL}` +
+      `?subject=${encodeURIComponent(subject)}` +
+      `&body=${encodeURIComponent(
+        `Hello Glorious Temple Team,\n\n` +
+        `Name: ${name}\n` +
+        `Email: ${email}\n` +
+        `Phone: ${phone}\n` +
+        `Subject: ${subject}\n\n` +
+        `Message:\n${message}\n\n` +
+        `Blessings!`
+      )}`;
+
+    window.location.href = mailto;
+  });
+
+  // Floating lamp animation
+  const style = document.createElement('style');
+  style.textContent = `
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-8px); }
+    }
+    .lamp { animation: float 3s ease-in-out infinite; }
+  `;
+  document.head.appendChild(style);
+
+  // Social media buttons
+  document.querySelectorAll('.btn-outline-warning').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const href = btn.getAttribute('href');
+      if (href && href !== '#') return;
+
+      e.preventDefault();
+      const icon = btn.querySelector('i');
+      let platform = '';
+      if (icon.classList.contains('fa-facebook-f')) platform = 'Facebook';
+      else if (icon.classList.contains('fa-instagram')) platform = 'Instagram';
+      else if (icon.classList.contains('fa-tiktok')) platform = 'TikTok';
+      else if (icon.classList.contains('fa-whatsapp')) platform = 'WhatsApp';
+      else if (btn.innerHTML.includes('Directions')) platform = 'Google Maps';
+
+      Swal.fire({
+        icon: 'info',
+        title: 'Coming Soon!',
+        text: `Connect with us on ${platform} — link coming shortly.`,
+        background: 'rgba(20,40,48,0.98)',
+        color: '#f0f3f8',
+        confirmButtonColor: '#FFD966'
+      });
+    });
+  });
+
+  // ============================================
+  // 🎫 SUPPORT TICKET SYSTEM
+  // ============================================
+  document.getElementById('supportBtn').addEventListener('click', () => {
+    const modal = new bootstrap.Modal(document.getElementById('supportModal'));
+    modal.show();
+  });
+
+  document.getElementById('ticketForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+
+    const name = document.getElementById('ticketName').value.trim();
+    const email = document.getElementById('ticketEmail').value.trim();
+    const phone = document.getElementById('ticketPhone').value.trim() || 'Not provided';
+    const category = document.getElementById('ticketCategory').value;
+    const subject = document.getElementById('ticketSubject').value.trim();
+    const message = document.getElementById('ticketMessage').value.trim();
+
+    if (!name || !email || !category || !subject || !message) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Missing Fields',
+        text: 'Please fill in all required fields (*)',
+        background: 'rgba(20,40,48,0.98)',
+        color: '#f0f3f8',
+        confirmButtonColor: '#FFD966'
+      });
+      return;
+    }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Invalid Email',
+        text: 'Please enter a valid email address',
+        background: 'rgba(20,40,48,0.98)',
+        color: '#f0f3f8',
+        confirmButtonColor: '#FFD966'
+      });
+      return;
+    }
+
+    const submitBtn = document.getElementById('submitTicketBtn');
+    const originalBtn = submitBtn.innerHTML;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Submitting...';
+    submitBtn.disabled = true;
+
+    try {
+      const ticketData = {
+        name: name,
+        email: email,
+        phone: phone,
+        category: category,
+        subject: subject,
+        message: message,
+        status: 'open'
+      };
+
+      const { data, error } = await supabaseClient
+        .from('support_tickets')
+        .insert([ticketData])
+        .select();
+
+      if (error) {
+        console.error('Supabase ticket insert error:', error);
+        throw new Error('Failed to save ticket: ' + error.message);
+      }
+
+      console.log('✅ Ticket saved to Supabase:', data);
+
+      const waMessage = 
+        `🎫 *NEW SUPPORT TICKET*\n\n` +
+        `👤 *Name:* ${name}\n` +
+        `📧 *Email:* ${email}\n` +
+        `📱 *Phone:* ${phone}\n` +
+        `📂 *Category:* ${category}\n` +
+        `📌 *Subject:* ${subject}\n\n` +
+        `💬 *Message:*\n${message}\n\n` +
+        `🆔 Ticket ID: #${data && data[0] ? data[0].id : 'N/A'}\n` +
+        `⏰ Submitted: ${new Date().toLocaleString()}`;
+
+      const waUrl = `https://wa.me/${2349058515139}?text=${encodeURIComponent(waMessage)}`;
+
+      const result = await Swal.fire({
+        icon: 'success',
+        title: 'Ticket Submitted! 🎉',
+        html: `
+          <p>Thank you, <strong>${escapeHtml(name)}</strong>!</p>
+          <p style="font-size:0.9rem; opacity:0.85; margin-top:0.5rem;">
+            Your ticket has been logged and our team will get back to you shortly.
+          </p>
+          <p style="font-size:0.8rem; opacity:0.7; margin-top:0.8rem;">
+            <i class="fas fa-ticket-alt" style="color:#FFD966;"></i>
+            Ticket ID: <strong>#${data && data[0] ? data[0].id : 'N/A'}</strong>
+          </p>
+        `,
+        background: 'rgba(20,40,48,0.98)',
+        color: '#f0f3f8',
+        confirmButtonColor: '#FFD966',
+        confirmButtonText: '<i class="fab fa-whatsapp"></i> Notify on WhatsApp',
+        showCancelButton: true,
+        cancelButtonText: 'Close',
+        cancelButtonColor: '#6c757d'
+      });
+
+      if (result.isConfirmed) {
+        window.open(waUrl, '_blank');
+      }
+
+      this.reset();
+      bootstrap.Modal.getInstance(document.getElementById('supportModal')).hide();
+
+    } catch (err) {
+      console.error('❌ Ticket submission error:', err);
+      Swal.fire({
+        icon: 'error',
+        title: 'Submission Failed',
+        text: 'Something went wrong. Please try again or contact us via WhatsApp.',
+        background: 'rgba(20,40,48,0.98)',
+        color: '#f0f3f8',
+        confirmButtonColor: '#FFD966'
+      });
+    } finally {
+      submitBtn.innerHTML = originalBtn;
+      submitBtn.disabled = false;
+    }
+  });
+
+  function escapeHtml(str) {
+    if (!str) return '';
+    return String(str).replace(/[&<>]/g, m => m === '&' ? '&amp;' : m === '<' ? '&lt;' : '&gt;');
+  }
+
+  console.log('%c✨ Contact Page Loaded | Support Tickets enabled ✨', 'color: #FFD966; font-size: 16px; font-weight: bold;');
+  console.log('%c🎫 WhatsApp notifications → ' + WHATSAPP_NUMBER, 'color: #25D366; font-size: 12px');
+</script>
+
+</body>
+</html>

@@ -1,0 +1,1382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>News & Events | Pontifical Mission Society</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(145deg, #0b1a22 0%, #132b34 50%, #1e3e4a 100%);
+      color: #f0f3f8;
+      overflow-x: hidden;
+      min-height: 100vh;
+      position: relative;
+    }
+
+    /* Logo background layers */
+    .logo-bg-layer {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      opacity: 0.04;
+      background-image: url('Images/main logo.jpeg');
+      background-repeat: repeat;
+      background-size: 320px 320px;
+      background-position: center center;
+      filter: brightness(1.4) contrast(0.9);
+      mix-blend-mode: lighten;
+    }
+    .logo-bg-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(circle at 20% 20%, rgba(255,217,102,0.06), transparent 45%),
+        radial-gradient(circle at 80% 80%, rgba(95,176,212,0.06), transparent 45%),
+        linear-gradient(180deg, rgba(11,26,34,0.55) 0%, rgba(11,26,34,0.15) 50%, rgba(11,26,34,0.55) 100%);
+    }
+
+    .hero-logo-watermark {
+      position: absolute;
+      top: 55%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 520px;
+      height: 520px;
+      max-width: 80vw;
+      max-height: 80vw;
+      background-image: url('Images/main logo.jpeg');
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+      opacity: 0.06;
+      pointer-events: none;
+      z-index: 0;
+      filter: blur(0.5px) brightness(1.5);
+      animation: watermarkFloat 14s ease-in-out infinite;
+    }
+    @keyframes watermarkFloat {
+      0%, 100% { transform: translate(-50%, -50%) scale(1) rotate(0deg); }
+      50% { transform: translate(-50%, -50%) scale(1.05) rotate(3deg); }
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: -20%;
+      left: -10%;
+      width: 60vw;
+      height: 60vw;
+      background: radial-gradient(circle, rgba(255,217,102,0.10), transparent 60%);
+      border-radius: 50%;
+      z-index: 0;
+      pointer-events: none;
+      filter: blur(40px);
+    }
+    body::after {
+      content: '';
+      position: fixed;
+      bottom: -20%;
+      right: -10%;
+      width: 50vw;
+      height: 50vw;
+      background: radial-gradient(circle, rgba(100,180,220,0.10), transparent 60%);
+      border-radius: 50%;
+      z-index: 0;
+      pointer-events: none;
+      filter: blur(40px);
+    }
+
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); }
+    ::-webkit-scrollbar-thumb { background: rgba(255,215,150,0.5); border-radius: 10px; }
+
+    /* NAVBAR */
+    .navbar {
+      background: rgba(10, 25, 30, 0.55);
+      backdrop-filter: blur(20px) saturate(160%);
+      -webkit-backdrop-filter: blur(20px) saturate(160%);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.25),
+                  inset 0 1px 0 rgba(255,255,255,0.06);
+      border-bottom: 1px solid rgba(255,217,102,0.18);
+      padding: 12px 0;
+      z-index: 1050;
+    }
+    .navbar-brand {
+      font-weight: 700;
+      font-size: 1.7rem;
+      background: linear-gradient(135deg, #FFE6B0, #FFC97E);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent !important;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .logo-icon { font-size: 1.8rem; color: #FFD966; margin-right: 8px; }
+
+    .navbar-logo-img {
+      height: 45px;
+      width: 45px;
+      object-fit: contain;
+      border-radius: 50%;
+      border: 2px solid rgba(255,217,102,0.5);
+      background: rgba(255,255,255,0.06);
+      backdrop-filter: blur(6px);
+      padding: 3px;
+      transition: 0.3s;
+    }
+    .navbar-logo-img:hover {
+      transform: scale(1.08);
+      border-color: #FFD966;
+      box-shadow: 0 0 20px rgba(255,217,102,0.55);
+    }
+
+    /* ✅ FIXED MOBILE TOGGLER */
+    .navbar-toggler {
+      border-color: rgba(255,215,150,0.6);
+      background: rgba(255,217,102,0.08);
+      padding: 6px 10px;
+    }
+    .navbar-toggler:focus {
+      box-shadow: 0 0 0 3px rgba(255,217,102,0.25);
+      outline: none;
+    }
+    .navbar-toggler-icon {
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(255,217,102,1)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important;
+    }
+
+    .nav-link {
+      color: rgba(255,248,225,0.9) !important;
+      font-weight: 500;
+      margin: 0 6px;
+      transition: 0.3s;
+    }
+    .nav-link:hover, .nav-link.active { color: #FFD966 !important; transform: translateY(-2px); }
+
+    @media (max-width: 991px) {
+      .navbar-logo-img { height: 38px; width: 38px; }
+      .navbar-brand { font-size: 1.3rem; }
+      .navbar-collapse {
+        background: rgba(10, 25, 30, 0.98);
+        backdrop-filter: blur(20px);
+        border-radius: 1rem;
+        padding: 1rem;
+        margin-top: 1rem;
+        border: 1px solid rgba(255,217,102,0.3);
+        box-shadow: 0 15px 40px rgba(0,0,0,0.5);
+      }
+      .nav-link {
+        padding: 0.8rem 1rem;
+        text-align: center;
+        border-radius: 0.5rem;
+        margin: 3px 0;
+      }
+      .nav-link:hover, .nav-link.active {
+        background: rgba(255,217,102,0.12);
+        transform: none;
+      }
+    }
+
+    /* Page Header */
+    .page-header {
+      position: relative;
+      padding: 140px 20px 60px;
+      text-align: center;
+      z-index: 1;
+      overflow: hidden;
+    }
+    .glass-header {
+      background: rgba(20, 40, 48, 0.4);
+      backdrop-filter: blur(24px) saturate(180%);
+      -webkit-backdrop-filter: blur(24px) saturate(180%);
+      border-radius: 3rem;
+      padding: 2.5rem 3rem;
+      border: 1px solid rgba(255,230,170,0.35);
+      display: inline-block;
+      box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5),
+                  inset 0 1px 0 rgba(255,255,255,0.15),
+                  inset 0 -1px 0 rgba(255,255,255,0.05);
+      position: relative;
+      overflow: hidden;
+      z-index: 2;
+    }
+    .glass-header::before {
+      content: '';
+      position: absolute;
+      top: 0; left: -50%;
+      width: 200%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+      animation: shineSweep 8s ease-in-out infinite;
+      pointer-events: none;
+    }
+    @keyframes shineSweep {
+      0%, 100% { transform: translateX(-100%); }
+      50% { transform: translateX(100%); }
+    }
+    .glass-header h1 {
+      font-size: 3.2rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #FFF6E0, #FFDA88);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      position: relative;
+      z-index: 1;
+    }
+    .glass-header p { font-size: 1.2rem; opacity: 0.95; position: relative; z-index: 1; }
+
+    /* Filters */
+    .filter-section { margin-bottom: 3rem; position: relative; z-index: 1; }
+    .glass-filters {
+      background: rgba(25, 45, 55, 0.35);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      border-radius: 60px;
+      padding: 8px;
+      display: inline-flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.5rem;
+      border: 1px solid rgba(255,230,170,0.28);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.25),
+                  inset 0 1px 0 rgba(255,255,255,0.12),
+                  inset 0 -1px 0 rgba(0,0,0,0.15);
+    }
+    .filter-chip {
+      background: transparent;
+      border: none;
+      padding: 0.7rem 1.8rem;
+      border-radius: 50px;
+      color: #f0f3f8;
+      font-weight: 500;
+      transition: all 0.3s;
+      cursor: pointer;
+      position: relative;
+    }
+    .filter-chip i { margin-right: 8px; }
+    .filter-chip.active {
+      background: linear-gradient(135deg, #FFD966, #FFB347);
+      color: #1e2f38;
+      box-shadow: 0 4px 15px rgba(255,217,102,0.35),
+                  inset 0 1px 0 rgba(255,255,255,0.4);
+    }
+    .filter-chip:hover:not(.active) {
+      background: rgba(255,217,102,0.15);
+      transform: translateY(-2px);
+      backdrop-filter: blur(8px);
+    }
+
+    /* News Cards */
+    .news-section { position: relative; z-index: 1; }
+    .news-card {
+      background: rgba(25, 45, 55, 0.4);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      border-radius: 1.5rem;
+      border: 1px solid rgba(255,230,170,0.25);
+      overflow: hidden;
+      transition: all 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+      height: 100%;
+      cursor: pointer;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.3),
+                  inset 0 1px 0 rgba(255,255,255,0.1),
+                  inset 0 -1px 0 rgba(0,0,0,0.1);
+      position: relative;
+    }
+    .news-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 1.5rem;
+      padding: 1.5px;
+      background: linear-gradient(135deg, transparent, transparent);
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      transition: 0.4s;
+      pointer-events: none;
+      z-index: 3;
+    }
+    .news-card:hover::before {
+      background: linear-gradient(135deg, #FFD966, #FFB347, #FFD966);
+      background-size: 200% 200%;
+      animation: borderGlow 1.5s ease infinite;
+    }
+    @keyframes borderGlow {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    .news-card:hover {
+      transform: translateY(-10px) scale(1.02);
+      background: rgba(35, 65, 78, 0.6);
+      border-color: #FFD966;
+      box-shadow: 0 30px 60px rgba(0,0,0,0.5),
+                  0 0 40px rgba(255,217,102,0.15),
+                  inset 0 1px 0 rgba(255,255,255,0.15);
+    }
+    .news-img-wrapper {
+      position: relative;
+      overflow: hidden;
+      height: 220px;
+    }
+    .news-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.6s ease;
+    }
+    .news-card:hover .news-img { transform: scale(1.08); }
+
+    .news-img-wrapper::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, transparent 40%, rgba(0,0,0,0.4) 100%);
+      pointer-events: none;
+    }
+
+    .news-date-badge {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      background: rgba(0,0,0,0.55);
+      backdrop-filter: blur(12px) saturate(180%);
+      -webkit-backdrop-filter: blur(12px) saturate(180%);
+      padding: 0.4rem 0.9rem;
+      border-radius: 30px;
+      font-size: 0.75rem;
+      color: #FFD966;
+      border: 1px solid rgba(255,217,102,0.35);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3),
+                  inset 0 1px 0 rgba(255,255,255,0.15);
+      z-index: 2;
+    }
+    .news-category {
+      position: absolute;
+      bottom: 15px;
+      left: 15px;
+      background: rgba(255,217,102,0.22);
+      backdrop-filter: blur(12px) saturate(180%);
+      -webkit-backdrop-filter: blur(12px) saturate(180%);
+      padding: 0.3rem 1rem;
+      border-radius: 30px;
+      font-size: 0.7rem;
+      color: #FFD966;
+      border: 1px solid rgba(255,217,102,0.4);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3),
+                  inset 0 1px 0 rgba(255,255,255,0.2);
+      z-index: 2;
+    }
+    .news-content {
+      padding: 1.5rem;
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0));
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+    .news-card h3 { font-size: 1.3rem; font-weight: 700; margin-bottom: 0.5rem; }
+    .news-excerpt { font-size: 0.85rem; opacity: 0.85; margin-bottom: 1rem; }
+    .news-meta { display: flex; gap: 1rem; margin-bottom: 1rem; font-size: 0.75rem; color: #FFD966; }
+    .btn-read {
+      background: rgba(255,217,102,0.15);
+      border: 1px solid rgba(255,217,102,0.4);
+      padding: 0.5rem 1.2rem;
+      border-radius: 30px;
+      color: #FFD966;
+      transition: all 0.3s;
+      width: 100%;
+      backdrop-filter: blur(8px);
+    }
+    .btn-read:hover {
+      background: #FFD966;
+      color: #1e2f38;
+      box-shadow: 0 8px 20px rgba(255,217,102,0.4);
+      transform: translateY(-2px);
+    }
+
+    .modal-content {
+      background: rgba(20, 40, 48, 0.75);
+      backdrop-filter: blur(30px) saturate(180%);
+      -webkit-backdrop-filter: blur(30px) saturate(180%);
+      border: 1px solid rgba(255,217,102,0.45);
+      border-radius: 1.5rem;
+      color: white;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.6),
+                  inset 0 1px 0 rgba(255,255,255,0.12),
+                  inset 0 -1px 0 rgba(0,0,0,0.15);
+    }
+    .modal-header, .modal-footer {
+      border-color: rgba(255,217,102,0.25) !important;
+    }
+    .modal-img { width: 100%; max-height: 350px; object-fit: cover; border-radius: 1rem; }
+
+    .newsletter-glass {
+      background: rgba(25, 45, 55, 0.4);
+      backdrop-filter: blur(24px) saturate(180%);
+      -webkit-backdrop-filter: blur(24px) saturate(180%);
+      border-radius: 2rem;
+      padding: 2.5rem;
+      border: 1px solid rgba(255,230,170,0.3);
+      margin-top: 2rem;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.35),
+                  inset 0 1px 0 rgba(255,255,255,0.12);
+      position: relative;
+      overflow: hidden;
+      z-index: 1;
+    }
+    .newsletter-glass::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -20%;
+      width: 60%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255,217,102,0.08), transparent 70%);
+      pointer-events: none;
+    }
+    .newsletter-input {
+      background: rgba(255,255,255,0.08);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255,230,170,0.3);
+      color: white;
+      padding: 0.8rem 1.2rem;
+      border-radius: 50px;
+      transition: 0.3s;
+    }
+    .newsletter-input::placeholder { color: rgba(255,255,255,0.5); }
+    .newsletter-input:focus {
+      background: rgba(255,255,255,0.15);
+      border-color: #FFD966;
+      box-shadow: 0 0 0 4px rgba(255,217,102,0.15);
+      color: white;
+    }
+    .btn-subscribe {
+      background: linear-gradient(135deg, #FFD966, #FFB347);
+      border: none;
+      padding: 0.8rem 2rem;
+      border-radius: 50px;
+      color: #1e2f38;
+      font-weight: 600;
+      transition: 0.3s;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.4);
+    }
+    .btn-subscribe:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(255,217,102,0.4),
+                  inset 0 1px 0 rgba(255,255,255,0.4);
+    }
+
+    footer {
+      background: rgba(5, 20, 25, 0.7);
+      backdrop-filter: blur(16px);
+      padding: 2rem;
+      text-align: center;
+      margin-top: 2rem;
+      border-top: 1px solid rgba(255,217,102,0.15);
+      position: relative;
+      z-index: 1;
+    }
+
+    .admin-btn {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      width: 55px;
+      height: 55px;
+      background: linear-gradient(135deg, #FFD966, #FFB347);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 100;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.35),
+                  0 0 25px rgba(255,217,102,0.3),
+                  inset 0 1px 0 rgba(255,255,255,0.4);
+      transition: all 0.3s;
+      animation: adminPulse 2.5s ease-in-out infinite;
+    }
+    @keyframes adminPulse {
+      0%, 100% { box-shadow: 0 8px 25px rgba(0,0,0,0.35), 0 0 25px rgba(255,217,102,0.3), inset 0 1px 0 rgba(255,255,255,0.4); }
+      50% { box-shadow: 0 8px 25px rgba(0,0,0,0.35), 0 0 40px rgba(255,217,102,0.55), inset 0 1px 0 rgba(255,255,255,0.4); }
+    }
+    .admin-btn:hover { transform: scale(1.1); }
+    .admin-btn i { font-size: 1.5rem; color: #1e2f38; }
+
+    .btn-outline-gold {
+      border: 1px solid #FFD966;
+      background: rgba(255,217,102,0.08);
+      backdrop-filter: blur(6px);
+      color: #FFD966;
+      border-radius: 40px;
+      padding: 8px 28px;
+      transition: 0.25s;
+    }
+    .btn-outline-gold:hover {
+      background: #FFD966;
+      color: #1e2f38;
+      box-shadow: 0 8px 20px rgba(255,217,102,0.4);
+    }
+
+    .table-dark {
+      --bs-table-bg: rgba(15, 30, 38, 0.5);
+      --bs-table-hover-bg: rgba(255,217,102,0.08);
+      border-radius: 1rem;
+      overflow: hidden;
+      backdrop-filter: blur(10px);
+    }
+    .table-dark th {
+      border-color: rgba(255,217,102,0.2) !important;
+      color: #FFD966;
+    }
+    .table-dark td {
+      border-color: rgba(255,217,102,0.1) !important;
+      vertical-align: middle;
+    }
+
+    .modal .form-control, .modal .form-select {
+      background: rgba(255,255,255,0.08) !important;
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255,230,170,0.25) !important;
+      color: white !important;
+      border-radius: 0.6rem;
+    }
+    .modal .form-control:focus, .modal .form-select:focus {
+      background: rgba(255,255,255,0.15) !important;
+      border-color: #FFD966 !important;
+      box-shadow: 0 0 0 3px rgba(255,217,102,0.15) !important;
+    }
+    .modal .form-control::placeholder { color: rgba(255,255,255,0.45); }
+    .modal select option { background: #1e2f38; color: white; }
+
+    .skeleton-card {
+      background: linear-gradient(90deg, rgba(25,45,55,0.3), rgba(40,65,80,0.5), rgba(25,45,55,0.3));
+      background-size: 200% 100%;
+      border-radius: 1.5rem;
+      height: 400px;
+      animation: shimmer 1.8s ease-in-out infinite;
+    }
+    @keyframes shimmer {
+      0% { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
+    }
+
+    /* ============================================
+       ✅ SUPPORT BUTTON + TICKET MODAL
+       ============================================ */
+    .support-btn {
+      position: fixed;
+      bottom: 30px;
+      left: 30px;
+      height: 55px;
+      background: linear-gradient(135deg, #FFD966, #FFB347);
+      border-radius: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 999;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.35),
+                  0 0 25px rgba(255,217,102,0.3),
+                  inset 0 1px 0 rgba(255,255,255,0.4);
+      padding: 0 22px;
+      transition: all 0.3s;
+      animation: supportPulse 2.5s ease-in-out infinite;
+      gap: 8px;
+      border: none;
+    }
+    @keyframes supportPulse {
+      0%, 100% { box-shadow: 0 8px 25px rgba(0,0,0,0.35), 0 0 25px rgba(255,217,102,0.3), inset 0 1px 0 rgba(255,255,255,0.4); }
+      50% { box-shadow: 0 8px 25px rgba(0,0,0,0.35), 0 0 40px rgba(255,217,102,0.55), inset 0 1px 0 rgba(255,255,255,0.4); }
+    }
+    .support-btn:hover { transform: scale(1.08) translateY(-3px); }
+    .support-btn i { font-size: 1.3rem; color: #1e2f38; }
+    .support-btn span { font-size: 0.85rem; font-weight: 700; color: #1e2f38; letter-spacing: 0.3px; }
+
+    .ticket-modal-content {
+      background: rgba(20, 40, 48, 0.98);
+      backdrop-filter: blur(28px);
+      border: 1px solid #FFD966;
+      border-radius: 1.5rem;
+      color: white;
+    }
+    .ticket-modal-content .modal-header { border-bottom: 1px solid rgba(255,217,102,0.3); }
+    .ticket-modal-content .form-label {
+      color: #FFD966;
+      font-weight: 500;
+      font-size: 0.85rem;
+      margin-bottom: 4px;
+    }
+    .ticket-modal-content .form-control,
+    .ticket-modal-content .form-select {
+      background: rgba(255,255,255,0.08);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255,230,170,0.3);
+      color: white;
+      padding: 0.7rem 1rem;
+      border-radius: 0.8rem;
+      transition: 0.3s;
+    }
+    .ticket-modal-content .form-control:focus,
+    .ticket-modal-content .form-select:focus {
+      background: rgba(255,255,255,0.15);
+      border-color: #FFD966;
+      box-shadow: 0 0 0 3px rgba(255,217,102,0.2);
+      color: white;
+    }
+    .ticket-modal-content .form-control::placeholder { color: rgba(255,255,255,0.5); }
+    .ticket-modal-content .form-select option { background: #1e2f38; color: white; }
+    .btn-submit-ticket {
+      background: linear-gradient(135deg, #FFD966, #FFB347);
+      border: none;
+      padding: 0.85rem 2rem;
+      border-radius: 2rem;
+      color: #1e2f38;
+      font-weight: 700;
+      width: 100%;
+      transition: 0.3s;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.4);
+    }
+    .btn-submit-ticket:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(255,217,102,0.45),
+                  inset 0 1px 0 rgba(255,255,255,0.4);
+    }
+
+    @media (max-width: 768px) {
+      .glass-header h1 { font-size: 2rem; }
+      .glass-header { padding: 1.5rem 1.8rem; }
+      .filter-chip { padding: 0.5rem 1.2rem; font-size: 0.8rem; }
+      .logo-bg-layer { background-size: 200px 200px; }
+      .hero-logo-watermark { width: 380px; height: 380px; }
+      .support-btn {
+        bottom: 20px;
+        left: 20px;
+        height: 48px;
+        padding: 0 16px;
+      }
+      .support-btn span { font-size: 0.75rem; }
+      .support-btn i { font-size: 1.1rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ============================================ -->
+<!-- ✨ PROFESSIONAL LOGO BACKGROUND (FIXED LAYERS) -->
+<!-- ============================================ -->
+<div class="logo-bg-layer"></div>
+<div class="logo-bg-overlay"></div>
+
+<!-- NAVBAR WITH LOGO -->
+<nav class="navbar navbar-expand-lg fixed-top">
+  <div class="container">
+    <a class="navbar-brand d-flex align-items-center" href="index.html">
+      <img src="Images/main logo.jpeg"
+           alt="Pontifical Mission Society Logo"
+           class="navbar-logo-img"
+           onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
+      <i class="fas fa-church logo-icon" style="display: none;"></i>
+      <span>Pontifical Mission Society</span>
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="mainNav">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item"><a class="nav-link" href="index.html"><i class="fas fa-home me-1"></i>Home</a></li>
+        <li class="nav-item"><a class="nav-link" href="about.html"><i class="fas fa-heart me-1"></i>About</a></li>
+        <li class="nav-item"><a class="nav-link" href="animators.html"><i class="fas fa-users me-1"></i>Animators</a></li>
+        <li class="nav-item"><a class="nav-link" href="projects.html"><i class="fas fa-hands-helping me-1"></i>Projects</a></li>
+        <li class="nav-item"><a class="nav-link active" href="news.html"><i class="fas fa-newspaper me-1"></i>News</a></li>
+        <li class="nav-item"><a class="nav-link" href="contact.html"><i class="fas fa-envelope me-1"></i>Contact</a></li>
+        <li class="nav-item"><a class="nav-link" href="gallery.html"><i class="fas fa-images me-1"></i>Gallery</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- PAGE HEADER -->
+<div class="page-header">
+  <div class="hero-logo-watermark"></div>
+  <div class="container">
+    <div class="glass-header" data-aos="fade-up">
+      <h1><i class="fas fa-newspaper me-2"></i>News & Events</h1>
+      <p>Stay updated with the latest happenings, testimonies, and announcements</p>
+    </div>
+  </div>
+</div>
+
+<!-- FILTER SECTION -->
+<div class="container filter-section" data-aos="fade-up" data-aos-delay="200">
+  <div class="row justify-content-center">
+    <div class="col-auto">
+      <div class="glass-filters">
+        <button class="filter-chip active" data-filter="all"><i class="fas fa-globe"></i> All News</button>
+        <button class="filter-chip" data-filter="events"><i class="fas fa-calendar-alt"></i> Events</button>
+        <button class="filter-chip" data-filter="outreach"><i class="fas fa-hand-holding-heart"></i> Outreach</button>
+        <button class="filter-chip" data-filter="announcement"><i class="fas fa-bullhorn"></i> Announcements</button>
+        <button class="filter-chip" data-filter="testimony"><i class="fas fa-pray"></i> Testimonies</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- NEWS GRID -->
+<section class="news-section">
+  <div class="container">
+    <div class="row g-4" id="newsGrid">
+      <div class="col-md-6 col-lg-4"><div class="skeleton-card"></div></div>
+      <div class="col-md-6 col-lg-4"><div class="skeleton-card"></div></div>
+      <div class="col-md-6 col-lg-4"><div class="skeleton-card"></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- NEWSLETTER SECTION -->
+<div class="container mb-5" data-aos="fade-up">
+  <div class="newsletter-glass">
+    <div class="row align-items-center">
+      <div class="col-lg-6 mb-4 mb-lg-0">
+        <h3><i class="fas fa-envelope-open-text me-2" style="color:#FFD966;"></i>Stay in the Loop</h3>
+        <p>Subscribe to receive weekly updates and prayer points.</p>
+      </div>
+      <div class="col-lg-6">
+        <div class="input-group">
+          <input type="email" class="form-control newsletter-input" placeholder="Enter your email" id="newsletterEmail">
+          <button class="btn-subscribe ms-2" id="subscribeBtn"><i class="fas fa-paper-plane me-2"></i>Subscribe</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- NEWS MODAL -->
+<div class="modal fade" id="newsModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalTitle" style="color:#FFD966;"></h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <img id="modalImage" class="modal-img mb-3" alt="">
+        <p id="modalContent"></p>
+        <div id="modalExtra" class="mt-3"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline-gold" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN BUTTON -->
+<div class="admin-btn" id="adminBtn">
+  <i class="fas fa-lock"></i>
+</div>
+
+<!-- ADMIN LOGIN MODAL -->
+<div class="modal fade" id="adminLoginModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" style="color:#FFD966;"><i class="fas fa-shield-alt me-2"></i>Admin Login</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <input type="text" id="loginUsername" class="form-control mb-3" placeholder="Username">
+        <input type="password" id="loginPassword" class="form-control mb-3" placeholder="Password">
+        <button class="btn btn-outline-gold w-100" id="doLoginBtn">Login</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN PANEL MODAL -->
+<div class="modal fade" id="adminPanelModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-xl modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" style="color:#FFD966;"><i class="fas fa-database me-2"></i>News Management Dashboard</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <button class="btn btn-outline-gold mb-3" id="addNewsBtn"><i class="fas fa-plus me-2"></i>Add New News</button>
+        <div class="table-responsive">
+          <table class="table table-dark table-hover">
+            <thead>
+              <tr><th>ID</th><th>Title</th><th>Category</th><th>Date</th><th>Actions</th></tr>
+            </thead>
+            <tbody id="adminNewsList"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ADD/EDIT NEWS MODAL -->
+<div class="modal fade" id="newsFormModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="formModalTitle" style="color:#FFD966;"></h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="editId">
+        <input type="text" id="newsTitle" class="form-control mb-2" placeholder="Title">
+        <select id="newsCategory" class="form-control mb-2">
+          <option value="events">Events</option>
+          <option value="outreach">Outreach</option>
+          <option value="announcement">Announcement</option>
+          <option value="testimony">Testimony</option>
+        </select>
+        <input type="date" id="newsDate" class="form-control mb-2">
+        <input type="text" id="newsAuthor" class="form-control mb-2" placeholder="Author">
+        <input type="url" id="newsImage" class="form-control mb-2" placeholder="Image URL">
+        <textarea id="newsExcerpt" class="form-control mb-2" rows="2" placeholder="Excerpt"></textarea>
+        <textarea id="newsContent" class="form-control mb-2" rows="5" placeholder="Full Content"></textarea>
+        <input type="text" id="statsAttendees" class="form-control mb-2" placeholder="Stats: Attendees (e.g., 2,000+)">
+        <input type="text" id="statsSpeakers" class="form-control mb-2" placeholder="Stats: Speakers">
+        <input type="text" id="statsSessions" class="form-control mb-2" placeholder="Stats: Sessions">
+        <button class="btn btn-outline-gold w-100" id="saveNewsBtn">Save News</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================ -->
+<!-- 🎫 FLOATING SUPPORT BUTTON -->
+<!-- ============================================ -->
+<button class="support-btn" id="supportBtn" title="Raise a Support Ticket">
+  <i class="fas fa-headset"></i>
+  <span>Support</span>
+</button>
+
+<!-- ============================================ -->
+<!-- 🎫 SUPPORT TICKET MODAL -->
+<!-- ============================================ -->
+<div class="modal fade" id="supportModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content ticket-modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" style="color:#FFD966;">
+          <i class="fas fa-ticket-alt me-2"></i>Raise a Support Ticket
+        </h4>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <p style="opacity:0.85; font-size:0.9rem; margin-bottom:1.2rem;">
+          <i class="fas fa-info-circle text-warning me-1"></i>
+          Fill in the form below and our team will get back to you shortly. All tickets are logged and tracked.
+        </p>
+
+        <form id="ticketForm">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label"><i class="fas fa-user me-1"></i>Full Name *</label>
+              <input type="text" class="form-control" id="ticketName" required placeholder="Enter your full name">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label"><i class="fas fa-envelope me-1"></i>Email *</label>
+              <input type="email" class="form-control" id="ticketEmail" required placeholder="your@email.com">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label"><i class="fas fa-phone me-1"></i>Phone / WhatsApp</label>
+              <input type="tel" class="form-control" id="ticketPhone" placeholder="+234 XXX XXX XXXX">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label"><i class="fas fa-tag me-1"></i>Category *</label>
+              <select class="form-select" id="ticketCategory" required>
+                <option value="" disabled selected>Select category</option>
+                <option value="General Inquiry">General Inquiry</option>
+                <option value="Technical Issue">Technical Issue</option>
+                <option value="Prayer Request">Prayer Request</option>
+                <option value="News Inquiry">News Inquiry</option>
+                <option value="Event Information">Event Information</option>
+                <option value="Donation / Support">Donation / Support</option>
+                <option value="Complaint">Complaint</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            <div class="col-12">
+              <label class="form-label"><i class="fas fa-heading me-1"></i>Subject *</label>
+              <input type="text" class="form-control" id="ticketSubject" required placeholder="Brief summary of your issue">
+            </div>
+            <div class="col-12">
+              <label class="form-label"><i class="fas fa-comment-dots me-1"></i>Description *</label>
+              <textarea class="form-control" id="ticketMessage" rows="5" required placeholder="Describe your issue or request in detail..."></textarea>
+            </div>
+            <div class="col-12">
+              <button type="submit" class="btn-submit-ticket" id="submitTicketBtn">
+                <i class="fas fa-paper-plane me-2"></i>Submit Ticket
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <p><i class="fas fa-cross me-1"></i> © 2026 Pontifical Mission Society · Spreading the Gospel Worldwide</p>
+  <p>Designed with <i class="fas fa-heart" style="color:#FFD966;"></i> by BerryRay Technologies</p>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    AOS.init({ once: true, offset: 60, duration: 700 });
+
+    // ==========================================
+    // 🔧 SUPPORT / TICKET CONFIGURATION
+    // ==========================================
+    const WHATSAPP_NUMBER = '2348091234567';  // ← CHANGE to your WhatsApp number
+    const SUPABASE_URL = 'https://ekhzbclqpelsrfefufpv.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVraHpiY2xxcGVsc3JmZWZ1ZnB2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY4NjQ2MjUsImV4cCI6MjA5MjQ0MDYyNX0.7dJiDcV4q8Ss_4Ua19-L-VFSxThJKNLyBv__bfdx02M';
+
+    if (typeof supabase === 'undefined') {
+      console.error('Supabase library failed to load.');
+      document.getElementById('newsGrid').innerHTML = '<div class="col-12 text-center"><div class="glass-header">Error loading news. Please refresh the page.</div></div>';
+      return;
+    }
+
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    let currentFilter = 'all';
+    let currentNewsData = [];
+    let isAdminLoggedIn = false;
+
+    async function loadNews(filter = 'all') {
+      const grid = document.getElementById('newsGrid');
+      if (!grid) return;
+
+      grid.innerHTML = `
+        <div class="col-md-6 col-lg-4"><div class="skeleton-card"></div></div>
+        <div class="col-md-6 col-lg-4"><div class="skeleton-card"></div></div>
+        <div class="col-md-6 col-lg-4"><div class="skeleton-card"></div></div>
+      `;
+
+      let query = supabaseClient.from('news_articles').select('*').order('date', { ascending: false });
+      if (filter !== 'all') query = query.eq('category', filter);
+
+      const { data, error } = await query;
+
+      if (error) {
+        console.error('Error loading news:', error);
+        grid.innerHTML = '<div class="col-12 text-center"><div class="glass-header">Error loading news. Please refresh the page.</div></div>';
+        return;
+      }
+
+      currentNewsData = data || [];
+      renderNewsCards(currentNewsData);
+    }
+
+    function renderNewsCards(newsArray) {
+      const grid = document.getElementById('newsGrid');
+      if (!grid) return;
+
+      if (newsArray.length === 0) {
+        grid.innerHTML = '<div class="col-12 text-center"><div class="glass-header">No news found. Check back soon!</div></div>';
+        return;
+      }
+
+      grid.innerHTML = '';
+
+      newsArray.forEach((news, index) => {
+        const categoryIcons = { events: 'fa-calendar-alt', outreach: 'fa-hand-holding-heart', announcement: 'fa-bullhorn', testimony: 'fa-pray' };
+        const icon = categoryIcons[news.category] || 'fa-newspaper';
+
+        const col = document.createElement('div');
+        col.className = 'col-md-6 col-lg-4';
+        col.setAttribute('data-aos', 'fade-up');
+        col.setAttribute('data-aos-delay', (index * 50).toString());
+        col.innerHTML = `
+          <div class="news-card" data-news-id="${news.id}">
+            <div class="news-img-wrapper">
+              <img src="${news.image_url || 'https://images.unsplash.com/photo-1438032005730-c779502df39b?w=800&h=500&fit=crop'}" class="news-img" loading="lazy">
+              <div class="news-date-badge"><i class="far fa-calendar-alt me-1"></i> ${news.date}</div>
+              <div class="news-category"><i class="fas ${icon} me-1"></i> ${news.category.charAt(0).toUpperCase() + news.category.slice(1)}</div>
+            </div>
+            <div class="news-content">
+              <h3>${escapeHtml(news.title)}</h3>
+              <div class="news-meta"><span><i class="fas fa-user"></i> ${escapeHtml(news.author)}</span></div>
+              <p class="news-excerpt">${escapeHtml(news.excerpt ? news.excerpt.substring(0, 120) : '')}${news.excerpt && news.excerpt.length > 120 ? '...' : ''}</p>
+              <button class="btn-read" data-id="${news.id}"><i class="fas fa-book-open me-2"></i>Read Full Story</button>
+            </div>
+          </div>
+        `;
+        grid.appendChild(col);
+      });
+
+      document.querySelectorAll('.btn-read').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const id = parseInt(btn.getAttribute('data-id'));
+          const news = currentNewsData.find(n => n.id === id);
+          if (news) openNewsModal(news);
+        });
+      });
+
+      document.querySelectorAll('.news-card').forEach(card => {
+        card.addEventListener('click', () => {
+          const id = parseInt(card.getAttribute('data-news-id'));
+          const news = currentNewsData.find(n => n.id === id);
+          if (news) openNewsModal(news);
+        });
+      });
+    }
+
+    function openNewsModal(news) {
+      document.getElementById('modalTitle').innerHTML = `<i class="fas fa-newspaper me-2"></i>${escapeHtml(news.title)}`;
+      document.getElementById('modalImage').src = news.image_url || 'https://images.unsplash.com/photo-1438032005730-c779502df39b?w=800&h=500&fit=crop';
+
+      let statsHtml = '';
+      if (news.stats_attendees) statsHtml += `<div><strong>${news.stats_attendees}</strong> Attendees</div>`;
+      if (news.stats_speakers) statsHtml += `<div><strong>${news.stats_speakers}</strong> Speakers</div>`;
+      if (news.stats_sessions) statsHtml += `<div><strong>${news.stats_sessions}</strong> Sessions</div>`;
+
+      const extraHtml = statsHtml ? `<div class="d-flex gap-3 p-3 bg-warning bg-opacity-10 rounded mb-3">${statsHtml}</div>` : '';
+
+      document.getElementById('modalContent').innerHTML = `<p>${escapeHtml(news.full_content)}</p>${extraHtml}`;
+      document.getElementById('modalExtra').innerHTML = `
+        <div class="d-flex gap-3 flex-wrap">
+          <span class="badge bg-warning bg-opacity-25 text-warning px-3 py-2"><i class="far fa-calendar-alt me-1"></i> ${news.date}</span>
+          <span class="badge bg-warning bg-opacity-25 text-warning px-3 py-2"><i class="fas fa-user me-1"></i> By: ${escapeHtml(news.author)}</span>
+        </div>
+      `;
+
+      new bootstrap.Modal(document.getElementById('newsModal')).show();
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return str.replace(/[&<>]/g, m => m === '&' ? '&amp;' : m === '<' ? '&lt;' : '&gt;');
+    }
+
+    async function loadAdminNews() {
+      const { data } = await supabaseClient.from('news_articles').select('*').order('date', { ascending: false });
+      if (data) {
+        const tbody = document.getElementById('adminNewsList');
+        tbody.innerHTML = data.map(news => `
+          <tr>
+            <td>${news.id}</td>
+            <td>${escapeHtml(news.title)}</td>
+            <td>${news.category}</td>
+            <td>${news.date}</td>
+            <td>
+              <button class="btn btn-sm btn-outline-warning me-1 edit-news" data-id="${news.id}"><i class="fas fa-edit"></i></button>
+              <button class="btn btn-sm btn-outline-danger delete-news" data-id="${news.id}"><i class="fas fa-trash"></i></button>
+            </td>
+          </tr>
+        `).join('');
+
+        document.querySelectorAll('.edit-news').forEach(btn => {
+          btn.addEventListener('click', () => editNews(parseInt(btn.dataset.id)));
+        });
+        document.querySelectorAll('.delete-news').forEach(btn => {
+          btn.addEventListener('click', () => deleteNews(parseInt(btn.dataset.id)));
+        });
+      }
+    }
+
+    async function editNews(id) {
+      const news = currentNewsData.find(n => n.id === id);
+      if (news) {
+        document.getElementById('formModalTitle').innerHTML = '<i class="fas fa-edit me-2"></i>Edit News';
+        document.getElementById('editId').value = news.id;
+        document.getElementById('newsTitle').value = news.title;
+        document.getElementById('newsCategory').value = news.category;
+        document.getElementById('newsDate').value = news.date;
+        document.getElementById('newsAuthor').value = news.author;
+        document.getElementById('newsImage').value = news.image_url || '';
+        document.getElementById('newsExcerpt').value = news.excerpt || '';
+        document.getElementById('newsContent').value = news.full_content || '';
+        document.getElementById('statsAttendees').value = news.stats_attendees || '';
+        document.getElementById('statsSpeakers').value = news.stats_speakers || '';
+        document.getElementById('statsSessions').value = news.stats_sessions || '';
+        new bootstrap.Modal(document.getElementById('newsFormModal')).show();
+      }
+    }
+
+    async function deleteNews(id) {
+      const result = await Swal.fire({
+        title: 'Are you sure?',
+        text: 'This action cannot be undone!',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        confirmButtonText: 'Yes, delete it!'
+      });
+
+      if (result.isConfirmed) {
+        const { error } = await supabaseClient.from('news_articles').delete().eq('id', id);
+        if (error) {
+          Swal.fire('Error!', 'Failed to delete news.', 'error');
+        } else {
+          Swal.fire('Deleted!', 'News has been deleted.', 'success');
+          loadNews(currentFilter);
+          if (isAdminLoggedIn) loadAdminNews();
+        }
+      }
+    }
+
+    async function saveNews() {
+      const id = document.getElementById('editId').value;
+      const newsData = {
+        title: document.getElementById('newsTitle').value,
+        category: document.getElementById('newsCategory').value,
+        date: document.getElementById('newsDate').value,
+        author: document.getElementById('newsAuthor').value,
+        image_url: document.getElementById('newsImage').value,
+        excerpt: document.getElementById('newsExcerpt').value,
+        full_content: document.getElementById('newsContent').value,
+        stats_attendees: document.getElementById('statsAttendees').value,
+        stats_speakers: document.getElementById('statsSpeakers').value,
+        stats_sessions: document.getElementById('statsSessions').value
+      };
+
+      if (!newsData.title || !newsData.category || !newsData.date || !newsData.author || !newsData.excerpt || !newsData.full_content) {
+        Swal.fire('Error!', 'Please fill all required fields.', 'error');
+        return;
+      }
+
+      let error;
+      if (id) {
+        const result = await supabaseClient.from('news_articles').update(newsData).eq('id', id);
+        error = result.error;
+      } else {
+        const result = await supabaseClient.from('news_articles').insert([newsData]);
+        error = result.error;
+      }
+
+      if (error) {
+        Swal.fire('Error!', 'Failed to save news. ' + error.message, 'error');
+      } else {
+        Swal.fire('Success!', 'News saved successfully.', 'success');
+        bootstrap.Modal.getInstance(document.getElementById('newsFormModal')).hide();
+        loadNews(currentFilter);
+        if (isAdminLoggedIn) loadAdminNews();
+        document.getElementById('editId').value = '';
+      }
+    }
+
+    document.querySelectorAll('.filter-chip').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.filter-chip').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentFilter = btn.dataset.filter;
+        loadNews(currentFilter);
+      });
+    });
+
+    document.getElementById('subscribeBtn')?.addEventListener('click', () => {
+      const email = document.getElementById('newsletterEmail').value;
+      if (email && email.includes('@')) {
+        Swal.fire('Subscribed!', `We'll send updates to ${email}`, 'success');
+        document.getElementById('newsletterEmail').value = '';
+      } else {
+        Swal.fire('Error!', 'Please enter a valid email address.', 'error');
+      }
+    });
+
+    document.getElementById('adminBtn')?.addEventListener('click', () => {
+      if (isAdminLoggedIn) {
+        loadAdminNews();
+        new bootstrap.Modal(document.getElementById('adminPanelModal')).show();
+      } else {
+        new bootstrap.Modal(document.getElementById('adminLoginModal')).show();
+      }
+    });
+
+    document.getElementById('doLoginBtn')?.addEventListener('click', async () => {
+      const username = document.getElementById('loginUsername').value;
+      const password = document.getElementById('loginPassword').value;
+
+      if (username === 'admin' && password === 'admin123') {
+        isAdminLoggedIn = true;
+        document.getElementById('adminBtn').innerHTML = '<i class="fas fa-cog"></i>';
+        bootstrap.Modal.getInstance(document.getElementById('adminLoginModal')).hide();
+        Swal.fire('Success!', 'Logged in as admin.', 'success');
+        loadAdminNews();
+        new bootstrap.Modal(document.getElementById('adminPanelModal')).show();
+      } else {
+        Swal.fire('Error!', 'Invalid credentials.', 'error');
+      }
+    });
+
+    document.getElementById('addNewsBtn')?.addEventListener('click', () => {
+      document.getElementById('formModalTitle').innerHTML = '<i class="fas fa-plus me-2"></i>Add New News';
+      document.getElementById('editId').value = '';
+      document.getElementById('newsTitle').value = '';
+      document.getElementById('newsCategory').value = 'events';
+      document.getElementById('newsDate').value = new Date().toISOString().split('T')[0];
+      document.getElementById('newsAuthor').value = '';
+      document.getElementById('newsImage').value = '';
+      document.getElementById('newsExcerpt').value = '';
+      document.getElementById('newsContent').value = '';
+      document.getElementById('statsAttendees').value = '';
+      document.getElementById('statsSpeakers').value = '';
+      document.getElementById('statsSessions').value = '';
+      new bootstrap.Modal(document.getElementById('newsFormModal')).show();
+    });
+
+    document.getElementById('saveNewsBtn')?.addEventListener('click', saveNews);
+
+    // ============================================
+    // 🎫 SUPPORT TICKET SYSTEM
+    // ============================================
+    document.getElementById('supportBtn').addEventListener('click', () => {
+      const modal = new bootstrap.Modal(document.getElementById('supportModal'));
+      modal.show();
+    });
+
+    document.getElementById('ticketForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+
+      const name = document.getElementById('ticketName').value.trim();
+      const email = document.getElementById('ticketEmail').value.trim();
+      const phone = document.getElementById('ticketPhone').value.trim() || 'Not provided';
+      const category = document.getElementById('ticketCategory').value;
+      const subject = document.getElementById('ticketSubject').value.trim();
+      const message = document.getElementById('ticketMessage').value.trim();
+
+      if (!name || !email || !category || !subject || !message) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Missing Fields',
+          text: 'Please fill in all required fields (*)',
+          background: 'rgba(20,40,48,0.98)',
+          color: '#f0f3f8',
+          confirmButtonColor: '#FFD966'
+        });
+        return;
+      }
+
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Invalid Email',
+          text: 'Please enter a valid email address',
+          background: 'rgba(20,40,48,0.98)',
+          color: '#f0f3f8',
+          confirmButtonColor: '#FFD966'
+        });
+        return;
+      }
+
+      const submitBtn = document.getElementById('submitTicketBtn');
+      const originalBtn = submitBtn.innerHTML;
+      submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Submitting...';
+      submitBtn.disabled = true;
+
+      try {
+        const ticketData = {
+          name: name,
+          email: email,
+          phone: phone,
+          category: category,
+          subject: subject,
+          message: message,
+          status: 'open'
+        };
+
+        const { data, error } = await supabaseClient
+          .from('support_tickets')
+          .insert([ticketData])
+          .select();
+
+        if (error) {
+          console.error('Supabase ticket insert error:', error);
+          throw new Error('Failed to save ticket: ' + error.message);
+        }
+
+        console.log('✅ Ticket saved to Supabase:', data);
+
+        const waMessage = 
+          `🎫 *NEW SUPPORT TICKET*\n\n` +
+          `👤 *Name:* ${name}\n` +
+          `📧 *Email:* ${email}\n` +
+          `📱 *Phone:* ${phone}\n` +
+          `📂 *Category:* ${category}\n` +
+          `📌 *Subject:* ${subject}\n\n` +
+          `💬 *Message:*\n${message}\n\n` +
+          `🆔 Ticket ID: #${data && data[0] ? data[0].id : 'N/A'}\n` +
+          `⏰ Submitted: ${new Date().toLocaleString()}`;
+
+        const waUrl = `https://wa.me/${2349058515139}?text=${encodeURIComponent(waMessage)}`;
+
+        const result = await Swal.fire({
+          icon: 'success',
+          title: 'Ticket Submitted! 🎉',
+          html: `
+            <p>Thank you, <strong>${escapeHtml(name)}</strong>!</p>
+            <p style="font-size:0.9rem; opacity:0.85; margin-top:0.5rem;">
+              Your ticket has been logged and our team will get back to you shortly.
+            </p>
+            <p style="font-size:0.8rem; opacity:0.7; margin-top:0.8rem;">
+              <i class="fas fa-ticket-alt" style="color:#FFD966;"></i>
+              Ticket ID: <strong>#${data && data[0] ? data[0].id : 'N/A'}</strong>
+            </p>
+          `,
+          background: 'rgba(20,40,48,0.98)',
+          color: '#f0f3f8',
+          confirmButtonColor: '#FFD966',
+          confirmButtonText: '<i class="fab fa-whatsapp"></i> Notify on WhatsApp',
+          showCancelButton: true,
+          cancelButtonText: 'Close',
+          cancelButtonColor: '#6c757d'
+        });
+
+        if (result.isConfirmed) {
+          window.open(waUrl, '_blank');
+        }
+
+        this.reset();
+        bootstrap.Modal.getInstance(document.getElementById('supportModal')).hide();
+
+      } catch (err) {
+        console.error('❌ Ticket submission error:', err);
+        Swal.fire({
+          icon: 'error',
+          title: 'Submission Failed',
+          text: 'Something went wrong. Please try again or contact us via WhatsApp.',
+          background: 'rgba(20,40,48,0.98)',
+          color: '#f0f3f8',
+          confirmButtonColor: '#FFD966'
+        });
+      } finally {
+        submitBtn.innerHTML = originalBtn;
+        submitBtn.disabled = false;
+      }
+    });
+
+    loadNews('all');
+
+    console.log('%c✨ News Page Loaded | Support Tickets enabled ✨', 'color: #FFD966; font-size: 16px');
+    console.log('%c🎫 WhatsApp notifications → ' + WHATSAPP_NUMBER, 'color: #25D366; font-size: 12px');
+    console.log('%c📸 Admin Login: admin / admin123', 'color: #FFB347; font-size: 12px');
+  });
+</script>
+
+</body>
+</html>
