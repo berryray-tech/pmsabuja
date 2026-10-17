@@ -22,15 +22,15 @@
       overflow-x: hidden;
       min-height: 100vh;
       position: relative;
+      padding-bottom: 80px;
     }
 
     .logo-bg-layer {
       position: fixed; inset: 0; z-index: 0; pointer-events: none;
       opacity: 0.04;
-      background-image: url('Images/main logo.jpeg');
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Ctext x='60' y='75' font-family='Poppins,sans-serif' font-size='48' font-weight='700' fill='%23FFD966' text-anchor='middle'%3EPMS%3C/text%3E%3C/svg%3E");
       background-repeat: repeat; background-size: 320px 320px;
       background-position: center center;
-      filter: brightness(1.4) contrast(0.9);
       mix-blend-mode: lighten;
     }
     .logo-bg-overlay {
@@ -45,10 +45,9 @@
       transform: translate(-50%, -50%);
       width: 620px; height: 620px;
       max-width: 85vw; max-height: 85vw;
-      background-image: url('Images/main logo.jpeg');
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400' viewBox='0 0 400 400'%3E%3Ccircle cx='200' cy='200' r='180' fill='none' stroke='%23FFD966' stroke-width='4'/%3E%3Ctext x='200' y='220' font-family='Poppins,sans-serif' font-size='72' font-weight='800' fill='%23FFD966' text-anchor='middle'%3EPMS%3C/text%3E%3C/svg%3E");
       background-size: contain; background-repeat: no-repeat; background-position: center;
       opacity: 0.06; pointer-events: none; z-index: 2;
-      filter: blur(0.5px) brightness(1.5);
       animation: watermarkFloat 14s ease-in-out infinite;
     }
     @keyframes watermarkFloat {
@@ -60,7 +59,9 @@
     ::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); }
     ::-webkit-scrollbar-thumb { background: rgba(255,215,150,0.5); border-radius: 10px; }
 
-    /* GLASS DOOR OVERLAY */
+    /* ============================
+       GLASS DOOR OVERLAY — uses main logo as background
+       ============================ */
     .glass-door-overlay {
       position: fixed; top: 0; left: 0;
       width: 100%; height: 100%;
@@ -85,41 +86,33 @@
     .door-left::before, .door-right::before {
       content: ''; position: absolute; top: 0; left: 0;
       width: 100%; height: 100%;
-      background-size: contain; background-position: center;
-      filter: blur(5px); transform: scale(1.15); z-index: 0; opacity: 0.9;
+      background-size: contain; background-position: center; background-repeat: no-repeat;
+      background-color: rgba(10, 25, 30, 0.6);
+      filter: blur(3px) brightness(1.4);
+      transform: scale(1.15); z-index: 0; opacity: 0.9;
     }
     .door-left { left: 0; border-right: 3px solid #FFD966; transform-origin: left; }
     .door-right { right: 0; border-left: 3px solid #FFD966; transform-origin: right; }
-    .door-left::before { background-image: url('Images/LEO LEFT.jpg'); }
-    .door-right::before { background-image: url('Images/LEO RIGHT.jpg'); }
+    /* FIX: doors now use MAIN LOGO as their background */
+    .door-left::before {
+      background-image: url("Images/main-logo.jpeg");
+    }
+    .door-right::before {
+      background-image: url("Images/main-logo.jpeg");
+      transform: scaleX(-1) scale(1.15);
+    }
     .glass-door-overlay.unveiled .door-left { transform: rotateY(-90deg); }
     .glass-door-overlay.unveiled .door-right { transform: rotateY(90deg); }
 
-    .pope-door-img {
-      width: 200px; height: 200px;
-      border-radius: 50%; object-fit: cover;
-      border: 4px solid #FFD966;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.4);
-      margin-bottom: 20px; transition: transform 0.3s;
-      position: relative; z-index: 10;
-      background: rgba(0,0,0,0.2); backdrop-filter: blur(4px);
+    .door-badge {
+      position: absolute; top: 40px;
+      background: rgba(0,0,0,0.5); backdrop-filter: blur(8px);
+      color: #FFD966; padding: 6px 18px;
+      border-radius: 40px; border: 1px solid rgba(255,217,102,0.5);
+      font-size: 0.75rem; font-weight: 600; letter-spacing: 1px;
+      text-transform: uppercase; z-index: 10;
     }
-    .door-left:hover .pope-door-img,
-    .door-right:hover .pope-door-img { transform: scale(1.05); }
-    .door-pope-name {
-      font-size: 1.3rem; font-weight: 700; color: #FFD966;
-      margin-top: 10px; text-align: center;
-      position: relative; z-index: 10;
-      text-shadow: 0 2px 10px rgba(0,0,0,0.5);
-      background: rgba(0,0,0,0.3); backdrop-filter: blur(4px);
-      padding: 5px 15px; border-radius: 30px;
-    }
-    .door-pope-title {
-      font-size: 0.8rem; opacity: 0.95; text-align: center;
-      position: relative; z-index: 10;
-      background: rgba(0,0,0,0.3); backdrop-filter: blur(4px);
-      padding: 3px 12px; border-radius: 20px; margin-top: 5px;
-    }
+
     .door-handle {
       position: absolute; width: 60px; height: 60px;
       background: linear-gradient(135deg, #FFD966, #FFB347);
@@ -137,6 +130,7 @@
       0%, 100% { transform: translateY(-50%) scale(1); box-shadow: 0 5px 20px rgba(255,217,102,0.5); }
       50% { transform: translateY(-50%) scale(1.1); box-shadow: 0 5px 30px rgba(255,217,102,0.8); }
     }
+
     .door-welcome-text {
       position: absolute; bottom: 15%; left: 50%;
       transform: translateX(-50%);
@@ -161,12 +155,15 @@
     }
     .main-content.visible { opacity: 1; visibility: visible; }
 
-    /* NAVBAR */
+    /* ============================
+       NAVBAR — FIXED HAMBURGER
+       ============================ */
     .navbar {
-      background: rgba(10, 25, 30, 0.65);
+      position: fixed; top: 0; left: 0; right: 0;
+      background: rgba(10, 25, 30, 0.85);
       backdrop-filter: blur(14px);
-      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-      padding: 12px 0; z-index: 1000;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+      padding: 12px 0; z-index: 1050;
     }
     .navbar-brand {
       font-weight: 700; font-size: 1.7rem;
@@ -174,38 +171,63 @@
       -webkit-background-clip: text; background-clip: text; color: transparent !important;
       display: flex; align-items: center; gap: 10px;
     }
-    .logo-icon { font-size: 1.8rem; color: #FFD966; margin-right: 8px; }
     .navbar-logo-img {
       height: 45px; width: 45px; object-fit: contain;
       border-radius: 50%;
       border: 2px solid rgba(255,217,102,0.5);
       background: rgba(255,255,255,0.05);
       padding: 3px; transition: 0.3s;
+      flex-shrink: 0;
     }
     .navbar-logo-img:hover {
       transform: scale(1.08);
       border-color: #FFD966;
       box-shadow: 0 0 15px rgba(255,217,102,0.5);
     }
+    .logo-icon { font-size: 1.8rem; color: #FFD966; margin-right: 8px; }
+
     .nav-link {
       color: rgba(255,248,225,0.9) !important;
       font-weight: 500; margin: 0 6px;
       transition: 0.3s; position: relative;
     }
     .nav-link:hover, .nav-link.active { color: #FFD966 !important; transform: translateY(-2px); }
-    .navbar-toggler { border-color: rgba(255,215,150,0.6); }
-    .navbar-toggler-icon { filter: brightness(0) invert(1); }
+
+    /* FIX: visible gold hamburger */
+    .navbar-toggler {
+      border: 1px solid rgba(255,215,150,0.6);
+      background: rgba(255,217,102,0.1);
+      padding: 8px 12px;
+      border-radius: 0.5rem;
+      position: relative;
+      z-index: 1060;
+    }
+    .navbar-toggler:focus {
+      box-shadow: 0 0 0 3px rgba(255,217,102,0.3);
+      outline: none;
+    }
+    .navbar-toggler-icon {
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(255,217,102,1)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important;
+      filter: none !important;
+    }
+
+    .navbar-collapse {
+      max-height: 80vh;
+      overflow-y: auto;
+    }
 
     @media (max-width: 991px) {
       .navbar-collapse {
-        background: rgba(10, 25, 30, 0.95);
+        background: rgba(10, 25, 30, 0.98);
         backdrop-filter: blur(20px);
         border-radius: 1rem; padding: 1rem; margin-top: 1rem;
         border: 1px solid rgba(255,215,150,0.3);
       }
+      .navbar-collapse.show { display: block !important; }
       .nav-link { padding: 0.8rem 1rem; text-align: center; border-radius: 0.5rem; margin: 2px 0; }
-      .nav-link:hover { background: rgba(255,217,102,0.1); }
+      .nav-link:hover, .nav-link.active { background: rgba(255,217,102,0.1); transform: none; }
       .navbar-logo-img { height: 38px; width: 38px; }
+      .navbar-brand { font-size: 1.2rem; }
     }
 
     /* HERO */
@@ -572,23 +594,28 @@
       color: #FFE2A4; font-size: 0.95rem; opacity: 0.9;
     }
 
-    /* Challenge entry modal */
-    .challenge-modal-content {
+    /* Modals */
+    .challenge-modal-content,
+    .ticket-modal-content {
       background: rgba(20, 40, 48, 0.98);
       backdrop-filter: blur(28px);
       border: 2px solid #FFD966;
       border-radius: 1.5rem;
       color: white;
     }
-    .challenge-modal-content .modal-header {
+    .challenge-modal-content .modal-header,
+    .ticket-modal-content .modal-header {
       border-bottom: 1px solid rgba(255,217,102,0.3);
     }
-    .challenge-modal-content .form-label {
+    .challenge-modal-content .form-label,
+    .ticket-modal-content .form-label {
       color: #FFD966; font-weight: 500;
       font-size: 0.85rem; margin-bottom: 4px;
     }
     .challenge-modal-content .form-control,
-    .challenge-modal-content .form-select {
+    .challenge-modal-content .form-select,
+    .ticket-modal-content .form-control,
+    .ticket-modal-content .form-select {
       background: rgba(255,255,255,0.08);
       backdrop-filter: blur(8px);
       border: 1px solid rgba(255,230,170,0.3);
@@ -598,28 +625,38 @@
       transition: 0.3s;
     }
     .challenge-modal-content .form-control:focus,
-    .challenge-modal-content .form-select:focus {
+    .challenge-modal-content .form-select:focus,
+    .ticket-modal-content .form-control:focus,
+    .ticket-modal-content .form-select:focus {
       background: rgba(255,255,255,0.15);
       border-color: #FFD966;
       box-shadow: 0 0 0 3px rgba(255,217,102,0.2);
       color: white;
     }
-    .challenge-modal-content .form-control::placeholder { color: rgba(255,255,255,0.5); }
-    .challenge-modal-content .form-select option { background: #1e2f38; color: white; }
-    .btn-submit-entry {
+    .challenge-modal-content .form-control::placeholder,
+    .ticket-modal-content .form-control::placeholder { color: rgba(255,255,255,0.5); }
+    .challenge-modal-content .form-select option,
+    .ticket-modal-content .form-select option { background: #1e2f38; color: white; }
+
+    .btn-submit-entry,
+    .btn-submit-ticket {
       background: linear-gradient(135deg, #FFD966, #FFB347);
       border: none; padding: 0.9rem 2rem;
       border-radius: 2rem; color: #1e2f38;
       font-weight: 800; width: 100%; transition: 0.3s;
       box-shadow: inset 0 1px 0 rgba(255,255,255,0.4);
     }
-    .btn-submit-entry:hover {
+    .btn-submit-entry:hover,
+    .btn-submit-ticket:hover {
       transform: translateY(-2px);
       box-shadow: 0 10px 25px rgba(255,217,102,0.45),
                   inset 0 1px 0 rgba(255,255,255,0.4);
     }
+    .btn-submit-entry:disabled,
+    .btn-submit-ticket:disabled {
+      opacity: 0.7; cursor: not-allowed; transform: none;
+    }
 
-    /* ✅ NEW: Social Media Caption Preview Box */
     .caption-box {
       background: linear-gradient(135deg, rgba(255,217,102,0.15), rgba(255,179,71,0.05));
       border: 1px dashed rgba(255,217,102,0.6);
@@ -778,17 +815,51 @@
       padding: 1rem; border-radius: 1rem;
       border-left: 4px solid #FFD966;
     }
+    .btn-outline-gold {
+      border: 1px solid #FFD966; background: transparent;
+      color: #FFD966; border-radius: 40px; padding: 8px 28px;
+      transition: 0.25s;
+    }
+    .btn-outline-gold:hover { background: #FFD966; color: #1e2f38; }
+
+    /* ============================
+       SUPPORT BUTTON
+       ============================ */
+    .support-btn {
+      position: fixed;
+      bottom: 30px;
+      left: 30px;
+      height: 55px;
+      background: linear-gradient(135deg, #FFD966, #FFB347);
+      border-radius: 50px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      z-index: 999;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.35),
+                  0 0 25px rgba(255,217,102,0.3),
+                  inset 0 1px 0 rgba(255,255,255,0.4);
+      padding: 0 22px;
+      transition: all 0.3s;
+      animation: supportPulse 2.5s ease-in-out infinite;
+      gap: 8px;
+      border: none;
+    }
+    @keyframes supportPulse {
+      0%, 100% { box-shadow: 0 8px 25px rgba(0,0,0,0.35), 0 0 25px rgba(255,217,102,0.3), inset 0 1px 0 rgba(255,255,255,0.4); }
+      50% { box-shadow: 0 8px 25px rgba(0,0,0,0.35), 0 0 40px rgba(255,217,102,0.55), inset 0 1px 0 rgba(255,255,255,0.4); }
+    }
+    .support-btn:hover { transform: scale(1.08) translateY(-3px); }
+    .support-btn i { font-size: 1.3rem; color: #1e2f38; }
+    .support-btn span { font-size: 0.85rem; font-weight: 700; color: #1e2f38; letter-spacing: 0.3px; }
 
     @media (max-width: 768px) {
       .portrait-container { width: 280px; height: 420px; }
       .wheel-handle { right: 10px; padding: 12px 8px; }
       .wheel-spinner { width: 45px; height: 45px; font-size: 1.3rem; }
       .wheel-arrow { width: 40px; height: 40px; font-size: 1rem; }
-      .pope-door-img { width: 120px; height: 120px; }
-      .vatican-logo-left, .vatican-logo-right { width: 60px; height: 60px; }
-      .vatican-logo-left img, .vatican-logo-right img { width: 40px; height: 40px; }
       .door-handle { width: 45px; height: 45px; font-size: 1.5rem; }
-      .door-welcome-text { font-size: 0.8rem; white-space: nowrap; padding: 0.5rem 1rem; }
+      .door-welcome-text { font-size: 0.75rem; white-space: normal; text-align: center; padding: 0.5rem 1rem; max-width: 90%; }
+      .door-badge { font-size: 0.6rem; padding: 4px 12px; top: 20px; }
       .pope-popup-card { width: 320px; right: -10px; }
       .pope-intentions-btn { min-width: 180px; height: 48px; padding: 0 18px; }
       .pope-intentions-btn span { font-size: 0.8rem; }
@@ -801,6 +872,12 @@
       .prize-value { font-size: 1.8rem; }
       .winner-photo { width: 100px; height: 100px; }
       .winner-name { font-size: 1.05rem; }
+      .support-btn { bottom: 20px; left: 20px; height: 48px; padding: 0 16px; }
+      .support-btn span { font-size: 0.75rem; }
+      .support-btn i { font-size: 1.1rem; }
+      .pope-intentions-wrapper { bottom: 20px; right: 20px; }
+      .pope-intentions-btn { min-width: 140px; height: 44px; padding: 0 12px; }
+      .pope-intentions-btn span { font-size: 0.7rem; }
     }
   </style>
 </head>
@@ -809,21 +886,21 @@
 <div class="logo-bg-layer"></div>
 <div class="logo-bg-overlay"></div>
 
-<!-- GLASS DOOR OVERLAY -->
+<!-- GLASS DOOR OVERLAY — MAIN LOGO AS BACKGROUND -->
 <div class="glass-door-overlay" id="glassDoor">
-  <div class="door-left">
-    <img src="images/LEO LEFT.jpg" alt="Pope Leo XIII" class="pope-door-img" onerror="this.src='https://randomuser.me/api/portraits/men/32.jpg'">
-    <div class="door-pope-name">Pope Leo XIII</div>
-    <div class="door-pope-title">Bishop of Rome · 1810-1903</div>
+  <div class="door-left" role="button" tabindex="0" aria-label="Open sacred doors">
+    <div class="door-badge">✦ Pontifical Mission Society ✦</div>
     <div class="door-handle" id="doorHandleLeft"><i class="fas fa-hand-peace"></i></div>
   </div>
-  <div class="door-right">
-    <img src="images/LEO RIGHT.jpg" alt="Pope Leo XIII" class="pope-door-img" onerror="this.src='https://randomuser.me/api/portraits/men/32.jpg'">
-    <div class="door-pope-name">Pope Leo XIII</div>
-    <div class="door-pope-title">Servant of the Servants of God</div>
+  <div class="door-right" role="button" tabindex="0" aria-label="Open sacred doors">
+    <div class="door-badge">✦ Sacred Doors ✦</div>
     <div class="door-handle" id="doorHandleRight"><i class="fas fa-door-open"></i></div>
   </div>
-  <div class="door-welcome-text"><i class="fas fa-chevron-right me-2"></i> CLICK THE HANDLE TO OPEN THE SACRED DOORS <i class="fas fa-chevron-left ms-2"></i></div>
+  <div class="door-welcome-text">
+    <i class="fas fa-chevron-right me-2"></i>
+    CLICK THE HANDLE TO OPEN THE SACRED DOORS
+    <i class="fas fa-chevron-left ms-2"></i>
+  </div>
 </div>
 
 <!-- MAIN CONTENT -->
@@ -831,14 +908,14 @@
   <nav class="navbar navbar-expand-lg fixed-top">
     <div class="container">
       <a class="navbar-brand d-flex align-items-center" href="index.html">
-        <img src="images/main logo.jpeg"
+        <img src="Images/main-logo.jpeg"
              alt="Pontifical Mission Society Logo"
              class="navbar-logo-img"
-             onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
-        <i class="fas fa-church logo-icon" style="display: none;"></i>
+             onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22100%22 height=%22100%22 viewBox=%220 0 100 100%22%3E%3Ccircle cx=%2250%22 cy=%2250%22 r=%2245%22 fill=%22%23FFD966%22/%3E%3Ctext x=%2250%22 y=%2263%22 font-family=%22Poppins,sans-serif%22 font-size=%2236%22 font-weight=%22800%22 fill=%22%231e2f38%22 text-anchor=%22middle%22%3EPMS%3C/text%3E%3C/svg%3E';">
         <span>Pontifical Mission Society</span>
       </a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav"
+              aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse" id="mainNav">
@@ -859,8 +936,8 @@
   <div class="hero-section">
     <div class="hero-bg-blur" id="heroBgBlur"></div>
     <div class="hero-logo-watermark"></div>
-    <div class="vatican-logo-left"><img src="images/CATHOLIC FLAG.png" alt="Vatican Logo" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/0/00/Emblem_of_the_Holy_See_usual.svg/800px-Emblem_of_the_Holy_See_usual.svg.png'"></div>
-    <div class="vatican-logo-right"><img src="images/CATHOLIC FLAG.png" alt="Vatican Logo" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/0/00/Emblem_of_the_Holy_See_usual.svg/800px-Emblem_of_the_Holy_See_usual.svg.png'"></div>
+    <div class="vatican-logo-left"><img src="Images/CATHOLIC-FLAG.png" alt="Vatican Logo" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/0/00/Emblem_of_the_Holy_See_usual.svg/800px-Emblem_of_the_Holy_See_usual.svg.png'"></div>
+    <div class="vatican-logo-right"><img src="Images/CATHOLIC-FLAG.png" alt="Vatican Logo" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/0/00/Emblem_of_the_Holy_See_usual.svg/800px-Emblem_of_the_Holy_See_usual.svg.png'"></div>
     <div class="portrait-container" id="portraitContainer"></div>
     <div class="wheel-handle">
       <div class="wheel-spinner" id="wheelSpinner"><i class="fas fa-cog"></i></div>
@@ -975,6 +1052,74 @@
   </footer>
 </div>
 
+<!-- SUPPORT BUTTON -->
+<button class="support-btn" id="supportBtn" title="Raise a Support Ticket" aria-label="Raise a support ticket">
+  <i class="fas fa-headset"></i>
+  <span>Support</span>
+</button>
+
+<!-- SUPPORT TICKET MODAL -->
+<div class="modal fade" id="supportModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content ticket-modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" style="color:#FFD966;">
+          <i class="fas fa-ticket-alt me-2"></i>Raise a Support Ticket
+        </h4>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p style="opacity:0.85; font-size:0.9rem; margin-bottom:1.2rem;">
+          <i class="fas fa-info-circle text-warning me-1"></i>
+          Fill in the form below and our team will get back to you shortly.
+        </p>
+        <form id="ticketForm" novalidate>
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label" for="ticketName"><i class="fas fa-user me-1"></i>Full Name *</label>
+              <input type="text" class="form-control" id="ticketName" required placeholder="Enter your full name">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label" for="ticketEmail"><i class="fas fa-envelope me-1"></i>Email *</label>
+              <input type="email" class="form-control" id="ticketEmail" required placeholder="your@email.com">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label" for="ticketPhone"><i class="fas fa-phone me-1"></i>Phone / WhatsApp</label>
+              <input type="tel" class="form-control" id="ticketPhone" placeholder="+234 XXX XXX XXXX">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label" for="ticketCategory"><i class="fas fa-tag me-1"></i>Category *</label>
+              <select class="form-select" id="ticketCategory" required>
+                <option value="" disabled selected>Select category</option>
+                <option value="General Inquiry">General Inquiry</option>
+                <option value="Technical Issue">Technical Issue</option>
+                <option value="Prayer Request">Prayer Request</option>
+                <option value="Donation / Support">Donation / Support</option>
+                <option value="Event Information">Event Information</option>
+                <option value="Complaint">Complaint</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            <div class="col-12">
+              <label class="form-label" for="ticketSubject"><i class="fas fa-heading me-1"></i>Subject *</label>
+              <input type="text" class="form-control" id="ticketSubject" required placeholder="Brief summary">
+            </div>
+            <div class="col-12">
+              <label class="form-label" for="ticketMessage"><i class="fas fa-comment-dots me-1"></i>Description *</label>
+              <textarea class="form-control" id="ticketMessage" rows="5" required placeholder="Describe your issue..."></textarea>
+            </div>
+            <div class="col-12">
+              <button type="submit" class="btn-submit-ticket" id="submitTicketBtn">
+                <i class="fas fa-paper-plane me-2"></i>Submit Ticket
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- CHALLENGE ENTRY MODAL -->
 <div class="modal fade" id="challengeEntryModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-lg modal-dialog-centered">
@@ -983,7 +1128,7 @@
         <h4 class="modal-title" style="color:#FFD966;">
           <i class="fas fa-fire me-2"></i>Join This Week's Challenge
         </h4>
-        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
         <div id="challengeEntryIntro" style="background: rgba(255,217,102,0.1); border-left: 3px solid #FFD966; padding: 0.9rem; border-radius: 0.6rem; margin-bottom: 1.2rem;">
@@ -993,7 +1138,6 @@
           </div>
         </div>
 
-        <!-- ✅ NEW: Social Media Caption Box -->
         <div class="caption-box" id="captionBox" style="display: none;">
           <h6><i class="fas fa-magic me-1"></i> Ready-to-Use Social Caption</h6>
           <div class="caption-text" id="captionTextPreview"></div>
@@ -1056,7 +1200,7 @@
     <div class="modal-content image-modal-content">
       <div class="modal-header border-warning">
         <h4 class="modal-title" id="modalImageTitle" style="color:#FFD966;"></h4>
-        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
         <div class="row">
@@ -1090,11 +1234,21 @@
   AOS.init({ once: true, offset: 80, duration: 700 });
 
   // ==========================================
-  // 🔧 SUPABASE CONFIG
+  // 🔧 CONFIG
   // ==========================================
   const SUPABASE_URL = 'https://ekhzbclqpelsrfefufpv.supabase.co';
   const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVraHpiY2xxcGVsc3JmZWZ1ZnB2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY4NjQ2MjUsImV4cCI6MjA5MjQ0MDYyNX0.7dJiDcV4q8Ss_4Ua19-L-VFSxThJKNLyBv__bfdx02M';
-  const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  const WHATSAPP_NUMBER = '2349058515139'; // <-- YOUR WhatsApp (no +, no spaces)
+
+  // Safe Supabase init
+  let supabaseClient = null;
+  try {
+    if (window.supabase && window.supabase.createClient) {
+      supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    } else {
+      console.warn('⚠️ Supabase CDN not loaded — some features unavailable.');
+    }
+  } catch (e) { console.warn('⚠️ Supabase init failed:', e); }
 
   const PDF_FILE_PATH = 'images/prayer.pdf';
   function viewPDF() { window.open(PDF_FILE_PATH, '_blank'); }
@@ -1110,42 +1264,69 @@
   document.getElementById('downloadIntentionsBtn')?.addEventListener('click', downloadPDF);
 
   // ==========================================
+  // HELPERS
+  // ==========================================
+  function escapeHtml(str) {
+    if (!str) return '';
+    return String(str).replace(/[&<>"']/g, m => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    }[m]));
+  }
+
+  function fallbackAvatar(name) {
+    const initial = (name || '?').trim().charAt(0).toUpperCase();
+    return `data:image/svg+xml,${encodeURIComponent(
+      `<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200">
+        <defs><linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#FFD966"/><stop offset="100%" stop-color="#FFB347"/></linearGradient></defs>
+        <rect width="200" height="200" fill="url(#g)"/>
+        <text x="100" y="130" font-family="Poppins,sans-serif" font-size="90" font-weight="800" fill="#1e2f38" text-anchor="middle">${initial}</text>
+      </svg>`
+    )}`;
+  }
+
+  // ==========================================
   // PORTRAIT SLIDES
   // ==========================================
   const slides = [
-    { img: "images/jesus.jpg", title: "Jesus Christ", desc: "The Prince Of Heaven", fullDescription: "Jesus Christ, the Son of God, came to earth to save humanity from sin. His life, death, and resurrection are the foundation of our faith.", scripture: "John 3:16 - 'For God so loved the world...'", date: "Throughout the Year" },
-    { img: "images/mary.jpg", title: "Mary, Mother of God", desc: "Queen Of Angels", fullDescription: "The Blessed Virgin Mary, Mother of Jesus, is honored as the Mother of God. Her 'yes' to God's plan brought salvation into the world.", scripture: "Luke 1:28 - 'Hail, full of grace...'", date: "Feast Days: January 1, August 15, December 8" },
-    { img: "images/LEO LEFT.jpg", title: "Pope Leo XIII", desc: "Bishop of Rome", fullDescription: "Pope Leo XIII served as Pope from 1878 to 1903. He was known for his intellectual contributions to Catholic social teaching.", scripture: "Matthew 16:18 - 'You are Peter...'", date: "Papacy: 1878-1903" },
-    { img: "images/archbishop kaigma.jpg", title: "His Grace Most Rev. Dr. Ignatius Kaigama", desc: "Catholic Archbishop Of Abuja Archdiocese", fullDescription: "Archbishop Ignatius Kaigama is the Metropolitan Archbishop of Abuja, a respected leader and peace advocate.", scripture: "Jeremiah 3:15 - 'And I will give you shepherds...'", date: "Installed: November 2019" },
-    { img: "images/his lord.png", title: "His Lordship Most Rev. Dr. Anselm Umoren MSP", desc: "Catholic Auxiliary Bishop Of Abuja", fullDescription: "Bishop Anselm Umoren serves as the Auxiliary Bishop of Abuja Archdiocese, dedicated to evangelization.", scripture: "Acts 1:8 - 'But you will receive power...'", date: "Consecrated: March 2024" },
-    { img: "images/father.png", title: "Rev. Fr. Samson Adachabo", desc: "Pontifical Mission Society Director", fullDescription: "Rev. Fr. Samson Adachabo is the current Director of the Pontifical Mission Societies in Abuja Archdiocese.", scripture: "Romans 10:14-15 - 'How can they believe...'", date: "Current PMS Director" },
-    { img: "images/16.jpeg", title: "Rev. Fr. Hilary Ugwuanyi", desc: "P.O.F Coordinator/YOMM Chaplain", fullDescription: "Rev. Fr. Hilary Ugwuanyi serves as the Propagation of the Faith Coordinator and Chaplain for YOMM.", scripture: "1 Timothy 4:12 - 'Don't let anyone look down on you...'", date: "YOMM Chaplain" },
-    { img: "images/nsu.jpeg", title: "Rev. Fr. Michael Nzume", desc: "PMU & SPU Archdiocesan Coordinator", fullDescription: "Rev. Fr. Michael Nzume serves as the Archdiocesan Coordinator for the Pontifical Mission Societies.", scripture: "Psalm 96:3 - 'Declare his glory among the nations...'", date: "PMS Archdiocesan Coordinator" },
-    { img: "images/sis1.jpg", title: "Sr. Ahaiwe Angelina, CCSSP", desc: "Holy Childhood Association Coordinator", fullDescription: "Sr. Ahaiwe Angelina serves as the Holy Childhood Association Coordinator.", scripture: "Matthew 19:14 - 'Let the little children come to me...'", date: "HCA Coordinator" },
-    { img: "images/sis.jpeg", title: "Sr Mary Lawrentine Amaefule, IHM", desc: "HCA Archdiocesan Coordinator", fullDescription: "Sr. Mary Lawrentine Amaefule serves as the Holy Childhood Association Archdiocesan Coordinator.", scripture: "Matthew 25:40 - 'Whatever you did for one of the least of these...'", date: "HCA Archdiocesan Coordinator" },
-    { img: "images/4.jpeg", title: "Bro. Charles Moses Amaghionyeodiwe", desc: "YOMM LAY COORDINATOR", fullDescription: "A beautiful moment honoring Our Lady of Grace. Replace this description with your own text about the new picture.", scripture: "Luke 1:48 - 'All generations will call me blessed.'", date: "Feast: Add date here" }
+    { img: "Images/jesus.jpg", title: "Jesus Christ", desc: "The Prince Of Heaven", fullDescription: "Jesus Christ, the Son of God, came to earth to save humanity from sin. His life, death, and resurrection are the foundation of our faith.", scripture: "John 3:16 - 'For God so loved the world...'", date: "Throughout the Year" },
+    { img: "Images/mary.jpg", title: "Mary, Mother of God", desc: "Queen Of Angels", fullDescription: "The Blessed Virgin Mary, Mother of Jesus, is honored as the Mother of God. Her 'yes' to God's plan brought salvation into the world.", scripture: "Luke 1:28 - 'Hail, full of grace...'", date: "Feast Days: January 1, August 15, December 8" },
+    { img: "Images/16.jpeg", title: "Rev. Fr. Hilary Ugwuanyi", desc: "P.O.F Coordinator/YOMM Chaplain", fullDescription: "Rev. Fr. Hilary Ugwuanyi serves as the Propagation of the Faith Coordinator and Chaplain for YOMM.", scripture: "1 Timothy 4:12 - 'Don't let anyone look down on you...'", date: "YOMM Chaplain" },
+    { img: "Images/archbishop kaigma.jpg", title: "His Grace Most Rev. Dr. Ignatius Kaigama", desc: "Catholic Archbishop Of Abuja Archdiocese", fullDescription: "Archbishop Ignatius Kaigama is the Metropolitan Archbishop of Abuja, a respected leader and peace advocate.", scripture: "Jeremiah 3:15 - 'And I will give you shepherds...'", date: "Installed: November 2019" },
+    { img: "Images/his lord.png", title: "His Lordship Most Rev. Dr. Anselm Umoren MSP", desc: "Catholic Auxiliary Bishop Of Abuja", fullDescription: "Bishop Anselm Umoren serves as the Auxiliary Bishop of Abuja Archdiocese, dedicated to evangelization.", scripture: "Acts 1:8 - 'But you will receive power...'", date: "Consecrated: March 2024" },
+    { img: "Images/father.png", title: "Rev. Fr. Samson Adachabo", desc: "Pontifical Mission Society Director", fullDescription: "Rev. Fr. Samson Adachabo is the current Director of the Pontifical Mission Societies in Abuja Archdiocese.", scripture: "Romans 10:14-15 - 'How can they believe...'", date: "Current PMS Director" },
+    { img: "Images/nsu.jpeg", title: "Rev. Fr. Michael Nzume", desc: "PMU & SPU Archdiocesan Coordinator", fullDescription: "Rev. Fr. Michael Nzume serves as the Archdiocesan Coordinator for the Pontifical Mission Societies.", scripture: "Psalm 96:3 - 'Declare his glory among the nations...'", date: "PMS Archdiocesan Coordinator" },
+    { img: "Images/sis1.jpg", title: "Sr. Ahaiwe Angelina, CCSSP", desc: "Holy Childhood Association Coordinator", fullDescription: "Sr. Ahaiwe Angelina serves as the Holy Childhood Association Coordinator.", scripture: "Matthew 19:14 - 'Let the little children come to me...'", date: "HCA Coordinator" },
+    { img: "Images/sis.jpeg", title: "Sr Mary Lawrentine Amaefule, IHM", desc: "HCA Archdiocesan Coordinator", fullDescription: "Sr. Mary Lawrentine Amaefule serves as the Holy Childhood Association Archdiocesan Coordinator.", scripture: "Matthew 25:40 - 'Whatever you did for one of the least of these...'", date: "HCA Archdiocesan Coordinator" },
+    { img: "Images/4.jpeg", title: "Bro. Charles Moses Amaghionyeodiwe", desc: "YOMM LAY COORDINATOR", fullDescription: "Bro. Charles Moses Amaghionyeodiwe serves as the YOMM Lay Coordinator, supporting youth missionary work.", scripture: "Luke 1:48 - 'All generations will call me blessed.'", date: "YOMM Lay Coordinator" }
   ];
 
   let currentIndex = 0;
   let timeRemaining = 10;
   let timerRunning = false;
   let animationFrame = null;
+  let timerPausedByModal = false;
 
   const container = document.getElementById('portraitContainer');
   const wheelCounter = document.getElementById('wheelCounter');
   const timerBar = document.getElementById('timerBar');
   const heroBgBlur = document.getElementById('heroBgBlur');
 
-  function updateBlurBackground() { if (heroBgBlur) heroBgBlur.style.backgroundImage = `url('${slides[currentIndex].img}')`; }
+  function updateBlurBackground() {
+    if (heroBgBlur && slides[currentIndex]) {
+      heroBgBlur.style.backgroundImage = `url('${slides[currentIndex].img}')`;
+    }
+  }
 
   function renderPortraits() {
+    if (!container) return;
     container.innerHTML = '';
     slides.forEach((slide, idx) => {
       const card = document.createElement('div');
       card.className = `portrait-card ${idx === currentIndex ? 'active' : ''}`;
       card.setAttribute('data-slide-idx', idx);
+      const fallback = fallbackAvatar(slide.title);
       card.innerHTML = `
-        <img src="${slide.img}" alt="${slide.title}" loading="lazy" onerror="this.src='https://images.pexels.com/photos/2704081/pexels-photo-2704081.jpeg?w=600&h=900&fit=crop'">
+        <img src="${slide.img}" alt="${escapeHtml(slide.title)}" loading="lazy" onerror="this.onerror=null; this.src='${fallback}'">
         <div class="portrait-overlay">
           <h2>${escapeHtml(slide.title)}</h2>
           <p><i class="fas fa-cross me-1"></i> ${escapeHtml(slide.desc)}</p>
@@ -1160,16 +1341,29 @@
 
   function openImageDetailModal(index) {
     const slide = slides[index];
+    if (!slide) return;
     document.getElementById('modalImageTitle').innerHTML = `<i class="fas fa-image me-2"></i>${escapeHtml(slide.title)}`;
     document.getElementById('modalImageDetail').src = slide.img;
-    document.getElementById('modalImageDescription').innerHTML = escapeHtml(slide.fullDescription);
-    document.getElementById('modalScripture').innerHTML = escapeHtml(slide.scripture);
-    document.getElementById('modalDate').innerHTML = escapeHtml(slide.date);
-    new bootstrap.Modal(document.getElementById('imageDetailModal')).show();
+    document.getElementById('modalImageDetail').onerror = function(){ this.onerror=null; this.src=fallbackAvatar(slide.title); };
+    document.getElementById('modalImageDescription').textContent = slide.fullDescription;
+    document.getElementById('modalScripture').textContent = slide.scripture;
+    document.getElementById('modalDate').textContent = slide.date;
+
+    // FIX: pause timer while modal open
+    if (timerRunning) { stopTimer(); timerPausedByModal = true; }
+
+    const modalEl = document.getElementById('imageDetailModal');
+    const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+    modalEl.addEventListener('hidden.bs.modal', function resume() {
+      modalEl.removeEventListener('hidden.bs.modal', resume);
+      if (timerPausedByModal) { timerPausedByModal = false; startTimer(); }
+    }, { once: true });
+    modal.show();
   }
 
-  function escapeHtml(str) { if (!str) return ''; return String(str).replace(/[&<>]/g, m => m === '&' ? '&amp;' : m === '<' ? '&lt;' : '&gt;'); }
-  function updateCounter() { if (wheelCounter) wheelCounter.textContent = `${currentIndex + 1}/${slides.length}`; }
+  function updateCounter() {
+    if (wheelCounter) wheelCounter.textContent = `${currentIndex + 1}/${slides.length}`;
+  }
   function updateActiveSlide() {
     document.querySelectorAll('.portrait-card').forEach((card, idx) => {
       if (idx === currentIndex) card.classList.add('active');
@@ -1183,13 +1377,17 @@
   function prevSlide() { goToSlide(currentIndex - 1); }
 
   function startTimer() {
-    stopTimer(); timerRunning = true; timeRemaining = 10; updateTimerBar(100);
+    stopTimer();
+    timerRunning = true;
+    timeRemaining = 10;
+    updateTimerBar(100);
     const startTime = Date.now(), startRemaining = 10;
     function updateTimer() {
       if (!timerRunning) return;
       const elapsed = (Date.now() - startTime) / 1000;
       const newRemaining = Math.max(0, startRemaining - elapsed);
-      timeRemaining = newRemaining; updateTimerBar((timeRemaining / 10) * 100);
+      timeRemaining = newRemaining;
+      updateTimerBar((timeRemaining / 10) * 100);
       if (newRemaining <= 0) { stopTimer(); nextSlide(); startTimer(); }
       else animationFrame = requestAnimationFrame(updateTimer);
     }
@@ -1206,48 +1404,66 @@
   document.getElementById('nextWheel')?.addEventListener('click', (e) => { e.stopPropagation(); nextSlide(); });
   document.getElementById('wheelSpinner')?.addEventListener('click', (e) => { e.stopPropagation(); resetTimer(); });
 
-  const portraitContainer = document.getElementById('portraitContainer');
   if (portraitContainer) {
     portraitContainer.addEventListener('mouseenter', () => stopTimer());
     portraitContainer.addEventListener('mouseleave', () => startTimer());
   }
 
-  // Door unveil
-  const glassDoor = document.getElementById('glassDoor'), mainContent = document.getElementById('mainContent');
-  const doorHandleLeft = document.getElementById('doorHandleLeft'), doorHandleRight = document.getElementById('doorHandleRight');
-  function unveilDesign() { glassDoor.classList.add('unveiled'); setTimeout(() => mainContent.classList.add('visible'), 500); }
+  // ==========================================
+  // DOOR UNVEIL
+  // ==========================================
+  const glassDoor = document.getElementById('glassDoor');
+  const mainContent = document.getElementById('mainContent');
+  const doorHandleLeft = document.getElementById('doorHandleLeft');
+  const doorHandleRight = document.getElementById('doorHandleRight');
+
+  function unveilDesign() {
+    if (!glassDoor || glassDoor.classList.contains('unveiled')) return;
+    glassDoor.classList.add('unveiled');
+    setTimeout(() => mainContent.classList.add('visible'), 500);
+  }
   doorHandleLeft?.addEventListener('click', (e) => { e.stopPropagation(); unveilDesign(); });
   doorHandleRight?.addEventListener('click', (e) => { e.stopPropagation(); unveilDesign(); });
-  glassDoor?.addEventListener('click', (e) => { if (e.target === glassDoor || e.target.classList.contains('door-left') || e.target.classList.contains('door-right')) unveilDesign(); });
+  glassDoor?.addEventListener('click', unveilDesign);
+  // FIX: keyboard accessibility
+  document.querySelectorAll('.door-left, .door-right').forEach(d => {
+    d.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); unveilDesign(); }
+    });
+  });
 
   document.getElementById('newsBannerClick')?.addEventListener('click', () => window.location.href = 'news.html');
 
-  // ============================================
-  // 🎯 WEEKLY CHALLENGE SYSTEM
-  // ============================================
+  // Close mobile menu on link click
+  document.querySelectorAll('.navbar-nav .nav-link').forEach(link => {
+    link.addEventListener('click', () => {
+      const nav = document.getElementById('mainNav');
+      if (nav && nav.classList.contains('show')) {
+        const bsCollapse = bootstrap.Collapse.getInstance(nav) || new bootstrap.Collapse(nav, { toggle: false });
+        bsCollapse.hide();
+      }
+    });
+  });
 
+  // ============================================
+  // 🎯 WEEKLY CHALLENGE
+  // ============================================
   let currentChallenge = null;
-
   const CHALLENGE_EMOJIS = ['🏆', '🎯', '🔥', '⭐', '🎁', '📖', '🙏', '✨', '🌟', '💫'];
 
-  // ============================================
-  // 📸 SOCIAL MEDIA CAPTION GENERATOR
-  // ============================================
   const BASE_HASHTAGS = [
     '#PontificalMissionSociety', '#PMS', '#PMSChallenge', '#WeeklyChallenge',
     '#CatholicChurch', '#MissionaryWork', '#Gospel', '#Faith', '#CatholicLife',
-    '#SpreadTheGospel', '#Mission', '#CatholicFaith', '#CatholicCommunity',
-    '#ChurchFamily', '#PraiseGod', '#GodIsGood', '#Blessed', '#Catholic',
-    '#Church', '#Evangelization', '#CatholicYouth', '#FaithChallenge'
+    '#SpreadTheGospel', '#Mission', '#CatholicFaith', '#CatholicCommunity'
   ];
 
   const PLATFORM_HASHTAGS = {
-    instagram: ['#Instagram', '#CatholicInstagram', '#CatholicReels', '#FaithGram', '#InstaCatholic'],
+    instagram: ['#Instagram', '#CatholicInstagram', '#FaithGram'],
     facebook: ['#Facebook', '#CatholicFacebook', '#CatholicCommunity'],
-    tiktok: ['#TikTokCatholic', '#CatholicTikTok', '#FaithTok', '#FYP', '#ForYou', '#Viral'],
+    tiktok: ['#TikTokCatholic', '#CatholicTikTok', '#FaithTok', '#FYP'],
     twitter: ['#CatholicTwitter', '#CathoTwitter', '#Faith'],
-    youtube: ['#CatholicYouTube', '#FaithVideos', '#CatholicVlog'],
-    linkedin: ['#CatholicLeadership', '#FaithAndWork', '#MissionDriven'],
+    youtube: ['#CatholicYouTube', '#FaithVideos'],
+    linkedin: ['#CatholicLeadership', '#FaithAndWork'],
     whatsapp: ['#WhatsApp', '#Blessings', '#Amin']
   };
 
@@ -1264,11 +1480,8 @@
 
   function toHashtag(str) {
     if (!str) return '';
-    const cleaned = String(str)
-      .replace(/[^a-zA-Z0-9\s]/g, '')
-      .split(/\s+/)
-      .map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
-      .join('');
+    const cleaned = String(str).replace(/[^a-zA-Z0-9\s]/g, '').split(/\s+/)
+      .map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join('');
     return cleaned ? '#' + cleaned : '';
   }
 
@@ -1276,17 +1489,9 @@
     const platformKey = (platform || 'other').toLowerCase().replace(/\s.*$/, '');
     const tone = PLATFORM_TONES[platformKey] || PLATFORM_TONES.other;
     const platformTags = PLATFORM_HASHTAGS[platformKey] || [];
-
-    // Build dynamic hashtags from challenge title + week label
     const titleTag = toHashtag(challenge.title);
     const weekTag = toHashtag(challenge.week_label);
-
-    const allTags = [...new Set([
-      titleTag,
-      weekTag,
-      ...platformTags,
-      ...BASE_HASHTAGS
-    ])].filter(Boolean);
+    const allTags = [...new Set([titleTag, weekTag, ...platformTags, ...BASE_HASHTAGS])].filter(Boolean);
 
     let caption = `${tone}\n\n`;
     caption += `🎯 *${challenge.title}*\n`;
@@ -1295,38 +1500,30 @@
     caption += `🏆 Prize: ${challenge.prize_cash || '₦10,000'}\n\n`;
     caption += `👉 Join us at Pontifical Mission Society\n\n`;
 
-    return {
-      caption,
-      hashtags: allTags.join(' '),
-      fullText: caption + allTags.join(' ')
-    };
+    return { caption, hashtags: allTags.join(' '), fullText: caption + allTags.join(' ') };
   }
 
-  // ============================================
-  // LOAD CURRENT CHALLENGE
-  // ============================================
   async function loadCurrentChallenge() {
     const containerEl = document.getElementById('challengeContent');
     if (!containerEl) return;
 
+    if (!supabaseClient) {
+      containerEl.innerHTML = `<div class="text-center py-4"><p style="opacity:0.7;">Challenge loading unavailable. Please try again later.</p></div>`;
+      return;
+    }
+
     try {
       const { data, error } = await supabaseClient
-        .from('challenges')
-        .select('*')
-        .eq('is_active', true)
-        .order('created_at', { ascending: false })
-        .limit(1)
-        .single();
+        .from('challenges').select('*').eq('is_active', true)
+        .order('created_at', { ascending: false }).limit(1).single();
 
       if (error || !data) {
-        console.warn('No active challenge found:', error);
         containerEl.innerHTML = `
           <div class="text-center py-4">
             <div style="font-size: 3rem; margin-bottom: 1rem;">🎯</div>
             <h4 style="color:#FFD966;">No Active Challenge Yet</h4>
             <p style="opacity:0.8;">A new challenge will be posted soon. Check back later!</p>
-          </div>
-        `;
+          </div>`;
         document.getElementById('challengeEmoji').textContent = '⏳';
         return;
       }
@@ -1339,80 +1536,53 @@
       const endDate = data.end_date ? new Date(data.end_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : 'TBA';
 
       containerEl.innerHTML = `
-        <div class="challenge-week">
-          <i class="fas fa-calendar-week"></i> ${escapeHtml(data.week_label || 'This Week')}
-        </div>
+        <div class="challenge-week"><i class="fas fa-calendar-week"></i> ${escapeHtml(data.week_label || 'This Week')}</div>
         <h2 class="challenge-title">${escapeHtml(data.title)}</h2>
         <p class="challenge-desc">${escapeHtml(data.description)}</p>
-
         <div class="challenge-meta">
-          <div class="challenge-meta-item">
-            <i class="fas fa-calendar-alt"></i>
-            <span>${startDate} → ${endDate}</span>
-          </div>
-          <div class="challenge-meta-item">
-            <i class="fas fa-trophy"></i>
-            <span>ONE winner only</span>
-          </div>
+          <div class="challenge-meta-item"><i class="fas fa-calendar-alt"></i><span>${startDate} → ${endDate}</span></div>
+          <div class="challenge-meta-item"><i class="fas fa-trophy"></i><span>ONE winner only</span></div>
         </div>
-
         <div class="prize-box">
           <h5><i class="fas fa-gift me-2"></i>This Week's Prize</h5>
           <div class="prize-value">${escapeHtml(data.prize_cash || '₦10,000')}</div>
-          <div class="prize-points">
-            <i class="fas fa-star text-warning"></i>
-            ${data.prize_points || 100} points = ₦${(data.prize_points || 100) * 100}
-          </div>
+          <div class="prize-points"><i class="fas fa-star text-warning"></i> ${data.prize_points || 100} points = ₦${(data.prize_points || 100) * 100}</div>
         </div>
-
         <button class="btn-join-challenge" onclick="openChallengeEntry(${data.id})">
           <i class="fas fa-fire me-2"></i>JOIN THIS CHALLENGE
-        </button>
-      `;
-
+        </button>`;
     } catch (err) {
       console.error('Error loading challenge:', err);
-      containerEl.innerHTML = `
-        <div class="text-center py-4">
-          <p style="opacity:0.7;">Unable to load challenge. Please refresh.</p>
-        </div>
-      `;
+      containerEl.innerHTML = `<div class="text-center py-4"><p style="opacity:0.7;">Unable to load challenge. Please refresh.</p></div>`;
     }
   }
 
-  // ============================================
-  // LOAD WINNERS (ONE PER CHALLENGE)
-  // ============================================
   async function loadWinners() {
     const grid = document.getElementById('winnersGrid');
-    if (!grid) return;
+    if (!grid || !supabaseClient) return;
 
     try {
-      // The UNIQUE constraint on challenge_id ensures only ONE winner per challenge
-      // But we still limit to the latest 3 challenges so the section stays clean
       const { data, error } = await supabaseClient
-        .from('challenge_winners')
-        .select('*, challenges(title, week_label)')
-        .order('awarded_at', { ascending: false })
-        .limit(3);
+        .from('challenge_winners').select('*, challenges(title, week_label)')
+        .order('awarded_at', { ascending: false }).limit(3);
 
       if (error || !data || data.length === 0) {
         grid.innerHTML = `
           <div class="col-12 text-center py-4">
             <div style="font-size: 3rem; margin-bottom: 1rem;">👑</div>
             <p style="opacity:0.8;">No winners announced yet. Be the first champion!</p>
-          </div>
-        `;
+          </div>`;
         return;
       }
 
       grid.innerHTML = data.map(winner => {
-        const photo = winner.winner_photo || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(winner.winner_name) + '&background=FFD966&color=1e2f38&size=200&bold=true';
+        const avatar = fallbackAvatar(winner.winner_name);
+        const photo = winner.winner_photo || avatar;
         return `
           <div class="col-md-6 col-lg-4">
             <div class="winner-card">
               <img src="${photo}" alt="${escapeHtml(winner.winner_name)}" class="winner-photo"
-                   onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(winner.winner_name)}&background=FFD966&color=1e2f38&size=200&bold=true'">
+                   onerror="this.onerror=null; this.src='${avatar}'">
               <div class="winner-name">${escapeHtml(winner.winner_name)}</div>
               ${winner.challenges ? `<div style="font-size:0.75rem; color:#FFE2A4; opacity:0.8; margin-bottom:0.5rem;">
                 <i class="fas fa-trophy" style="color:#FFD966;"></i> ${escapeHtml(winner.challenges.week_label || winner.challenges.title)}
@@ -1424,26 +1594,15 @@
               </div>` : ''}
               ${winner.testimonial ? `<div class="winner-testimonial">${escapeHtml(winner.testimonial)}</div>` : ''}
               <div class="winner-stats">
-                <div class="winner-stat">
-                  <i class="fas fa-star"></i>${winner.points_awarded || 0} pts
-                </div>
-                <div class="winner-stat">
-                  <i class="fas fa-money-bill-wave"></i>${escapeHtml(winner.cash_value || '₦' + ((winner.points_awarded || 0) * 100))}
-                </div>
+                <div class="winner-stat"><i class="fas fa-star"></i>${winner.points_awarded || 0} pts</div>
+                <div class="winner-stat"><i class="fas fa-money-bill-wave"></i>${escapeHtml(winner.cash_value || '₦' + ((winner.points_awarded || 0) * 100))}</div>
               </div>
             </div>
-          </div>
-        `;
+          </div>`;
       }).join('');
-
-    } catch (err) {
-      console.error('Error loading winners:', err);
-    }
+    } catch (err) { console.error('Error loading winners:', err); }
   }
 
-  // ============================================
-  // OPEN CHALLENGE ENTRY MODAL (WITH CAPTION)
-  // ============================================
   window.openChallengeEntry = function(challengeId) {
     document.getElementById('entryChallengeId').value = challengeId;
     document.getElementById('challengeEntryForm').reset();
@@ -1454,70 +1613,58 @@
           <i class="fas fa-fire text-warning me-1"></i>
           <strong style="color:#FFD966;">${escapeHtml(currentChallenge.title)}</strong>
           <span style="opacity:0.85;"> — Submit your social media post URL below. Only <strong>ONE winner</strong> gets ${escapeHtml(currentChallenge.prize_cash || '₦10,000')}!</span>
-        </div>
-      `;
+        </div>`;
 
-      // Show caption preview with default Instagram caption
       const preview = buildChallengeCaption(currentChallenge, 'Instagram');
       document.getElementById('captionBox').style.display = 'block';
-      document.getElementById('captionTextPreview').innerHTML = 
-        escapeHtml(preview.caption) + 
+      document.getElementById('captionTextPreview').innerHTML =
+        escapeHtml(preview.caption) +
         `<span class="hashtags">${escapeHtml(preview.hashtags.substring(0, 250))}...</span>`;
     }
-
-    const modal = new bootstrap.Modal(document.getElementById('challengeEntryModal'));
-    modal.show();
+    bootstrap.Modal.getOrCreateInstance(document.getElementById('challengeEntryModal')).show();
   };
 
-  // Update caption preview when user changes platform
-  document.getElementById('entryPlatform')?.addEventListener('change', function() {
+  document.getElementById('entryPlatform')?.addEventListener('change', function () {
     if (!currentChallenge) return;
-    const platform = this.value || 'Other';
-    const preview = buildChallengeCaption(currentChallenge, platform);
-    document.getElementById('captionTextPreview').innerHTML = 
-      escapeHtml(preview.caption) + 
+    const preview = buildChallengeCaption(currentChallenge, this.value || 'Other');
+    document.getElementById('captionTextPreview').innerHTML =
+      escapeHtml(preview.caption) +
       `<span class="hashtags">${escapeHtml(preview.hashtags.substring(0, 250))}...</span>`;
   });
 
-  // Copy caption button
   document.getElementById('copyCaptionBtn')?.addEventListener('click', async () => {
     if (!currentChallenge) return;
     const platform = document.getElementById('entryPlatform').value || 'Instagram';
     const preview = buildChallengeCaption(currentChallenge, platform);
-
     try {
       await navigator.clipboard.writeText(preview.fullText);
       Swal.fire({
-        icon: 'success',
-        title: 'Caption Copied! 📋',
-        html: `
-          <p style="font-size:0.9rem; opacity:0.85;">
-            Your ready-to-use caption + hashtags have been copied. Paste it when sharing on ${escapeHtml(platform)}!
-          </p>
-        `,
-        background: 'rgba(20,40,48,0.98)',
-        color: '#f0f3f8',
-        confirmButtonColor: '#FFD966',
-        timer: 2500,
-        showConfirmButton: false
+        icon: 'success', title: 'Caption Copied! 📋',
+        html: `<p style="font-size:0.9rem; opacity:0.85;">Your caption + hashtags were copied. Paste on ${escapeHtml(platform)}!</p>`,
+        background: 'rgba(20,40,48,0.98)', color: '#f0f3f8',
+        confirmButtonColor: '#FFD966', timer: 2500, showConfirmButton: false
       });
     } catch (err) {
       Swal.fire({
-        icon: 'error',
-        title: 'Copy Failed',
+        icon: 'error', title: 'Copy Failed',
         text: 'Your browser blocked clipboard access. Please copy manually.',
-        background: 'rgba(20,40,48,0.98)',
-        color: '#f0f3f8',
-        confirmButtonColor: '#FFD966'
+        background: 'rgba(20,40,48,0.98)', color: '#f0f3f8', confirmButtonColor: '#FFD966'
       });
     }
   });
 
-  // ============================================
-  // HANDLE ENTRY FORM SUBMISSION
-  // ============================================
-  document.getElementById('challengeEntryForm').addEventListener('submit', async function(e) {
+  let lastEntryTime = 0;
+  document.getElementById('challengeEntryForm')?.addEventListener('submit', async function(e) {
     e.preventDefault();
+
+    if (Date.now() - lastEntryTime < 30000) {
+      Swal.fire({
+        icon: 'info', title: 'Please Wait',
+        text: 'You recently submitted an entry. Please wait 30 seconds.',
+        background: 'rgba(20,40,48,0.98)', color: '#f0f3f8', confirmButtonColor: '#FFD966'
+      });
+      return;
+    }
 
     const challengeId = document.getElementById('entryChallengeId').value;
     const name = document.getElementById('entryName').value.trim();
@@ -1527,26 +1674,17 @@
 
     if (!name || !email || !platform || !url) {
       Swal.fire({
-        icon: 'warning',
-        title: 'Missing Fields',
+        icon: 'warning', title: 'Missing Fields',
         text: 'Please fill in all required fields',
-        background: 'rgba(20,40,48,0.98)',
-        color: '#f0f3f8',
-        confirmButtonColor: '#FFD966'
+        background: 'rgba(20,40,48,0.98)', color: '#f0f3f8', confirmButtonColor: '#FFD966'
       });
       return;
     }
-
-    try {
-      new URL(url);
-    } catch {
+    try { new URL(url); } catch {
       Swal.fire({
-        icon: 'error',
-        title: 'Invalid URL',
+        icon: 'error', title: 'Invalid URL',
         text: 'Please enter a valid social media post URL',
-        background: 'rgba(20,40,48,0.98)',
-        color: '#f0f3f8',
-        confirmButtonColor: '#FFD966'
+        background: 'rgba(20,40,48,0.98)', color: '#f0f3f8', confirmButtonColor: '#FFD966'
       });
       return;
     }
@@ -1557,112 +1695,71 @@
     submitBtn.disabled = true;
 
     try {
-      const { data, error } = await supabaseClient
-        .from('challenge_entries')
-        .insert([{
-          challenge_id: parseInt(challengeId),
-          user_name: name,
-          user_email: email,
-          social_url: url,
-          social_platform: platform,
-          status: 'pending'
-        }])
-        .select();
+      if (!supabaseClient) throw new Error('Database unavailable. Please try again later.');
 
+      const { error } = await supabaseClient.from('challenge_entries').insert([{
+        challenge_id: parseInt(challengeId),
+        user_name: name, user_email: email,
+        social_url: url, social_platform: platform, status: 'pending'
+      }]);
       if (error) throw error;
 
-      console.log('✅ Entry saved:', data);
+      lastEntryTime = Date.now();
 
-      // Build a share-ready caption for the user to copy
       const preview = buildChallengeCaption(currentChallenge, platform);
       const encodedCaption = encodeURIComponent(preview.fullText);
-      const pageUrl = encodeURIComponent('https://your-domain.com/gallery.html');
+      const pageUrl = encodeURIComponent(window.location.origin + '/gallery.html');
 
-      // Build platform share URLs
       let shareUrl = '';
-      const platformKey = (platform || '').toLowerCase().replace(/\s.*$/, '');
+      const pk = (platform || '').toLowerCase().replace(/\s.*$/, '');
+      if (pk === 'facebook') shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${pageUrl}&quote=${encodedCaption}`;
+      else if (pk === 'twitter') shareUrl = `https://twitter.com/intent/tweet?text=${encodedCaption}&url=${pageUrl}`;
+      else if (pk === 'whatsapp') shareUrl = `https://wa.me/?text=${encodedCaption}%0A%0A${pageUrl}`;
+      else if (pk === 'linkedin') shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${pageUrl}`;
 
-      if (platformKey === 'instagram' || platformKey === 'tiktok') {
-        shareUrl = ''; // Instagram/TikTok don't have web share; user copies caption manually
-      } else if (platformKey === 'facebook') {
-        shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${pageUrl}&quote=${encodedCaption}`;
-      } else if (platformKey === 'twitter') {
-        shareUrl = `https://twitter.com/intent/tweet?text=${encodedCaption}&url=${pageUrl}`;
-      } else if (platformKey === 'whatsapp') {
-        shareUrl = `https://wa.me/?text=${encodedCaption}%0A%0A${pageUrl}`;
-      } else if (platformKey === 'linkedin') {
-        shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${pageUrl}`;
-      } else if (platformKey === 'youtube') {
-        shareUrl = ''; // YouTube has no direct share
-      }
-
-      // Show success + offer to share or copy caption
       const result = await Swal.fire({
-        icon: 'success',
-        title: 'Entry Submitted! 🎉',
+        icon: 'success', title: 'Entry Submitted! 🎉',
         html: `
           <p>Thank you, <strong>${escapeHtml(name)}</strong>!</p>
           <p style="font-size: 0.9rem; opacity: 0.85; margin-top: 0.5rem;">
-            Your entry has been received. Only <strong style="color:#FFD966;">ONE winner</strong> will be chosen per challenge.
+            Only <strong style="color:#FFD966;">ONE winner</strong> will be chosen per challenge.
           </p>
           <p style="font-size: 0.8rem; opacity: 0.75; margin-top: 0.8rem;">
-            <i class="fas fa-star" style="color:#FFD966;"></i>
-            Winner gets <strong>${currentChallenge?.prize_cash || '₦10,000'}</strong>
+            <i class="fas fa-star" style="color:#FFD966;"></i> Prize: <strong>${escapeHtml(currentChallenge?.prize_cash || '₦10,000')}</strong>
           </p>
-          ${shareUrl ? `
-            <p style="font-size: 0.8rem; color:#FFD966; margin-top: 1rem;">
-              📸 Help us grow the challenge — share it with your friends!
-            </p>
-          ` : `
-            <p style="font-size: 0.8rem; color:#FFD966; margin-top: 1rem;">
-              📋 Your caption + hashtags are ready. Tap <strong>Copy Caption</strong> to share on ${escapeHtml(platform)}.
-            </p>
-          `}
-        `,
-        background: 'rgba(20,40,48,0.98)',
-        color: '#f0f3f8',
+          ${shareUrl
+            ? `<p style="font-size: 0.8rem; color:#FFD966; margin-top: 1rem;">📸 Share the challenge with your friends!</p>`
+            : `<p style="font-size: 0.8rem; color:#FFD966; margin-top: 1rem;">📋 Tap <strong>Copy Caption</strong> and paste on ${escapeHtml(platform)}.</p>`}`,
+        background: 'rgba(20,40,48,0.98)', color: '#f0f3f8',
         confirmButtonColor: '#FFD966',
         confirmButtonText: shareUrl ? '<i class="fas fa-share-alt me-1"></i>Share Challenge' : '<i class="fas fa-copy me-1"></i>Copy Caption',
-        showCancelButton: true,
-        cancelButtonText: 'Close',
-        cancelButtonColor: '#6c757d'
+        showCancelButton: true, cancelButtonText: 'Close', cancelButtonColor: '#6c757d'
       });
 
       if (result.isConfirmed) {
-        if (shareUrl) {
-          window.open(shareUrl, '_blank');
-        } else {
-          // Copy caption for Instagram/TikTok/YouTube
+        if (shareUrl) window.open(shareUrl, '_blank');
+        else {
           try {
             await navigator.clipboard.writeText(preview.fullText);
             Swal.fire({
-              icon: 'success',
-              title: 'Caption Copied! 📋',
+              icon: 'success', title: 'Caption Copied! 📋',
               text: 'Paste it when you share on ' + platform,
-              background: 'rgba(20,40,48,0.98)',
-              color: '#f0f3f8',
-              confirmButtonColor: '#FFD966',
-              timer: 2000,
-              showConfirmButton: false
+              background: 'rgba(20,40,48,0.98)', color: '#f0f3f8',
+              confirmButtonColor: '#FFD966', timer: 2000, showConfirmButton: false
             });
-          } catch (err) {
-            console.error('Copy failed:', err);
-          }
+          } catch (err) { console.error('Copy failed:', err); }
         }
       }
 
       this.reset();
-      bootstrap.Modal.getInstance(document.getElementById('challengeEntryModal')).hide();
-
+      const m = bootstrap.Modal.getInstance(document.getElementById('challengeEntryModal'));
+      if (m) m.hide();
     } catch (err) {
       console.error('❌ Entry submission error:', err);
       Swal.fire({
-        icon: 'error',
-        title: 'Submission Failed',
+        icon: 'error', title: 'Submission Failed',
         text: err.message || 'Something went wrong. Please try again.',
-        background: 'rgba(20,40,48,0.98)',
-        color: '#f0f3f8',
-        confirmButtonColor: '#FFD966'
+        background: 'rgba(20,40,48,0.98)', color: '#f0f3f8', confirmButtonColor: '#FFD966'
       });
     } finally {
       submitBtn.innerHTML = originalBtn;
@@ -1670,20 +1767,121 @@
     }
   });
 
-  // Load challenge + winners on page load
   loadCurrentChallenge();
   loadWinners();
 
-  console.log('%c✨ Weekly Challenge System Loaded ✨', 'color: #FFD966; font-size: 16px');
-  console.log('%c🏆 Only ONE winner per challenge (enforced by database constraint)', 'color: #FFB347; font-size: 12px');
-  console.log('%c📸 Auto-generates social captions + hashtags for every platform', 'color: #FFB347; font-size: 12px');
-</script>
+  // ============================================
+  // 🎫 SUPPORT TICKET SYSTEM
+  // ============================================
+  const supportBtn = document.getElementById('supportBtn');
+  if (supportBtn) {
+    supportBtn.addEventListener('click', () => {
+      bootstrap.Modal.getOrCreateInstance(document.getElementById('supportModal')).show();
+    });
+  }
 
-<style>
-  .main-content { opacity: 0; visibility: hidden; }
-  .main-content.visible { opacity: 1; visibility: visible; }
-  .btn-outline-gold { border: 1px solid #FFD966; background: transparent; color: #FFD966; border-radius: 40px; padding: 8px 28px; transition: 0.25s; }
-  .btn-outline-gold:hover { background: #FFD966; color: #1e2f38; }
-</style>
+  let lastTicketTime = 0;
+  document.getElementById('ticketForm')?.addEventListener('submit', async function (e) {
+    e.preventDefault();
+
+    if (Date.now() - lastTicketTime < 30000) {
+      Swal.fire({
+        icon: 'info', title: 'Please Wait',
+        text: 'You recently submitted a ticket. Please wait 30 seconds.',
+        background: 'rgba(20,40,48,0.98)', color: '#f0f3f8', confirmButtonColor: '#FFD966'
+      });
+      return;
+    }
+
+    const name = document.getElementById('ticketName').value.trim();
+    const email = document.getElementById('ticketEmail').value.trim();
+    const phone = document.getElementById('ticketPhone').value.trim() || 'Not provided';
+    const category = document.getElementById('ticketCategory').value;
+    const subject = document.getElementById('ticketSubject').value.trim();
+    const message = document.getElementById('ticketMessage').value.trim();
+
+    if (!name || !email || !category || !subject || !message) {
+      Swal.fire({
+        icon: 'warning', title: 'Missing Fields',
+        text: 'Please fill in all required fields (*)',
+        background: 'rgba(20,40,48,0.98)', color: '#f0f3f8', confirmButtonColor: '#FFD966'
+      });
+      return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      Swal.fire({
+        icon: 'error', title: 'Invalid Email',
+        text: 'Please enter a valid email address',
+        background: 'rgba(20,40,48,0.98)', color: '#f0f3f8', confirmButtonColor: '#FFD966'
+      });
+      return;
+    }
+
+    const submitBtn = document.getElementById('submitTicketBtn');
+    const originalBtn = submitBtn.innerHTML;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Submitting...';
+    submitBtn.disabled = true;
+
+    let ticketId = 'N/A';
+
+    try {
+      if (supabaseClient) {
+        const { data, error } = await supabaseClient.from('support_tickets')
+          .insert([{ name, email, phone, category, subject, message, status: 'open' }]).select();
+        if (error) throw error;
+        if (data && data[0]) ticketId = data[0].id;
+      } else {
+        console.warn('Supabase unavailable — skipping DB save, using WhatsApp only');
+      }
+
+      lastTicketTime = Date.now();
+
+      const waMessage =
+        `🎫 *NEW SUPPORT TICKET*\n\n` +
+        `👤 *Name:* ${name}\n` +
+        `📧 *Email:* ${email}\n` +
+        `📱 *Phone:* ${phone}\n` +
+        `📂 *Category:* ${category}\n` +
+        `📌 *Subject:* ${subject}\n\n` +
+        `💬 *Message:*\n${message}\n\n` +
+        `🆔 Ticket ID: #${ticketId}\n` +
+        `⏰ Submitted: ${new Date().toLocaleString()}`;
+
+      const waUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(waMessage)}`;
+
+      const result = await Swal.fire({
+        icon: 'success', title: 'Ticket Submitted! 🎉',
+        html: `
+          <p>Thank you, <strong>${escapeHtml(name)}</strong>!</p>
+          <p style="font-size:0.9rem; opacity:0.85; margin-top:0.5rem;">Your ticket has been logged. Our team will get back to you shortly.</p>
+          <p style="font-size:0.8rem; opacity:0.7; margin-top:0.8rem;">
+            <i class="fas fa-ticket-alt" style="color:#FFD966;"></i> Ticket ID: <strong>#${ticketId}</strong>
+          </p>`,
+        background: 'rgba(20,40,48,0.98)', color: '#f0f3f8',
+        confirmButtonColor: '#FFD966',
+        confirmButtonText: '<i class="fab fa-whatsapp"></i> Notify on WhatsApp',
+        showCancelButton: true, cancelButtonText: 'Close', cancelButtonColor: '#6c757d'
+      });
+
+      if (result.isConfirmed) window.open(waUrl, '_blank');
+
+      this.reset();
+      const m = bootstrap.Modal.getInstance(document.getElementById('supportModal'));
+      if (m) m.hide();
+    } catch (err) {
+      console.error('❌ Ticket error:', err);
+      Swal.fire({
+        icon: 'error', title: 'Submission Failed',
+        text: 'Could not save your ticket. Please try again or contact us on WhatsApp.',
+        background: 'rgba(20,40,48,0.98)', color: '#f0f3f8', confirmButtonColor: '#FFD966'
+      });
+    } finally {
+      submitBtn.innerHTML = originalBtn;
+      submitBtn.disabled = false;
+    }
+  });
+
+  console.log('%c✨ Sacred Doors Page Loaded | All Fixes Applied ✨', 'color:#FFD966; font-size:16px');
+</script>
 </body>
 </html>
