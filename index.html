@@ -15,6 +15,9 @@
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
+    /* ============================================
+       MAIN WEBSITE BACKGROUND IMAGE
+       ============================================ */
     body {
       font-family: 'Poppins', sans-serif;
       background: linear-gradient(145deg, #0b1a22 0%, #132b34 50%, #1e3e4a 100%);
@@ -22,30 +25,40 @@
       overflow-x: hidden;
       min-height: 100vh;
       position: relative;
+      background-image: url('images/main logo.jpeg');
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      background-repeat: no-repeat;
     }
 
+    /* Main-page logo watermark overlay (subtle) */
     .logo-bg-layer {
       position: fixed; inset: 0; z-index: 0; pointer-events: none;
-      opacity: 0.04;
-      background-image: url('Images/main logo.jpeg');
-      background-repeat: repeat; background-size: 320px 320px;
+      opacity: 0.08;
+      background-image: url('images/main logo.jpeg');
+      background-repeat: no-repeat;
+      background-size: 380px 380px;
       background-position: center center;
-      filter: brightness(1.4) contrast(0.9);
+      filter: brightness(1.4) contrast(0.9) blur(0.4px);
       mix-blend-mode: lighten;
     }
     .logo-bg-overlay {
       position: fixed; inset: 0; z-index: 0; pointer-events: none;
       background:
-        radial-gradient(circle at 20% 20%, rgba(255,217,102,0.06), transparent 45%),
-        radial-gradient(circle at 80% 80%, rgba(95,176,212,0.06), transparent 45%),
-        linear-gradient(180deg, rgba(11,26,34,0.55) 0%, rgba(11,26,34,0.15) 50%, rgba(11,26,34,0.55) 100%);
+        radial-gradient(circle at 20% 20%, rgba(255,217,102,0.08), transparent 45%),
+        radial-gradient(circle at 80% 80%, rgba(95,176,212,0.08), transparent 45%),
+        linear-gradient(180deg,
+          rgba(11,26,34,0.78) 0%,
+          rgba(11,26,34,0.60) 50%,
+          rgba(11,26,34,0.82) 100%);
     }
     .hero-logo-watermark {
       position: absolute; top: 50%; left: 50%;
       transform: translate(-50%, -50%);
       width: 620px; height: 620px;
       max-width: 85vw; max-height: 85vw;
-      background-image: url('Images/main logo.jpeg');
+      background-image: url('images/main logo.jpeg');
       background-size: contain; background-repeat: no-repeat; background-position: center;
       opacity: 0.06; pointer-events: none; z-index: 2;
       filter: blur(0.5px) brightness(1.5);
@@ -60,7 +73,9 @@
     ::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); }
     ::-webkit-scrollbar-thumb { background: rgba(255,215,150,0.5); border-radius: 10px; }
 
-    /* GLASS DOOR OVERLAY */
+    /* ============================================
+       GLASS DOOR OVERLAY — LOGO AS BACKGROUND
+       ============================================ */
     .glass-door-overlay {
       position: fixed; top: 0; left: 0;
       width: 100%; height: 100%;
@@ -69,6 +84,7 @@
       cursor: pointer;
       transition: all 1s cubic-bezier(0.68, -0.55, 0.265, 1.55);
       visibility: visible; opacity: 1;
+      background: #0b1a22;
     }
     .glass-door-overlay.unveiled { visibility: hidden; opacity: 0; pointer-events: none; }
 
@@ -83,6 +99,7 @@
       overflow: hidden;
       background-color: #0b1a22;
     }
+    /* DOOR BACKGROUND — main logo split across the two doors */
     .door-left::before, .door-right::before {
       content: ''; position: absolute; top: 0;
       width: 100%; height: 100%;
@@ -94,16 +111,19 @@
       z-index: 0;
       opacity: 1;
     }
+    /* Left door = left half of the logo */
     .door-left::before {
       left: 0;
       background-position: left center;
       background-size: 200% 100%;
     }
+    /* Right door = right half of the logo */
     .door-right::before {
       left: 0;
       background-position: right center;
       background-size: 200% 100%;
     }
+    /* Dark gradient overlay for readability of the door content */
     .door-left::after, .door-right::after {
       content: ''; position: absolute; inset: 0;
       background: linear-gradient(180deg,
@@ -801,9 +821,7 @@
       border-left: 4px solid #FFD966;
     }
 
-    /* ============================================
-       ✨ NEW — SUPPORT BUTTON & TICKET MODAL
-       ============================================ */
+    /* Support button & ticket modal */
     .support-btn {
       position: fixed;
       bottom: 30px;
@@ -904,6 +922,7 @@
       .support-btn span { font-size: 0.75rem; }
       .support-btn i { font-size: 1.1rem; }
       .pope-intentions-wrapper { bottom: 20px; right: 20px; }
+      body { background-attachment: scroll; }
     }
   </style>
 </head>
@@ -1078,13 +1097,13 @@
   </footer>
 </div>
 
-<!-- ✨ NEW: SUPPORT BUTTON -->
+<!-- SUPPORT BUTTON -->
 <button class="support-btn" id="supportBtn" title="Raise a Support Ticket" aria-label="Raise a support ticket">
   <i class="fas fa-headset"></i>
   <span>Support</span>
 </button>
 
-<!-- ✨ NEW: SUPPORT TICKET MODAL -->
+<!-- SUPPORT TICKET MODAL -->
 <div class="modal fade" id="supportModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-lg modal-dialog-centered">
     <div class="modal-content ticket-modal-content">
@@ -1259,14 +1278,10 @@
 <script>
   AOS.init({ once: true, offset: 80, duration: 700 });
 
-  // ==========================================
-  // 🔧 SUPABASE CONFIG
-  // ==========================================
   const SUPABASE_URL = 'https://ekhzbclqpelsrfefufpv.supabase.co';
   const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVraHpiY2xxcGVsc3JmZWZ1ZnB2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY4NjQ2MjUsImV4cCI6MjA5MjQ0MDYyNX0.7dJiDcV4q8Ss_4Ua19-L-VFSxThJKNLyBv__bfdx02M';
   const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  // ✨ NEW: Your WhatsApp number (no +, no spaces). Change if needed.
   const WHATSAPP_NUMBER = '2349058515139';
 
   const PDF_FILE_PATH = 'images/prayer.pdf';
@@ -1282,9 +1297,6 @@
   document.getElementById('viewPdfBtn')?.addEventListener('click', viewPDF);
   document.getElementById('downloadIntentionsBtn')?.addEventListener('click', downloadPDF);
 
-  // ==========================================
-  // PORTRAIT SLIDES
-  // ==========================================
   const slides = [
     { img: "images/jesus.jpg", title: "Jesus Christ", desc: "The Prince Of Heaven", fullDescription: "Jesus Christ, the Son of God, came to earth to save humanity from sin. His life, death, and resurrection are the foundation of our faith.", scripture: "John 3:16 - 'For God so loved the world...'", date: "Throughout the Year" },
     { img: "images/mary.jpg", title: "Mary, Mother of God", desc: "Queen Of Angels", fullDescription: "The Blessed Virgin Mary, Mother of Jesus, is honored as the Mother of God. Her 'yes' to God's plan brought salvation into the world.", scripture: "Luke 1:28 - 'Hail, full of grace...'", date: "Feast Days: January 1, August 15, December 8" },
@@ -1385,7 +1397,6 @@
     portraitContainer.addEventListener('mouseleave', () => startTimer());
   }
 
-  // Door unveil
   const glassDoor = document.getElementById('glassDoor'), mainContent = document.getElementById('mainContent');
   const doorHandleLeft = document.getElementById('doorHandleLeft'), doorHandleRight = document.getElementById('doorHandleRight');
   function unveilDesign() { glassDoor.classList.add('unveiled'); setTimeout(() => mainContent.classList.add('visible'), 500); }
@@ -1394,10 +1405,6 @@
   glassDoor?.addEventListener('click', (e) => { if (e.target === glassDoor || e.target.classList.contains('door-left') || e.target.classList.contains('door-right')) unveilDesign(); });
 
   document.getElementById('newsBannerClick')?.addEventListener('click', () => window.location.href = 'news.html');
-
-  // ============================================
-  // 🎯 WEEKLY CHALLENGE SYSTEM
-  // ============================================
 
   let currentChallenge = null;
 
@@ -1464,11 +1471,7 @@
     caption += `🏆 Prize: ${challenge.prize_cash || '₦10,000'}\n\n`;
     caption += `👉 Join us at Pontifical Mission Society\n\n`;
 
-    return {
-      caption,
-      hashtags: allTags.join(' '),
-      fullText: caption + allTags.join(' ')
-    };
+    return { caption, hashtags: allTags.join(' '), fullText: caption + allTags.join(' ') };
   }
 
   async function loadCurrentChallenge() {
@@ -1679,26 +1682,18 @@
 
     if (!name || !email || !platform || !url) {
       Swal.fire({
-        icon: 'warning',
-        title: 'Missing Fields',
+        icon: 'warning', title: 'Missing Fields',
         text: 'Please fill in all required fields',
-        background: 'rgba(20,40,48,0.98)',
-        color: '#f0f3f8',
-        confirmButtonColor: '#FFD966'
+        background: 'rgba(20,40,48,0.98)', color: '#f0f3f8', confirmButtonColor: '#FFD966'
       });
       return;
     }
 
-    try {
-      new URL(url);
-    } catch {
+    try { new URL(url); } catch {
       Swal.fire({
-        icon: 'error',
-        title: 'Invalid URL',
+        icon: 'error', title: 'Invalid URL',
         text: 'Please enter a valid social media post URL',
-        background: 'rgba(20,40,48,0.98)',
-        color: '#f0f3f8',
-        confirmButtonColor: '#FFD966'
+        background: 'rgba(20,40,48,0.98)', color: '#f0f3f8', confirmButtonColor: '#FFD966'
       });
       return;
     }
@@ -1732,7 +1727,7 @@
       let shareUrl = '';
       const platformKey = (platform || '').toLowerCase().replace(/\s.*$/, '');
 
-      if (platformKey === 'instagram' || platformKey === 'tiktok') {
+      if (platformKey === 'instagram' || platformKey === 'tiktok' || platformKey === 'youtube') {
         shareUrl = '';
       } else if (platformKey === 'facebook') {
         shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${pageUrl}&quote=${encodedCaption}`;
@@ -1742,8 +1737,6 @@
         shareUrl = `https://wa.me/?text=${encodedCaption}%0A%0A${pageUrl}`;
       } else if (platformKey === 'linkedin') {
         shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${pageUrl}`;
-      } else if (platformKey === 'youtube') {
-        shareUrl = '';
       }
 
       const result = await Swal.fire({
@@ -1822,7 +1815,7 @@
   loadWinners();
 
   // ============================================
-  // 🎫 SUPPORT TICKET SYSTEM  (NEW)
+  // 🎫 SUPPORT TICKET SYSTEM
   // ============================================
   const supportBtn = document.getElementById('supportBtn');
   if (supportBtn) {
@@ -1938,10 +1931,7 @@
     });
   }
 
-  console.log('%c✨ Weekly Challenge System Loaded ✨', 'color: #FFD966; font-size: 16px');
-  console.log('%c🏆 Only ONE winner per challenge (enforced by database constraint)', 'color: #FFB347; font-size: 12px');
-  console.log('%c📸 Auto-generates social captions + hashtags for every platform', 'color: #FFB347; font-size: 12px');
-  console.log('%c🎫 Support Ticket System Active', 'color: #FFD966; font-size: 12px');
+  console.log('%c✨ All systems loaded ✨', 'color: #FFD966; font-size: 16px');
 </script>
 
 <style>
