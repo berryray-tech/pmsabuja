@@ -5,25 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
   <title>News & Events | Pontifical Mission Society</title>
 
-  <!-- Bootstrap 5 CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <!-- AOS CSS -->
   <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
-  <!-- Font Awesome 6 -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
-  <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-  <!-- SweetAlert2 -->
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <!-- Supabase Client -->
   <script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
       font-family: 'Poppins', sans-serif;
@@ -34,9 +24,7 @@
       position: relative;
     }
 
-    /* ============================================
-       ✨ PROFESSIONAL LOGO BACKGROUND LAYERS
-       ============================================ */
+    /* Logo background layers */
     .logo-bg-layer {
       position: fixed;
       inset: 0;
@@ -61,7 +49,6 @@
         linear-gradient(180deg, rgba(11,26,34,0.55) 0%, rgba(11,26,34,0.15) 50%, rgba(11,26,34,0.55) 100%);
     }
 
-    /* Large floating logo watermark behind the page header */
     .hero-logo-watermark {
       position: absolute;
       top: 55%;
@@ -86,7 +73,6 @@
       50% { transform: translate(-50%, -50%) scale(1.05) rotate(3deg); }
     }
 
-    /* Ambient background glow blobs — enhances glass effect */
     body::before {
       content: '';
       position: fixed;
@@ -127,7 +113,7 @@
                   inset 0 1px 0 rgba(255,255,255,0.06);
       border-bottom: 1px solid rgba(255,217,102,0.18);
       padding: 12px 0;
-      z-index: 1000;
+      z-index: 1050;
     }
     .navbar-brand {
       font-weight: 700;
@@ -158,8 +144,19 @@
       border-color: #FFD966;
       box-shadow: 0 0 20px rgba(255,217,102,0.55);
     }
-    @media (max-width: 991px) {
-      .navbar-logo-img { height: 38px; width: 38px; }
+
+    /* ✅ FIXED MOBILE TOGGLER */
+    .navbar-toggler {
+      border-color: rgba(255,215,150,0.6);
+      background: rgba(255,217,102,0.08);
+      padding: 6px 10px;
+    }
+    .navbar-toggler:focus {
+      box-shadow: 0 0 0 3px rgba(255,217,102,0.25);
+      outline: none;
+    }
+    .navbar-toggler-icon {
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(255,217,102,1)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important;
     }
 
     .nav-link {
@@ -169,6 +166,30 @@
       transition: 0.3s;
     }
     .nav-link:hover, .nav-link.active { color: #FFD966 !important; transform: translateY(-2px); }
+
+    @media (max-width: 991px) {
+      .navbar-logo-img { height: 38px; width: 38px; }
+      .navbar-brand { font-size: 1.3rem; }
+      .navbar-collapse {
+        background: rgba(10, 25, 30, 0.98);
+        backdrop-filter: blur(20px);
+        border-radius: 1rem;
+        padding: 1rem;
+        margin-top: 1rem;
+        border: 1px solid rgba(255,217,102,0.3);
+        box-shadow: 0 15px 40px rgba(0,0,0,0.5);
+      }
+      .nav-link {
+        padding: 0.8rem 1rem;
+        text-align: center;
+        border-radius: 0.5rem;
+        margin: 3px 0;
+      }
+      .nav-link:hover, .nav-link.active {
+        background: rgba(255,217,102,0.12);
+        transform: none;
+      }
+    }
 
     /* Page Header */
     .page-header {
@@ -555,12 +576,102 @@
       100% { background-position: 200% 0; }
     }
 
+    /* ============================================
+       ✅ SUPPORT BUTTON + TICKET MODAL
+       ============================================ */
+    .support-btn {
+      position: fixed;
+      bottom: 30px;
+      left: 30px;
+      height: 55px;
+      background: linear-gradient(135deg, #FFD966, #FFB347);
+      border-radius: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 999;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.35),
+                  0 0 25px rgba(255,217,102,0.3),
+                  inset 0 1px 0 rgba(255,255,255,0.4);
+      padding: 0 22px;
+      transition: all 0.3s;
+      animation: supportPulse 2.5s ease-in-out infinite;
+      gap: 8px;
+      border: none;
+    }
+    @keyframes supportPulse {
+      0%, 100% { box-shadow: 0 8px 25px rgba(0,0,0,0.35), 0 0 25px rgba(255,217,102,0.3), inset 0 1px 0 rgba(255,255,255,0.4); }
+      50% { box-shadow: 0 8px 25px rgba(0,0,0,0.35), 0 0 40px rgba(255,217,102,0.55), inset 0 1px 0 rgba(255,255,255,0.4); }
+    }
+    .support-btn:hover { transform: scale(1.08) translateY(-3px); }
+    .support-btn i { font-size: 1.3rem; color: #1e2f38; }
+    .support-btn span { font-size: 0.85rem; font-weight: 700; color: #1e2f38; letter-spacing: 0.3px; }
+
+    .ticket-modal-content {
+      background: rgba(20, 40, 48, 0.98);
+      backdrop-filter: blur(28px);
+      border: 1px solid #FFD966;
+      border-radius: 1.5rem;
+      color: white;
+    }
+    .ticket-modal-content .modal-header { border-bottom: 1px solid rgba(255,217,102,0.3); }
+    .ticket-modal-content .form-label {
+      color: #FFD966;
+      font-weight: 500;
+      font-size: 0.85rem;
+      margin-bottom: 4px;
+    }
+    .ticket-modal-content .form-control,
+    .ticket-modal-content .form-select {
+      background: rgba(255,255,255,0.08);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255,230,170,0.3);
+      color: white;
+      padding: 0.7rem 1rem;
+      border-radius: 0.8rem;
+      transition: 0.3s;
+    }
+    .ticket-modal-content .form-control:focus,
+    .ticket-modal-content .form-select:focus {
+      background: rgba(255,255,255,0.15);
+      border-color: #FFD966;
+      box-shadow: 0 0 0 3px rgba(255,217,102,0.2);
+      color: white;
+    }
+    .ticket-modal-content .form-control::placeholder { color: rgba(255,255,255,0.5); }
+    .ticket-modal-content .form-select option { background: #1e2f38; color: white; }
+    .btn-submit-ticket {
+      background: linear-gradient(135deg, #FFD966, #FFB347);
+      border: none;
+      padding: 0.85rem 2rem;
+      border-radius: 2rem;
+      color: #1e2f38;
+      font-weight: 700;
+      width: 100%;
+      transition: 0.3s;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.4);
+    }
+    .btn-submit-ticket:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(255,217,102,0.45),
+                  inset 0 1px 0 rgba(255,255,255,0.4);
+    }
+
     @media (max-width: 768px) {
       .glass-header h1 { font-size: 2rem; }
       .glass-header { padding: 1.5rem 1.8rem; }
       .filter-chip { padding: 0.5rem 1.2rem; font-size: 0.8rem; }
       .logo-bg-layer { background-size: 200px 200px; }
       .hero-logo-watermark { width: 380px; height: 380px; }
+      .support-btn {
+        bottom: 20px;
+        left: 20px;
+        height: 48px;
+        padding: 0 16px;
+      }
+      .support-btn span { font-size: 0.75rem; }
+      .support-btn i { font-size: 1.1rem; }
     }
   </style>
 </head>
@@ -583,7 +694,7 @@
       <i class="fas fa-church logo-icon" style="display: none;"></i>
       <span>Pontifical Mission Society</span>
     </a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="mainNav">
@@ -602,9 +713,7 @@
 
 <!-- PAGE HEADER -->
 <div class="page-header">
-  <!-- ✨ FLOATING LOGO WATERMARK -->
   <div class="hero-logo-watermark"></div>
-
   <div class="container">
     <div class="glass-header" data-aos="fade-up">
       <h1><i class="fas fa-newspaper me-2"></i>News & Events</h1>
@@ -753,6 +862,80 @@
   </div>
 </div>
 
+<!-- ============================================ -->
+<!-- 🎫 FLOATING SUPPORT BUTTON -->
+<!-- ============================================ -->
+<button class="support-btn" id="supportBtn" title="Raise a Support Ticket">
+  <i class="fas fa-headset"></i>
+  <span>Support</span>
+</button>
+
+<!-- ============================================ -->
+<!-- 🎫 SUPPORT TICKET MODAL -->
+<!-- ============================================ -->
+<div class="modal fade" id="supportModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content ticket-modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" style="color:#FFD966;">
+          <i class="fas fa-ticket-alt me-2"></i>Raise a Support Ticket
+        </h4>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <p style="opacity:0.85; font-size:0.9rem; margin-bottom:1.2rem;">
+          <i class="fas fa-info-circle text-warning me-1"></i>
+          Fill in the form below and our team will get back to you shortly. All tickets are logged and tracked.
+        </p>
+
+        <form id="ticketForm">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label"><i class="fas fa-user me-1"></i>Full Name *</label>
+              <input type="text" class="form-control" id="ticketName" required placeholder="Enter your full name">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label"><i class="fas fa-envelope me-1"></i>Email *</label>
+              <input type="email" class="form-control" id="ticketEmail" required placeholder="your@email.com">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label"><i class="fas fa-phone me-1"></i>Phone / WhatsApp</label>
+              <input type="tel" class="form-control" id="ticketPhone" placeholder="+234 XXX XXX XXXX">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label"><i class="fas fa-tag me-1"></i>Category *</label>
+              <select class="form-select" id="ticketCategory" required>
+                <option value="" disabled selected>Select category</option>
+                <option value="General Inquiry">General Inquiry</option>
+                <option value="Technical Issue">Technical Issue</option>
+                <option value="Prayer Request">Prayer Request</option>
+                <option value="News Inquiry">News Inquiry</option>
+                <option value="Event Information">Event Information</option>
+                <option value="Donation / Support">Donation / Support</option>
+                <option value="Complaint">Complaint</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            <div class="col-12">
+              <label class="form-label"><i class="fas fa-heading me-1"></i>Subject *</label>
+              <input type="text" class="form-control" id="ticketSubject" required placeholder="Brief summary of your issue">
+            </div>
+            <div class="col-12">
+              <label class="form-label"><i class="fas fa-comment-dots me-1"></i>Description *</label>
+              <textarea class="form-control" id="ticketMessage" rows="5" required placeholder="Describe your issue or request in detail..."></textarea>
+            </div>
+            <div class="col-12">
+              <button type="submit" class="btn-submit-ticket" id="submitTicketBtn">
+                <i class="fas fa-paper-plane me-2"></i>Submit Ticket
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
 <footer>
   <p><i class="fas fa-cross me-1"></i> © 2026 Pontifical Mission Society · Spreading the Gospel Worldwide</p>
   <p>Designed with <i class="fas fa-heart" style="color:#FFD966;"></i> by BerryRay Technologies</p>
@@ -764,9 +947,10 @@
   document.addEventListener('DOMContentLoaded', function() {
     AOS.init({ once: true, offset: 60, duration: 700 });
 
-    // ============================================
-    // SUPABASE CONFIGURATION
-    // ============================================
+    // ==========================================
+    // 🔧 SUPPORT / TICKET CONFIGURATION
+    // ==========================================
+    const WHATSAPP_NUMBER = '2348091234567';  // ← CHANGE to your WhatsApp number
     const SUPABASE_URL = 'https://ekhzbclqpelsrfefufpv.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVraHpiY2xxcGVsc3JmZWZ1ZnB2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY4NjQ2MjUsImV4cCI6MjA5MjQ0MDYyNX0.7dJiDcV4q8Ss_4Ua19-L-VFSxThJKNLyBv__bfdx02M';
 
@@ -1058,9 +1242,138 @@
 
     document.getElementById('saveNewsBtn')?.addEventListener('click', saveNews);
 
+    // ============================================
+    // 🎫 SUPPORT TICKET SYSTEM
+    // ============================================
+    document.getElementById('supportBtn').addEventListener('click', () => {
+      const modal = new bootstrap.Modal(document.getElementById('supportModal'));
+      modal.show();
+    });
+
+    document.getElementById('ticketForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+
+      const name = document.getElementById('ticketName').value.trim();
+      const email = document.getElementById('ticketEmail').value.trim();
+      const phone = document.getElementById('ticketPhone').value.trim() || 'Not provided';
+      const category = document.getElementById('ticketCategory').value;
+      const subject = document.getElementById('ticketSubject').value.trim();
+      const message = document.getElementById('ticketMessage').value.trim();
+
+      if (!name || !email || !category || !subject || !message) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Missing Fields',
+          text: 'Please fill in all required fields (*)',
+          background: 'rgba(20,40,48,0.98)',
+          color: '#f0f3f8',
+          confirmButtonColor: '#FFD966'
+        });
+        return;
+      }
+
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Invalid Email',
+          text: 'Please enter a valid email address',
+          background: 'rgba(20,40,48,0.98)',
+          color: '#f0f3f8',
+          confirmButtonColor: '#FFD966'
+        });
+        return;
+      }
+
+      const submitBtn = document.getElementById('submitTicketBtn');
+      const originalBtn = submitBtn.innerHTML;
+      submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Submitting...';
+      submitBtn.disabled = true;
+
+      try {
+        const ticketData = {
+          name: name,
+          email: email,
+          phone: phone,
+          category: category,
+          subject: subject,
+          message: message,
+          status: 'open'
+        };
+
+        const { data, error } = await supabaseClient
+          .from('support_tickets')
+          .insert([ticketData])
+          .select();
+
+        if (error) {
+          console.error('Supabase ticket insert error:', error);
+          throw new Error('Failed to save ticket: ' + error.message);
+        }
+
+        console.log('✅ Ticket saved to Supabase:', data);
+
+        const waMessage = 
+          `🎫 *NEW SUPPORT TICKET*\n\n` +
+          `👤 *Name:* ${name}\n` +
+          `📧 *Email:* ${email}\n` +
+          `📱 *Phone:* ${phone}\n` +
+          `📂 *Category:* ${category}\n` +
+          `📌 *Subject:* ${subject}\n\n` +
+          `💬 *Message:*\n${message}\n\n` +
+          `🆔 Ticket ID: #${data && data[0] ? data[0].id : 'N/A'}\n` +
+          `⏰ Submitted: ${new Date().toLocaleString()}`;
+
+        const waUrl = `https://wa.me/${2349058515139}?text=${encodeURIComponent(waMessage)}`;
+
+        const result = await Swal.fire({
+          icon: 'success',
+          title: 'Ticket Submitted! 🎉',
+          html: `
+            <p>Thank you, <strong>${escapeHtml(name)}</strong>!</p>
+            <p style="font-size:0.9rem; opacity:0.85; margin-top:0.5rem;">
+              Your ticket has been logged and our team will get back to you shortly.
+            </p>
+            <p style="font-size:0.8rem; opacity:0.7; margin-top:0.8rem;">
+              <i class="fas fa-ticket-alt" style="color:#FFD966;"></i>
+              Ticket ID: <strong>#${data && data[0] ? data[0].id : 'N/A'}</strong>
+            </p>
+          `,
+          background: 'rgba(20,40,48,0.98)',
+          color: '#f0f3f8',
+          confirmButtonColor: '#FFD966',
+          confirmButtonText: '<i class="fab fa-whatsapp"></i> Notify on WhatsApp',
+          showCancelButton: true,
+          cancelButtonText: 'Close',
+          cancelButtonColor: '#6c757d'
+        });
+
+        if (result.isConfirmed) {
+          window.open(waUrl, '_blank');
+        }
+
+        this.reset();
+        bootstrap.Modal.getInstance(document.getElementById('supportModal')).hide();
+
+      } catch (err) {
+        console.error('❌ Ticket submission error:', err);
+        Swal.fire({
+          icon: 'error',
+          title: 'Submission Failed',
+          text: 'Something went wrong. Please try again or contact us via WhatsApp.',
+          background: 'rgba(20,40,48,0.98)',
+          color: '#f0f3f8',
+          confirmButtonColor: '#FFD966'
+        });
+      } finally {
+        submitBtn.innerHTML = originalBtn;
+        submitBtn.disabled = false;
+      }
+    });
+
     loadNews('all');
 
-    console.log('%c✨ News Page Loaded | Logo Background Applied ✨', 'color: #FFD966; font-size: 16px');
+    console.log('%c✨ News Page Loaded | Support Tickets enabled ✨', 'color: #FFD966; font-size: 16px');
+    console.log('%c🎫 WhatsApp notifications → ' + WHATSAPP_NUMBER, 'color: #25D366; font-size: 12px');
     console.log('%c📸 Admin Login: admin / admin123', 'color: #FFB347; font-size: 12px');
   });
 </script>
