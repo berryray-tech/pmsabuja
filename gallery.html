@@ -468,7 +468,13 @@
 <!-- GALLERY GRID -->
 <section class="gallery-section">
   <div class="container">
-    <div class="gallery-grid" id="galleryGrid"></div>
+    <div class="gallery-grid" id="galleryGrid">
+      <!-- Loading Spinner (Will be replaced by JS) -->
+      <div style="grid-column: 1 / -1; text-align: center; padding: 50px;">
+        <div class="spinner-border text-warning" role="status" style="width: 3rem; height: 3rem;"></div>
+        <p class="mt-3">Loading Gallery from Database...</p>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -558,163 +564,42 @@
 
   const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+  // Array to hold data fetched from Supabase
+  let galleryData = [];
+
   // ============================================
-  // ORIGINAL 12 GALLERY ITEMS
+  // 📥 FETCH GALLERY FROM SUPABASE
   // ============================================
-  const baseGalleryData = [
-    { id: 1, imageUrl: "https://images.pexels.com/photos/267950/pexels-photo-267950.jpeg?w=800&h=500&fit=crop", title: "YOMM National Congress 2025", organizer: "YOMM Nigeria", date: "December 10-15, 2025" },
-    { id: 2, imageUrl: "https://images.pexels.com/photos/267951/pexels-photo-267951.jpeg?w=800&h=500&fit=crop", title: "Missionary Formation Workshop", organizer: "Pontifical Mission Society", date: "October 5-7, 2025" },
-    { id: 3, imageUrl: "https://images.pexels.com/photos/267952/pexels-photo-267952.jpeg?w=800&h=500&fit=crop", title: "Youth Evangelization Outreach", organizer: "YOMM Abuja Province", date: "August 20, 2025" },
-    { id: 4, imageUrl: "https://images.pexels.com/photos/267953/pexels-photo-267953.jpeg?w=800&h=500&fit=crop", title: "Leadership Training Camp", organizer: "Catholic Youth Organization", date: "June 15-18, 2025" },
-    { id: 5, imageUrl: "https://images.pexels.com/photos/267954/pexels-photo-267954.jpeg?w=800&h=500&fit=crop", title: "Prayer Vigil for Missions", organizer: "Holy Childhood Association", date: "May 30, 2025" },
-    { id: 6, imageUrl: "https://images.pexels.com/photos/267955/pexels-photo-267955.jpeg?w=800&h=500&fit=crop", title: "Charity Outreach Program", organizer: "YOMM Charity Arm", date: "April 12, 2025" },
-    { id: 7, imageUrl: "https://images.pexels.com/photos/267956/pexels-photo-267956.jpeg?w=800&h=500&fit=crop", title: "Missionary Quiz Competition", organizer: "Pontifical Mission Union", date: "March 22, 2025" },
-    { id: 8, imageUrl: "https://images.pexels.com/photos/267957/pexels-photo-267957.jpeg?w=800&h=500&fit=crop", title: "Cultural Fiesta", organizer: "YOMM Cultural Committee", date: "February 14, 2025" },
-    { id: 9, imageUrl: "https://images.pexels.com/photos/267958/pexels-photo-267958.jpeg?w=800&h=500&fit=crop", title: "Retreat for Animators", organizer: "Society for Propagation of Faith", date: "January 25-27, 2025" },
-    { id: 10, imageUrl: "https://images.pexels.com/photos/267959/pexels-photo-267959.jpeg?w=800&h=500&fit=crop", title: "World Mission Sunday", organizer: "Pontifical Mission Society", date: "October 20, 2024" },
-    { id: 11, imageUrl: "https://images.pexels.com/photos/267960/pexels-photo-267960.jpeg?w=800&h=500&fit=crop", title: "Seminar on Evangelization", organizer: "Pontifical Mission Union", date: "September 8, 2024" },
-    { id: 12, imageUrl: "https://images.pexels.com/photos/267961/pexels-photo-267961.jpeg?w=800&h=500&fit=crop", title: "Youth Festival 2024", organizer: "YOMM National", date: "August 5-8, 2024" }
-  ];
+  async function fetchGalleryData() {
+    try {
+      const { data, error } = await supabaseClient
+        .from('gallery')
+        .select('*')
+        .order('created_at', { ascending: false });
 
-  function generateExtraImages(count = 100) {
-    const titles = [
-      "Annual General Meeting", "Easter Celebration", "Christmas Carol Night",
-      "Baptism Ceremony", "First Holy Communion", "Confirmation Mass",
-      "Catechist Training", "Choir Festival", "Bible Study Retreat",
-      "Rosary Procession", "Adoration Night", "Youth Camp",
-      "Community Outreach", "Food Drive", "Medical Mission",
-      "School Visit", "Orphanage Visit", "Prison Ministry",
-      "Hospital Visitation", "Elderly Care Visit", "Clean-Up Drive",
-      "Tree Planting", "Blood Donation Drive", "Awareness Campaign",
-      "Mission Sunday Celebration", "Vocation Sunday", "Palm Sunday Procession",
-      "Holy Week Retreat", "Good Friday Service", "Divine Mercy Sunday",
-      "Pentecost Celebration", "Corpus Christi Procession", "Feast of Assumption",
-      "All Saints Day Mass", "Christ the King Feast", "Immaculate Conception",
-      "New Year Thanksgiving", "Harvest Festival", "Cultural Day",
-      "Youth Rally", "Teens Encounter", "Kids Missionary Day",
-      "Family Life Seminar", "Marriage Enrichment Retreat", "Singles Forum",
-      "Men's Fellowship", "Women's Guild Meeting", "Catholic Women Organization",
-      "Knights of St. Mulumba Event", "Catholic Men Organization",
-      "Legion of Mary Meeting", "St. Vincent de Paul Outreach",
-      "Charismatic Renewal Prayer", "Youth Bible Quiz",
-      "Children's Talent Show", "Drama Ministry Performance",
-      "Dance Ministry Showcase", "Music Concert", "Gospel Fest",
-      "Anniversary Celebration", "Ordination Ceremony", "Religious Profession",
-      "Diaconate Ordination", "Seminary Visit", "Convent Visit",
-      "Catechetical Week", "Bible Week", "Mission Awareness Week",
-      "Faith Formation Class", "Youth Leadership Summit",
-      "Women's Day Celebration", "Father's Day Event",
-      "Mother's Day Celebration", "Children's Day Party",
-      "Independence Day Mass", "Democracy Day Prayer",
-      "Peace Prayer Meeting", "Interfaith Dialogue",
-      "Ecology Awareness Day", "Laudato Si' Seminar",
-      "Charity Bazaar", "Fundraising Dinner", "Cultural Fiesta",
-      "Talent Showcase Night", "Thanksgiving Service",
-      "Harvest Thanksgiving", "Bazaar Day", "Family Fun Fair",
-      "Sports Festival", "Football Tournament", "Basketball Championship",
-      "Athletics Meet", "Youth Games", "Inter-Parish Competition",
-      "Christmas Play", "Nativity Scene", "Carol Service"
-    ];
+      if (error) throw error;
 
-    const organizers = [
-      "Pontifical Mission Society", "YOMM National", "YOMM Abuja Province",
-      "Holy Childhood Association", "Pontifical Mission Union",
-      "Society for Propagation of Faith", "St. Patrick's Parish",
-      "Christ the King Parish", "Holy Trinity Parish",
-      "Catholic Youth Organization", "Catholic Women Organization",
-      "Catholic Men Organization", "Knights of St. Mulumba",
-      "Legion of Mary", "St. Vincent de Paul", "Charismatic Renewal",
-      "Archdiocesan Catechetical Commission", "Youth Ministry Council",
-      "Family Life Commission", "Liturgical Commission",
-      "St. Augustine's Parish", "St. Michael's Parish",
-      "Our Lady Queen of Nigeria", "Sacred Heart Parish",
-      "Holy Family Parish", "St. Joseph's Parish",
-      "St. Thomas More Parish", "SS. Peter & Paul Parish",
-      "St. Paul's Parish", "Our Lady of Fatima Parish"
-    ];
+      // Map database columns to the names used in your frontend
+      galleryData = data.map(item => ({
+        id: item.id,
+        imageUrl: item.image_url,
+        title: item.title || 'Untitled Event',
+        organizer: item.organizer || 'Pontifical Mission Society',
+        date: item.date || 'Date TBA'
+      }));
 
-    const dates = [
-      "January 2025", "February 2025", "March 2025", "April 2025",
-      "May 2025", "June 2025", "July 2025", "August 2025",
-      "September 2025", "October 2025", "November 2025", "December 2025",
-      "January 2024", "February 2024", "March 2024", "April 2024",
-      "May 2024", "June 2024", "July 2024", "August 2024",
-      "September 2024", "October 2024", "November 2024", "December 2024"
-    ];
+      renderGallery();
 
-    const imagePool = [
-      "https://images.unsplash.com/photo-1507692049790-de58290a4334?w=800&h=500&fit=crop",
-      "https://images.unsplash.com/photo-1438032005730-c779502df39b?w=800&h=500&fit=crop",
-      "https://images.unsplash.com/photo-1548625149-fc4a29cf7092?w=800&h=500&fit=crop",
-      "https://images.unsplash.com/photo-1497486751825-1233686d5d80?w=800&h=500&fit=crop",
-      "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=800&h=500&fit=crop",
-      "https://images.unsplash.com/photo-1541544741938-0af808871cc0?w=800&h=500&fit=crop",
-      "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&h=500&fit=crop",
-      "https://images.unsplash.com/photo-1524230572899-a752b3835840?w=800&h=500&fit=crop",
-      "https://images.unsplash.com/photo-1490730141103-6cac27aaab94?w=800&h=500&fit=crop",
-      "https://images.unsplash.com/photo-1509909756405-be0199881695?w=800&h=500&fit=crop",
-      "https://images.unsplash.com/photo-1519892300165-cb5542fb47c7?w=800&h=500&fit=crop",
-      "https://images.unsplash.com/photo-1490127252417-7c393f993ee4?w=800&h=500&fit=crop",
-      "https://images.unsplash.com/photo-1489493585363-d69421e0edd3?w=800&h=500&fit=crop",
-      "https://images.unsplash.com/photo-1504198453319-5ce911bafcde?w=800&h=500&fit=crop",
-      "https://images.unsplash.com/photo-1544427920-c49ccfb85579?w=800&h=500&fit=crop",
-      "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=800&h=500&fit=crop",
-      "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800&h=500&fit=crop",
-      "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=500&fit=crop",
-      "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=800&h=500&fit=crop",
-      "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=800&h=500&fit=crop",
-      "https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?w=800&h=500&fit=crop",
-      "https://images.unsplash.com/photo-1519681393784-d120267933ba?w=800&h=500&fit=crop",
-      "https://images.unsplash.com/photo-1465101046530-73398c7f28ca?w=800&h=500&fit=crop",
-      "https://images.unsplash.com/photo-1502716119720-b23a93e5fe1b?w=800&h=500&fit=crop",
-      "https://images.unsplash.com/photo-1499750310159-5b5f6c3b4d6a?w=800&h=500&fit=crop",
-      "https://images.unsplash.com/photo-1524758631624-e2822e304c36?w=800&h=500&fit=crop",
-      "https://images.unsplash.com/photo-1543269865-cbf427effbad?w=800&h=500&fit=crop",
-      "https://images.unsplash.com/photo-1511632765486-a01980e01a18?w=800&h=500&fit=crop",
-      "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=800&h=500&fit=crop",
-      "https://images.unsplash.com/photo-1517048676732-d65bc937f952?w=800&h=500&fit=crop",
-      "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=800&h=500&fit=crop",
-      "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=800&h=500&fit=crop",
-      "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=800&h=500&fit=crop",
-      "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=800&h=500&fit=crop",
-      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&h=500&fit=crop",
-      "https://images.unsplash.com/photo-1508186225823-0963cf9ab0de?w=800&h=500&fit=crop",
-      "https://images.unsplash.com/photo-1478147427282-58a87a120781?w=800&h=500&fit=crop",
-      "https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?w=800&h=500&fit=crop",
-      "https://images.unsplash.com/photo-1528605248644-14dd04022da1?w=800&h=500&fit=crop",
-      "https://images.unsplash.com/photo-1513151233558-d860c5398176?w=800&h=500&fit=crop",
-      "https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?w=800&h=500&fit=crop",
-      "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=800&h=500&fit=crop",
-      "https://images.unsplash.com/photo-1522512115668-c09775d6f424?w=800&h=500&fit=crop",
-      "https://images.unsplash.com/photo-1495837174058-628aafc7d610?w=800&h=500&fit=crop",
-      "https://images.unsplash.com/photo-1517457373958-b7bdd4587205?w=800&h=500&fit=crop",
-      "https://images.unsplash.com/photo-1531058020387-3be344556be6?w=800&h=500&fit=crop",
-      "https://images.unsplash.com/photo-1533228100845-08145b01de14?w=800&h=500&fit=crop",
-      "https://images.unsplash.com/photo-1516997121675-4c2d1684aa3e?w=800&h=500&fit=crop",
-      "https://images.unsplash.com/photo-1483721310020-03333e577078?w=800&h=500&fit=crop",
-      "https://images.unsplash.com/photo-1469571486292-0ba58a3f068b?w=800&h=500&fit=crop"
-    ];
-
-    const extra = [];
-    for (let i = 0; i < count; i++) {
-      const title = titles[i % titles.length];
-      const organizer = organizers[i % organizers.length];
-      const date = dates[i % dates.length];
-      const baseImg = imagePool[i % imagePool.length];
-      const imageUrl = baseImg + `&sig=${i+13}`;
-
-      extra.push({
-        id: 13 + i,
-        imageUrl,
-        title: `${title} #${i+1}`,
-        organizer,
-        date
-      });
+    } catch (error) {
+      console.error('Error fetching gallery:', error);
+      document.getElementById('galleryGrid').innerHTML = `
+        <div style="grid-column: 1 / -1; text-align: center; padding: 50px;">
+          <h4 style="color:#FF6B6B;">Failed to load gallery</h4>
+          <p style="opacity: 0.8;">Please check your database connection or try again later.</p>
+        </div>
+      `;
     }
-    return extra;
   }
-
-  const galleryData = [...baseGalleryData, ...generateExtraImages(100)];
 
   // ============================================
   // 📸 SOCIAL MEDIA CAPTION & HASHTAG GENERATOR
@@ -760,16 +645,11 @@
     return cleaned ? '#' + cleaned : '';
   }
 
-  /**
-   * Build a caption + hashtags for a specific platform
-   */
   function buildSocialPost(item, platform) {
     const tone = PLATFORM_TONES[platform] || PLATFORM_TONES.copy;
-
     const titleTag = toHashtag(item.title);
     const organizerTag = toHashtag(item.organizer);
     const dateTag = toHashtag(item.date.replace(/\s/g, ''));
-
     const platformTags = PLATFORM_HASHTAGS[platform] || [];
 
     const allTags = [...new Set([
@@ -792,9 +672,6 @@
     return { caption, hashtags: hashtagsLine, fullText, allTags };
   }
 
-  /**
-   * Plain text version for email (no emojis, uses real newlines)
-   */
   function buildPlainTextPost(item) {
     const titleTag = toHashtag(item.title);
     const organizerTag = toHashtag(item.organizer);
@@ -897,7 +774,7 @@
   }
 
   // ============================================
-  // SHARE HANDLER — with proper per-platform fixes
+  // SHARE HANDLER
   // ============================================
   function shareImage(platform, item) {
     const pageUrl = window.location.href;
@@ -905,12 +782,10 @@
     const encodedText = encodeURIComponent(post.fullText);
     const encodedUrl = encodeURIComponent(pageUrl);
     const encodedImg = encodeURIComponent(item.imageUrl);
-    const encodedTitle = encodeURIComponent(item.title);
 
     let shareUrl = '';
 
     switch (platform) {
-      // ✅ WHATSAPP — now includes the image URL inside the message so the preview renders
       case 'whatsapp': {
         const waText =
           `${post.caption}` +
@@ -920,45 +795,30 @@
         shareUrl = `https://wa.me/?text=${encodeURIComponent(waText)}`;
         break;
       }
-
-      // ✅ LINKEDIN — using shareArticle with proper title + summary + source
       case 'linkedin': {
-        // LinkedIn's shareArticle endpoint reads OG tags from the URL you share.
-        // We pass the LinkedIn share URL with proper parameters.
-        // Note: the actual preview (image + title) comes from OG meta tags on the shared URL.
-        // To ensure LinkedIn shows the image, the page being shared (this gallery) needs OG meta tags pointing to the image.
-        // For a direct post, we open LinkedIn's create-post page which lets the user paste.
         shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`;
         break;
       }
-
-      // ✅ EMAIL — plain text body with proper line breaks (%0D%0A) and image URL included
       case 'email': {
         const emailBody = buildPlainTextPost(item);
         const emailSubject = `${item.title} — Pontifical Mission Society`;
         shareUrl = `mailto:?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`;
         break;
       }
-
       case 'facebook':
         shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}&quote=${encodedText}`;
         break;
-
       case 'twitter': {
         const twitterText = `📸 ${item.title}\n📍 ${item.organizer}\n📅 ${item.date}\n\n${post.allTags.slice(0, 6).join(' ')}`;
         shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(twitterText)}&url=${encodedUrl}`;
         break;
       }
-
       case 'telegram':
         shareUrl = `https://t.me/share/url?url=${encodedUrl}&text=${encodedText}`;
         break;
-
       case 'pinterest':
         shareUrl = `https://pinterest.com/pin/create/button/?url=${encodedUrl}&media=${encodedImg}&description=${encodedText}`;
         break;
-
-      // ✅ TIKTOK — no web share URL exists. Copy caption + open TikTok upload page
       case 'tiktok': {
         navigator.clipboard.writeText(post.fullText).then(() => {
           Swal.fire({
@@ -992,7 +852,6 @@
         });
         return;
       }
-
       case 'copy':
         navigator.clipboard.writeText(`${post.fullText}\n\n${pageUrl}`).then(() => {
           Swal.fire({
@@ -1115,6 +974,18 @@ ${escapeHtml(whatsappPost.caption)}<span class="hashtags">${escapeHtml(whatsappP
     const grid = document.getElementById('galleryGrid');
     if (!grid) return;
 
+    // If no images found in database
+    if (galleryData.length === 0) {
+      grid.innerHTML = `
+        <div style="grid-column: 1 / -1; text-align: center; padding: 50px;">
+          <div style="font-size: 3rem; margin-bottom: 1rem;">🖼️</div>
+          <h4 style="color:#FFD966;">No images in gallery yet</h4>
+          <p style="opacity: 0.8;">Add images through your Supabase Dashboard to see them here!</p>
+        </div>
+      `;
+      return;
+    }
+
     grid.innerHTML = '';
 
     galleryData.forEach((item, index) => {
@@ -1216,9 +1087,10 @@ ${escapeHtml(whatsappPost.caption)}<span class="hashtags">${escapeHtml(whatsappP
         }
       });
     });
-  }
 
-  renderGallery();
+    // Re-initialize AOS animations for newly added items
+    AOS.refresh();
+  }
 
   // ============================================
   // SUPPORT TICKET SYSTEM
@@ -1348,7 +1220,10 @@ ${escapeHtml(whatsappPost.caption)}<span class="hashtags">${escapeHtml(whatsappP
     }
   });
 
-  console.log('%c✨ Gallery Loaded | Social Captions + TikTok enabled ✨', 'color: #FFD966; font-size: 16px');
+  // Fetch data on load
+  fetchGalleryData();
+
+  console.log('%c✨ Gallery Loaded from Database | Social Captions + TikTok enabled ✨', 'color: #FFD966; font-size: 16px');
 </script>
 
 <style>
